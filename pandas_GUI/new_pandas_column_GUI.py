@@ -3,7 +3,7 @@ def new_pandas_column_GUI(dfs_info, show_text_col = False):
 
     :param show_text_col: bool (default = False). When True columns containing
     text will be shown.
-    :param dfs_info: List of List of strings [[globalname, userfriendly]
+    :param dfs_info: List of Lists of strings [[globalname, userfriendly]
     ],..]
         :globalname: string name of the object in the user global name space.
         :userfriendly: string name to display for user selection.
@@ -19,7 +19,6 @@ def new_pandas_column_GUI(dfs_info, show_text_col = False):
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell
     # will be set to true if needed for operations used that require numpy.
-    dfs_info = dfs_info
     friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
 
     #### Define GUI Elements ####
