@@ -50,7 +50,8 @@ available in your command shell. More discussion:
     
 _Development_
 
-Simply replace `$ pip install jupyter_new_Pandas_column_GUI` with `$ pip install -e jupyter_new_Pandas_column_GUI` in the _Production_
+Simply replace `$ pip install jupyter_new_Pandas_column_GUI` with `$ pip 
+install -e ../jupyter_new_Pandas_column_GUI` in the _Production_
 instructions.
 
 **Issues or comments**
