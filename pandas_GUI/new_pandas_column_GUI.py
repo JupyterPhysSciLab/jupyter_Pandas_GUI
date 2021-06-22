@@ -38,7 +38,8 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     #### Define GUI Elements ####
 
-    # DataFrame Choice
+    # DataFrame Choice (Step 1)
+    step1instr = Label(value = 'Select the DataFrame to work with.')
     tempopts = []
     tempopts.append('Choose')
     for k in dfs_info:
@@ -59,11 +60,12 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
                     tempopt.append(k)
         whichcolumn.options = tempopt
         pass
-
     whichframe.observe(update_columns, names='value')
-    # Step 1
+    step1 = VBox([step1instr, whichframe])
+
+    # Step 2
     newname = Text(placeholder='Type name for new column.')
-    step1instr = Label(
+    step2instr = Label(
         value='Pick a name for the new column. The expression will be ' \
               'built in the cell below. Click the "Insert" button when ' \
               'you are satisfied with the name.')
@@ -77,9 +79,9 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     insertname.on_click(do_insertname)
 
-    step1 = VBox([step1instr, HBox([newname,
+    step2 = VBox([step2instr, HBox([newname,
                                            insertname])])
-    # Step 2
+    # Step 3
     whichcolumn = Dropdown(options=['Choose column to insert.'],
                            description='Column: ',
                            )
@@ -95,7 +97,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         pass
 
     whichcolumn.observe(column_insert, names='value')
-    step2instr = Label(
+    step3instr = Label(
         value='Choose columns and operations from the menus to insert ' \
               'into your expression. Your choices will replace selected ' \
               'text or insert at the current cursor position.')
@@ -125,19 +127,19 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     whichop.observe(op_insert, names='value')
 
-    step2drops = HBox([whichcolumn, whichop])
-    step2 = VBox([step2instr, step2drops])
-    # Step 3
-    step3instr1 = Label(
+    step3drops = HBox([whichcolumn, whichop])
+    step3 = VBox([step3instr, step3drops])
+    # Step 4
+    step4instr1 = Label(
         value='Carefully check the expression for typos before selecting' \
               ' "Do it!".')
-    step3instr2 = Label(
+    step4instr2 = Label(
         value=' * Parentheses, brackets or braces highlighted in red ' \
               'are missing their partner.')
-    step3instr3 = Label(
+    step4instr3 = Label(
         value=' * Check that all double and single quotes are also ' \
               'properly paired.')
-    step3instr4 = Label(
+    step4instr4 = Label(
         value=' * Check that all function calls are prefaced by ' \
               'an \'np.\'.')
     show_updated_df_box = Checkbox(description='Display updated '
@@ -155,6 +157,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         # if show updated dataframe is checked append dataframe name as last line.
         if show_updated_df_box.value == True:
             text = friendly_to_globalname[whichframe.value]
+            text += ' # DataFrame name on last line of cell displays summary.'
             insert_newline_at_end_of_current_cell(text)
         # run composed operation
         display(JS('Jupyter.notebook.get_selected_cell().execute()'))
@@ -162,20 +165,21 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         pass
 
     gen_col_but.on_click(run_new_col_decl)
-    step3instr = VBox([step3instr1, step3instr2, step3instr3,
-                        step3instr4])
-    step3act = VBox([show_updated_df_box, gen_col_but])
-    step3 = HBox([step3instr, step3act])
+    step4instr = VBox([step4instr1, step4instr2, step4instr3,
+                        step4instr4])
+    step4act = VBox([show_updated_df_box, gen_col_but])
+    step4 = HBox([step4instr, step4act])
 
-    steps = Tab([step1, step2, step3])
+    steps = Tab([step1, step2, step3, step4])
     steps.set_title(0, 'Step 1')
     steps.set_title(1, 'Step 2')
     steps.set_title(2, 'Step 3')
+    steps.set_title(3, 'Step 4')
 
     display(HTML(
         "<h3 style='text-align:center;'>Pandas New Calculated Column Composer</h3>"))
-    pdComposer = VBox([whichframe, steps])
-    display(pdComposer)
+    #pdComposer = VBox([whichframe, steps])
+    display(steps)
     new_cell_immediately_below()
     pass
 
