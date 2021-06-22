@@ -1,89 +1,26 @@
-def new_pandas_column_GUI(dfs_info):
+def new_pandas_column_GUI(dfs_info, show_text_col = False):
     """
 
-    :param dfs_info: List of List of strings [[globalname,userfriendly,
-    object]
+    :param show_text_col: bool (default = False). When True columns containing
+    text will be shown.
+    :param dfs_info: List of List of strings [[globalname, userfriendly]
     ],..]
-        :globalname: string name of the object in the global name space.
+        :globalname: string name of the object in the user global name space.
         :userfriendly: string name to display for user selection.
     :return:
     """
-######
-# Jupyter JS call utilities
-######
-    def new_cell_immediately_below():
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(
-            JS('Jupyter.notebook.focus_cell();' \
-                'Jupyter.notebook.insert_cell_above();'))
-        pass
-
-
-    def select_cell_immediately_below():
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(JS('Jupyter.notebook.select_next(true);'))
-
-
-    def move_cursor_in_current_cell(delta):
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(
-            JS('var curPos = Jupyter.notebook.get_selected_cell().code_' \
-               'mirror.doc.getCursor();' \
-               'var curline = curPos.line; var curch = curPos.ch +' + str(
-                delta) + ';' \
-                         'Jupyter.notebook.get_selected_cell().code_mirror.' \
-                         'doc.setCursor({line:curline,ch:curch});'))
-        pass
-
-
-    def insert_text_into_next_cell(text):
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(JS('Jupyter.notebook.select_next(true);' \
-                   'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
-                   'replaceSelection("' + text + '");'))
-        pass
-
-
-    def insert_text_at_beginning_of_current_cell(text):
-        # append \n to line insert as a separate line.
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(
-            JS('Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
-               'setCursor({line:0,ch:0});' \
-               'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
-               'replaceSelection("' + text + '");'))
-        pass
-
-    def insert_newline_at_end_of_current_cell(text):
-        from IPython.display import display, HTML
-        from IPython.display import Javascript as JS
-        display(
-            JS('var lastline = Jupyter.notebook.get_selected_cell().' \
-               'code_mirror.doc.lineCount();' \
-               'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
-               'setCursor(lastline,0);' \
-               'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
-               'replaceSelection("\\n' + text + '");'))
-        pass
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Dropdown, Label, Text, Button, Checkbox
     from IPython.display import display, HTML
-    from IPython.display import Javascript as JS
+    from IPython import get_ipython
+    from .utils import new_cell_immediately_below,\
+        select_cell_immediately_below, move_cursor_in_current_cell, \
+        insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
+        insert_newline_at_end_of_current_cell
     # will be set to true if needed for operations used that require numpy.
-    global need_numpy
-    need_numpy = False
     dfs_info = dfs_info
-    global friendly_to_globalname
     friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
-    global_to_friendlyname = {k[0]:k[1] for k in dfs_info}
-    global friendly_to_object
-    friendly_to_object = {k[1]:k[2] for k in dfs_info}
 
     #### Define GUI Elements ####
 
@@ -96,13 +33,16 @@ def new_pandas_column_GUI(dfs_info):
                                 description='DataFrame: ',)
 
     def update_columns(change):
-        from new_pandas_column_GUI import utils
-        global friendly_to_object
-        tempcols = friendly_to_object[change['new']].columns.values
-        # tempcols = utils.get_ipython_globals()[change['new']].columns.values
+        dfname = friendly_to_globalname[change['new']]
+        user_ns = get_ipython().user_ns
+        tempcols = user_ns[dfname].columns.values
         tempopt = ['Choose column to insert.']
         for k in tempcols:
-            tempopt.append(k)
+            if show_text_col:
+                tempopt.append(k)
+            else:
+                if user_ns[dfname][k].dtype != 'O':
+                    tempopt.append(k)
         whichcolumn.options = tempopt
         pass
 
@@ -116,7 +56,6 @@ def new_pandas_column_GUI(dfs_info):
     insertname = Button(description="Insert")
 
     def do_insertname(change):
-        global friendly_to_globalname
         framename = friendly_to_globalname[whichframe.value]
         text = framename + '[\'' + newname.value + '\'] = '
         insert_text_into_next_cell(text)
@@ -135,7 +74,6 @@ def new_pandas_column_GUI(dfs_info):
         col = change['new']
         if col == 'Choose column to insert.':
             return
-        global friendly_to_globalname
         framename = friendly_to_globalname[whichframe.value]
         text = framename + '[\'' + col + '\']'
         insert_text_into_next_cell(text)
@@ -153,7 +91,7 @@ def new_pandas_column_GUI(dfs_info):
     whichop = Dropdown(options=oplst,
                        description='Operation: ')
     def op_insert(change):
-        global need_numpy
+        need_numpy = False
         np_list = ['exp()', 'log()', 'ln()', 'sqrt()', 'sin()', 'cos()',
                    'tan()', 'cot()', 'asin()', 'acos()', 'atan()',
                    'acot()']
@@ -192,6 +130,7 @@ def new_pandas_column_GUI(dfs_info):
                                                  'dataset.',
                                    value=True)
     gen_col_but = Button(description='Do it!')
+
     def run_new_col_decl(change):
         from IPython.display import display, HTML
         from IPython.display import Javascript as JS
@@ -201,7 +140,6 @@ def new_pandas_column_GUI(dfs_info):
         insert_text_at_beginning_of_current_cell(text)
         # if show updated dataframe is checked append dataframe name as last line.
         if show_updated_df_box.value == True:
-            global friendly_to_globalname
             text = friendly_to_globalname[whichframe.value]
             insert_newline_at_end_of_current_cell(text)
         # run composed operation
@@ -227,3 +165,24 @@ def new_pandas_column_GUI(dfs_info):
     new_cell_immediately_below()
     pass
 
+
+def tstGUI():
+    from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
+        Dropdown, Label, Text, Button, Checkbox
+    from IPython.display import display, HTML
+    from IPython import get_ipython
+    from pandas import DataFrame as df
+    def tstobs(change):
+        global_dict = get_ipython().user_ns
+        print(global_dict[change['new']].columns)
+        pass
+
+    global_dict = get_ipython().user_ns
+    dataframes = []
+    for k in global_dict:
+        if not (str.startswith(k, '_')) and isinstance(global_dict[k], df):
+            dataframes.append(k)
+    tstdrp = Dropdown(options = dataframes)
+    tstdrp.observe(tstobs,names='value')
+    display(tstdrp)
+    pass

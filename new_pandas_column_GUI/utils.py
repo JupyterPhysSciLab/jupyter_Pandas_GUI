@@ -1,43 +1,67 @@
-def get_ipython_globals():
-    """
-    This operation returns the dictionary of global objects in the
-    interactive namespace.
-    :return: dict that is equivalent to an interactive call to Globals().
-    """
-    import inspect
-    is_not_ipython_global = True
-    frame = inspect.currentframe()
-    global_dict = frame.f_globals
-    try:
-        namestr = global_dict['__name__']
-        docstr = global_dict['__doc__']
-        # print(global_dict['__name__'])
-        # print(docstr)
-    except KeyError:
-        namestr = ''
-    if (namestr == '__main__'):
-        is_not_ipython_global = False
-    depth = 0
-    try:
-        while (is_not_ipython_global):
-            nextframe = frame.f_back
-            frame = nextframe
-            depth += 1
-            try:
-                global_dict = frame.f_globals
-                namestr = global_dict['__name__']
-                docstr = global_dict['__doc__']
-                print(str(namestr) + ': ' + str(docstr))
-                # print(global_dict['__name__'])
-            except KeyError:
-                namestr = ''
-            if (namestr == '__main__'):
-                is_not_ipython_global = False
-    except AttributeError:
-        raise AttributeError(
-            'Unable to find `__main__` of interactive session. Are you ' \
-            'running in Jupyter or IPython?')
-    return (global_dict)
+######
+# Jupyter JS call utilities
+######
+def new_cell_immediately_below():
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(
+        JS('Jupyter.notebook.focus_cell();' \
+           'Jupyter.notebook.insert_cell_above();'))
+    pass
+
+
+def select_cell_immediately_below():
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(JS('Jupyter.notebook.select_next(true);'))
+
+
+def move_cursor_in_current_cell(delta):
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(
+        JS('var curPos = Jupyter.notebook.get_selected_cell().code_' \
+           'mirror.doc.getCursor();' \
+           'var curline = curPos.line; var curch = curPos.ch +' + str(
+            delta) + ';' \
+                     'Jupyter.notebook.get_selected_cell().code_mirror.' \
+                     'doc.setCursor({line:curline,ch:curch});'))
+    pass
+
+
+def insert_text_into_next_cell(text):
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(JS('Jupyter.notebook.select_next(true);' \
+               'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
+               'replaceSelection("' + text + '");'))
+    pass
+
+
+def insert_text_at_beginning_of_current_cell(text):
+    # append \n to line insert as a separate line.
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(
+        JS('Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
+           'setCursor({line:0,ch:0});' \
+           'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
+           'replaceSelection("' + text + '");'))
+    pass
+
+
+def insert_newline_at_end_of_current_cell(text):
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(
+        JS('var lastline = Jupyter.notebook.get_selected_cell().' \
+           'code_mirror.doc.lineCount();' \
+           'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
+           'setCursor(lastline,0);' \
+           'Jupyter.notebook.get_selected_cell().code_mirror.doc.' \
+           'replaceSelection("\\n' + text + '");'))
+    pass
+
 
 def find_pandas_dataframe_names():
     """
@@ -49,8 +73,10 @@ def find_pandas_dataframe_names():
     namespace that are pandas DataFrames.
     """
     from pandas import DataFrame as df
+    from IPython import get_ipython
+
     dataframenames = []
-    global_dict = get_ipython_globals()
+    global_dict = get_ipython().user_ns
     for k in global_dict:
         if not (str.startswith(k, '_')) and isinstance(global_dict[k], df):
             dataframenames.append(k)
