@@ -1,16 +1,20 @@
-**jupyter_new_Pandas_column_GUI**
+**jupyter_Pandas_GUI**
 
-GUI to help the user construct expressions for new calculated Pandas
-columns. This GUI is meant to run in an interactive Jupyter notebook.
+GUI to help the user construct Pandas expressions such as a new calculated
+column. This GUI is meant to run in an interactive Jupyter notebook.
 It is based on Jupyter widgets.
 
 **Current Features:**
 
-* Dropdown to choose the DataFrame to work with.
-* 
+* A GUI with four steps to lead the user through formulating an expression
+  for a new column.
+* In development: a GUI to lead the user through plotting Pandas data.
 
 **Wishlist:**
 
+* A GUI for doing simple fits (linear, polynomial, exponetial, etc...) on
+  Pandas data.
+  
 **Installation**
 
 Installation using pip into a virtual environment is recommended.
@@ -24,7 +28,7 @@ available in your command shell. More discussion:
 1. Navigate to the directory where this package will be installed.
 1. Start a shell in the environment `$ pipenv shell`.
 1. Install using pip.
-    1. `$ pip install jupyter_new_Pandas_column_GUI`. This will install 
+    1. `$ pip install jupyter_Pandas_GUI`. This will install 
        Jupyter into the same virtual
     environment if you do not already have it on your machine. If Jupyter is already
     installed the virtual environment will use the existing installation. This takes
@@ -33,12 +37,14 @@ available in your command shell. More discussion:
     1. Still within the environment shell test this by starting jupyter
 `$ jupyter notebook`. Jupyter should launch in your browser.
         1. Open a new notebook using the default (Python 3) kernel.
-        1. In the first cell import the input_table module:
-            `from new_pandas_column_GUI import *`
-        1. To try use the command `???(df_info)` in the next cell. This should 
-           generate a blank code cell
-        and another code cell that has a table in the output for you to define your table dimensions.
-        1. If you define the dimensions the input table will be created for you.
+        1. In the first cell import the pandas_GUI module:
+            `from pandas_GUI import *`
+        1. To try:
+           1. Create some Pandas DataFrames in the notebook.
+           1. Use the command `new_pandas_column_GUI()` to start the GUI.
+           1. It will search for the DataFrames you created.
+           1. Follow the steps to create a new column in one of your
+              DataFrames.
         
 1. _Optional_ You can make this environment available to an alternate Jupyter install as a special kernel when you are the user.
     1. Make sure you are running in your virtual environment `$ pipenv shell` in the directory for  virtual
@@ -50,10 +56,10 @@ available in your command shell. More discussion:
     
 _Development_
 
-Simply replace `$ pip install jupyter_new_Pandas_column_GUI` with `$ pip 
-install -e ../jupyter_new_Pandas_column_GUI` in the _Production_
+Simply replace `$ pip install jupyter_Pandas_GUI` with `$ pip 
+install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 **Issues or comments**
 
-[JupyterPhysSciLab/jupyter_new_Pandas_column_GUI](https://github.com/JupyterPhysSciLab/jupyter_new_Pandas_column_GUI)
+[JupyterPhysSciLab/jupyter_Pandas_GUI](https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI)

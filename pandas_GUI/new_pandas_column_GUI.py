@@ -1,5 +1,15 @@
-def new_pandas_column_GUI(dfs_info, show_text_col = False):
+def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
     """
+    If passed no parameters this will look for all the dataframes in the user
+    namespace and make them available for adding a new column to. Once a
+    dataframe is chosen only the numerical columns from that dataframe will
+    be available for inclusion in the new column expression.
+
+    If you wish to allow only certain dataframes or have them show up as
+    user friendly names in the menus provide that information in the first
+    paramater dfs_info.
+
+    To allow inclusion of text columns pass True for show_text_col.
 
     :param show_text_col: bool (default = False). When True columns containing
     text will be shown.
@@ -19,6 +29,11 @@ def new_pandas_column_GUI(dfs_info, show_text_col = False):
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell
     # will be set to true if needed for operations used that require numpy.
+    if dfs_info == None:
+        from .utils import find_pandas_dataframe_names
+        dfs_info = []
+        for k in find_pandas_dataframe_names():
+            dfs_info.append([k,k])
     friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
 
     #### Define GUI Elements ####

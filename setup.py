@@ -4,12 +4,12 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="jupyter_new_Pandas_column_GUI",
+    name="jupyter_Pandas_GUI",
     version="0.5",
-    description="Pandas new column expression composer using Jupyter widgets.",
+    description="Pandas expression composers using Jupyter widgets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/JupyterPhysSciLab/jupyter_new_Pandas_column_GUI",
+    url="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI",
     author="Jonathan Gutow",
     author_email="gutow@uwosh.edu",
     license="GPL-3.0+",
