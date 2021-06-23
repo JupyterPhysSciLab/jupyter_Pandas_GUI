@@ -62,6 +62,32 @@ def insert_newline_at_end_of_current_cell(text):
            'replaceSelection("\\n' + text + '");'))
     pass
 
+def select_containing_cell(elemID):
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    # Create a synthetic click in the cell to force selection of the cell
+    # containing the table
+    display(JS(
+    'var event = new MouseEvent("click", {' \
+    'view: window,' \
+    'bubbles: true,' \
+    'cancelable: true' \
+    '});' \
+    'var elem = document.getElementById("'+elemID+'");' \
+    'var cancelled = !elem.dispatchEvent(event);' \
+    'if (cancelled) {' \
+    # A handler called preventDefault.
+    'alert("Something is wrong. Try running the cell that creates this GUI' \
+           '.");' \
+    '}'))
+    pass
+
+def delete_selected_cell():
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(JS('Jupyter.notebook.delete_cell(' \
+               'Jupyter.notebook.get_selected_index());'))
+    pass
 
 def find_pandas_dataframe_names():
     """

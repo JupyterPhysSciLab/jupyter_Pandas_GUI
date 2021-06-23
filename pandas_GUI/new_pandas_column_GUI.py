@@ -27,7 +27,9 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
     from .utils import new_cell_immediately_below,\
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
-        insert_newline_at_end_of_current_cell
+        insert_newline_at_end_of_current_cell, select_containing_cell, \
+        delete_selected_cell
+
     # will be set to true if needed for operations used that require numpy.
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
@@ -162,6 +164,8 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         # run composed operation
         display(JS('Jupyter.notebook.get_selected_cell().execute()'))
         # TODO: add deletion of composer cell after this is a functioning module.
+        select_containing_cell('newcolGUI')
+        delete_selected_cell()
         pass
 
     gen_col_but.on_click(run_new_col_decl)
@@ -177,7 +181,9 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
     steps.set_title(3, 'Step 4')
 
     display(HTML(
-        "<h3 style='text-align:center;'>Pandas New Calculated Column Composer</h3>"))
+        "<h3 id ='newcolGUI' style='text-align:center;'>Pandas New Calculated "
+        "Column "
+        "Composer</h3>"))
     #pdComposer = VBox([whichframe, steps])
     display(steps)
     new_cell_immediately_below()
