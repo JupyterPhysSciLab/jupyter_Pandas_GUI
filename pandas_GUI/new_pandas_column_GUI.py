@@ -164,7 +164,6 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
             insert_newline_at_end_of_current_cell(text)
         # run composed operation
         display(JS('Jupyter.notebook.get_selected_cell().execute()'))
-        # TODO: add deletion of composer cell after this is a functioning module.
         select_containing_cell('newcolGUI')
         delete_selected_cell()
         pass
@@ -187,6 +186,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         "Composer</h3>"))
     #pdComposer = VBox([whichframe, steps])
     display(steps)
+    select_containing_cell('newcolGUI')
     new_cell_immediately_below()
     pass
 

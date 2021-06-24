@@ -6,7 +6,7 @@ def new_cell_immediately_below():
     from IPython.display import Javascript as JS
     display(
         JS('Jupyter.notebook.focus_cell();' \
-           'Jupyter.notebook.insert_cell_above();'))
+           'Jupyter.notebook.insert_cell_below();'))
     pass
 
 
@@ -73,7 +73,13 @@ def select_containing_cell(elemID):
     'bubbles: true,' \
     'cancelable: true' \
     '});' \
+    'var start = new Date().getTime();' \
     'var elem = document.getElementById("'+elemID+'");' \
+    'do {' \
+    'elem = document.getElementById("'+elemID+'");' \
+    '} while ((elem == null) && (new Date().getTime() < start+5000));' \
+    'if (elem == null){' \
+    'alert("It took more than 5 seconds to build element.");}' \
     'var cancelled = !elem.dispatchEvent(event);' \
     'if (cancelled) {' \
     # A handler called preventDefault.
@@ -107,3 +113,15 @@ def find_pandas_dataframe_names():
         if not (str.startswith(k, '_')) and isinstance(global_dict[k], df):
             dataframenames.append(k)
     return dataframenames
+
+def find_figure_names():
+    from plotly.graph_objects import Figure, FigureWidget
+    from IPython import get_ipython
+
+    fignames = []
+    global_dict = get_ipython().user_ns
+    for k in global_dict:
+        if not (str.startswith(k, '_')) and isinstance(global_dict[k],
+                                                       (Figure,FigureWidget)):
+            fignames.append(k)
+    return fignames

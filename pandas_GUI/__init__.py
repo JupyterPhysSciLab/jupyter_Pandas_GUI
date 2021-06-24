@@ -13,3 +13,4 @@ mydir = os.path.dirname(__file__)
 # load any supporting files
 
 from pandas_GUI.new_pandas_column_GUI import new_pandas_column_GUI
+from pandas_GUI.plot_Pandas_GUI import plot_pandas_GUI
