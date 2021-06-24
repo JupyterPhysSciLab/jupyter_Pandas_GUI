@@ -21,6 +21,8 @@ setuptools.setup(
         'jupyter>=1.0.0',
         'pandas>=1.0.0',
         'numpy>=1.19.0',
+        'plotly>=4.14.3',
+        'ipywidgets>=7.6.2',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

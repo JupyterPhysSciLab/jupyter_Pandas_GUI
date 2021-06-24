@@ -22,6 +22,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Dropdown, Label, Text, Button, Checkbox
+    from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
     from IPython import get_ipython
     from .utils import new_cell_immediately_below,\
@@ -30,7 +31,6 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell
 
-    # will be set to true if needed for operations used that require numpy.
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
         dfs_info = []
@@ -67,7 +67,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     # Step 2
     newname = Text(placeholder='Type name for new column.')
-    step2instr = Label(
+    step2instr = richLabel(
         value='Pick a name for the new column. The expression will be ' \
               'built in the cell below. Click the "Insert" button when ' \
               'you are satisfied with the name.')
@@ -99,9 +99,10 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         pass
 
     whichcolumn.observe(column_insert, names='value')
-    step3instr = Label(
-        value='Choose columns and operations from the menus to insert ' \
-              'into your expression. Your choices will replace selected ' \
+    step3instr = richLabel(
+        value='Add the calculation to the right hand side using the menus ' \
+              'to insert columns, math operations or functions. ' \
+              'Your choices will replace selected ' \
               'text or insert at the current cursor position.')
     oplst = ['Choose an operation to insert.', '+', '-', '*', '/', '**',
              'exp()', 'log()', 'ln()', 'sqrt()', 'sin()', 'cos()',
