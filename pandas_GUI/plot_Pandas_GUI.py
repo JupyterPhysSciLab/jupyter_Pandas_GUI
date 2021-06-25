@@ -23,7 +23,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     :return:
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
-        Accordion, Dropdown, Label, Text, Button, Checkbox
+        Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText
     from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
     from IPython import get_ipython
@@ -53,7 +53,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     # Those followed by a * are required.
     display(HTML(
         "<h3 id ='pandasplotGUI' style='text-align:center;'>Pandas Plot "
-        "Composer</h3> <div style='text-align:center;'>Steps followed by a "
+        "Composer</h3> <div style='text-align:center;'>Steps with a "
         "* are required.</div>"))
 
     # 1. Pick Traces*
@@ -71,7 +71,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    'used for the legend;</li>'
                                    '<li> OPTIONAL - set additional formatting '
                                    'and error display by expanding the '
-                                   'sections below;</li>'
+                                   'sections at the bottom of this tab;</li>'
                                    '<li>Once everything is set use the '
                                    '<b>"Add Trace"</b> button to '
                                    'include it in your plot.</li></ol>'
@@ -84,7 +84,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     # DataFrame selection
     tempopts = []
-    tempopts.append('Choose')
+    tempopts.append('Choose data set.')
     for k in dfs_info:
         tempopts.append(k[1])
     whichframe = Dropdown(options=tempopts,
@@ -126,14 +126,66 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                       description = 'Trace name: ')
 
     #   b. Trace Style (optional)
+    modedrop = Dropdown(options = ['lines','markers','lines+markers'],
+                    description = 'Style: ')
+    colordrop = Dropdown(options=['default','blue','orange','green','purple',
+                              'red','gold','brown','black'],
+                     description = 'Color: ')
+    formatHbox = HBox([modedrop,colordrop])
+    step1formatacc = Accordion([formatHbox])
+    step1formatacc.set_title(0,'Trace Formatting')
+    step1formatacc.selected_index = None
+    yerrtype = Dropdown(options = ['none','percent','constant','data'],
+                        description = 'Error Type :')
+    yerrvalue = FloatText(description = '% or constant :', disabled = True)
+    yerrdata = Dropdown(options = ['Choose error column.'],
+                        description = 'Error values :',
+                        disabled = True)
+    yerrrow1 = HBox([yerrtype,yerrvalue])
+    yerror = VBox([yerrrow1,yerrdata])
+    xerrtype = Dropdown(options = ['none','percent','constant','data'],
+                        description = 'Error Type :')
+    xerrvalue = FloatText(description = '% or constant :', disabled = True)
+    xerrdata = Dropdown(options = ['Choose error column.'],
+                        description = 'Error values :',
+                        disabled = True)
+    xerrrow1 = HBox([xerrtype,xerrvalue])
+    xerror = VBox([xerrrow1,xerrdata])
+    step1erracc = Accordion([yerror,xerror])
+    step1erracc.set_title(0, 'Y error bars')
+    step1erracc.set_title(1, 'X error bars')
+    step1erracc.selected_index = None
 
     # Add Trace button
     add_trace_but = Button(description = 'Add Trace')
-    def do_add_trace():
+    def do_add_trace(change):
+        text = 'scat = go.Scatter(x = '+whichframe.value+'[\'' \
+               +Xcoord.value+'\'],'
+        text += ' y = ' +whichframe.value+'[\''+Ycoord.value+ \
+                                          '\'],\\n'
+        text += '        mode = \''+modedrop.value+'\', name = \'' \
+                                               +trace_name.value+'\''
+        # in here add other formatting items using ifs.
+        if colordrop.value != 'default':
+            text +=',\\n        '
+            if str(modedrop.value).find('lines') > -1:
+                text += 'line_color = \''+colordrop.value+'\', '
+            if str(modedrop.value).find('markers') > -1:
+                text += 'marker_color = \'' + colordrop.value + '\', '
+            text += '\\n'
+        text += ')\\n'
+        text += figname + '.add_trace(scat)'
+        select_cell_immediately_below()
+        insert_newline_at_end_of_current_cell(text)
         pass
     add_trace_but.on_click(do_add_trace)
     step1hbox = HBox([Xcoord,add_trace_but])
-    step1 = VBox([step1instracc, whichframe,step1hbox,Ycoord,trace_name])
+    step1optbox = VBox([step1formatacc, step1erracc])
+    step1opt = Accordion([step1optbox])
+    step1opt.set_title(0, 'Optional (Trace formatting, error bars...)')
+    step1opt.selected_index = None
+    step1 = VBox([step1instracc, whichframe,step1hbox,Ycoord,trace_name,
+                  step1opt])
 
     # 2. Set Axes Labels (will use column names by default).
 
