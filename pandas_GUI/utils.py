@@ -95,6 +95,10 @@ def delete_selected_cell():
                'Jupyter.notebook.get_selected_index());'))
     pass
 
+######
+# Pandas and Figures routines
+######
+
 def find_pandas_dataframe_names():
     """
     This operation will search the interactive name space for pandas
@@ -125,3 +129,31 @@ def find_figure_names():
                                                        (Figure,FigureWidget)):
             fignames.append(k)
     return fignames
+
+class iconselector():
+    def __init__(self,iconlist, selected = None):
+        from ipywidgets import HBox, Button, Layout
+        self.buttons = []
+        self.selected = selected # This will be the selected icon name
+
+        def iconbutclk(but):
+            self.selected = but.icon
+            for k in self.buttons:
+                if k.icon != self.selected:
+                    k.style.button_color = 'white'
+                else:
+                    k.style.button_color = 'darkgray'
+            pass
+
+        smallbut = Layout(width='30px')
+        for k in iconlist:
+            tempbut = Button(icon=k,layout=smallbut)
+            tempbut.style.button_color = 'white'
+            tempbut.style.boarder = 'none'
+            tempbut.on_click(iconbutclk)
+            self.buttons.append(tempbut)
+        if self.selected != None:
+            for k in self.buttons:
+                if k.icon == self.selected:
+                    iconbutclk(k)
+        self.box = HBox(self.buttons) # This can be passed as a widget.
