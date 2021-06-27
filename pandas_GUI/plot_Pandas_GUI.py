@@ -210,7 +210,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     formatVbox = VBox([formatHbox1,linehbox,markervbox])
     step1formatacc = Accordion([formatVbox])
     step1formatacc.set_title(0,'Trace Formatting')
-    step1formatacc.selected_index = None
+    step1formatacc.selected_index = 0
     yerrtype = Dropdown(options = ['none','percent','constant','data'],
                         description = 'Error Type: ',
                         disabled = True)
@@ -349,6 +349,26 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 text += 'line_color = \''+colordrop.value+'\', '
             if str(modedrop.value).find('markers') > -1:
                 text += 'marker_color = \'' + colordrop.value + '\', '
+        if str(modedrop.value).find('lines') > -1:
+            if line_style.value != 'solid':
+                text +='\\n        '
+                text +='line_dash=\'' + line_style.value + '\', '
+            if line_width.value != 2:
+                text +='\\n        '
+                text +='line_width=' + str(line_width.value) + ', '
+        if str(modedrop.value).find('markers') > -1:
+            if markersize.value != 6:
+                text += '\\n        '
+                text += 'marker_size=' + str(markersize.value) + ', '
+            tmpmkr = icontoplotly[marker_selector.value]
+            if not filled_open.value:
+                text += '\\n        '
+                tmpmkr +='-open'
+                text += 'marker_symbol=\'' + tmpmkr + '\', '
+            else:
+                if tmpmkr != 'circle':
+                    text += '\\n        '
+                    text += 'marker_symbol=\'' + tmpmkr + '\', '
         if yerrtype.value != 'none':
             text +='\\n        '
             if yerrtype.value == 'data':

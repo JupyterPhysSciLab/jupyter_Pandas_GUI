@@ -119,6 +119,16 @@ def find_pandas_dataframe_names():
     return dataframenames
 
 def find_figure_names():
+    """
+    This operation will search the interactive namespace for objects that are
+    plotly Figures (plotly.graph_objects.Figure) or plotly FigureWidgets
+    (plotly.graph_objects.FigureWidget). It will not find Figures or
+    FigureWidgets that are children of other objects. You will need to
+    provide your own operation for finding those.
+
+    :return: List of string names for the objects in the global interactive
+    namespace that are plotly Figures or FigureWidgets.
+    """
     from plotly.graph_objects import Figure, FigureWidget
     from IPython import get_ipython
 
@@ -131,6 +141,14 @@ def find_figure_names():
     return fignames
 
 class iconselector():
+    """
+    This class provides a self updating set of small buttons showing the
+    font-awesome icons passed to it. The user selected icon is highlighted
+    in darkgray. The `selected` attribute (value is a synonym) is set to the
+    name of the current selection. The `box` attribute is an ipywidget HBox
+    that can be displayed or incorporated into more complex ipywidget
+    constructs to interact with the user.
+    """
     def __init__(self,iconlist, selected = None):
         from ipywidgets import HBox, Button, Layout
         self.buttons = []
@@ -157,3 +175,7 @@ class iconselector():
                 if k.icon == self.selected:
                     iconbutclk(k)
         self.box = HBox(self.buttons) # This can be passed as a widget.
+
+    @property
+    def value(self):
+        return self.selected
