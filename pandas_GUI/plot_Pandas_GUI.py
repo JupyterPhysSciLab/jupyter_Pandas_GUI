@@ -27,6 +27,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         RadioButtons, BoundedIntText
     from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
     from IPython import get_ipython
     from .utils import new_cell_immediately_below,\
         select_cell_immediately_below, move_cursor_in_current_cell, \
@@ -509,7 +510,31 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    '<li>If you did any manual editing '
                                    'double-check for typos.</li>')
     step4noticebox = richLabel(value = makeplot_notices.notice_html())
+    def makeplt_click(change):
+        select_cell_immediately_below()
+        text = figname + '.update_xaxes(title= \''+X_label.value+'\''
+        def get_mirror_text():
+            if mirror_axes.value:
+                mirror_text = ', mirror = True)'
+                if mirror_ticks.value:
+                    mirror_text = ', mirror= \'ticks\')'
+            else:
+                mirror_text = ')'
+            return mirror_text
+        text += get_mirror_text()
+        insert_newline_at_end_of_current_cell(text)
+        text = figname + '.update_yaxes(title= \''+Y_label.value+'\''
+        text += get_mirror_text()
+        insert_newline_at_end_of_current_cell(text)
+        if plot_title.value !='' or plot_template.value != 'simple_white':
+            text = figname+'.update_layout(title = \''+plot_title.value+'\', '
+            text += 'template = \''+ plot_template.value +'\')'
+            insert_newline_at_end_of_current_cell(text)
+        # run the cell to build the plot
+        display(JS('Jupyter.notebook.get_selected_cell().execute()'))
+        pass
     makeplotbut = Button(description = 'Make Plot', disabled = True)
+    makeplotbut.on_click(makeplt_click)
     step4vbox = VBox([makeplotbut,step4noticebox])
     step4 = HBox([step4instr,step4vbox])
 
@@ -520,13 +545,17 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     steps.set_title(2,'3. Title, Format ...')
     steps.set_title(3,'4. Final Check*')
     def tab_changed(change):
-        # print(change['new'])
         if change['new'] ==3:
             if X_label.value == '' or Y_label.value == '':
                 makeplot_notices.activate_notice(1)
+                makeplotbut.disabled = True
+                makeplotbut.button_style = ''
             else:
                 makeplot_notices.deactivate_notice(1)
             step4noticebox.value = makeplot_notices.notice_html()
+        if len(makeplot_notices.get_active()) == 0:
+            makeplotbut.disabled = False
+            makeplotbut.button_style = 'success'
         pass
 
     steps.observe(tab_changed, names = 'selected_index')

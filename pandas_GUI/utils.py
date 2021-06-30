@@ -222,6 +222,7 @@ class notice_group():
         self.active = []
 
     def get_active(self):
+        """Returns a list of indexes of active notices"""
         return self.active
 
     def set_active(self,whichnotices):
