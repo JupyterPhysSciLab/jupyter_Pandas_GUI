@@ -6,9 +6,9 @@ notebook. All tools are based on Jupyter widgets.
 
 **Current Features:**
 
-A few GUIs have been defined. The user can pass them a list of Pandas 
-DataFrames to work with. If no list is passed the GUI will look for Pandas
-DataFrames in the interactive session.
+The user can pass the GUI tools a list of Pandas 
+DataFrames to work with. If an empty list is passed, the GUI will look for 
+Pandas DataFrames in the interactive session.
 
 Currently defined GUIs:
 
