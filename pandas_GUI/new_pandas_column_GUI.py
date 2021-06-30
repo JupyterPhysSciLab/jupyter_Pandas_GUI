@@ -111,7 +111,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
                        description='Operation: ')
     def op_insert(change):
         need_numpy = False
-        np_list = ['exp()', 'log()', 'ln()', 'sqrt()', 'sin()', 'cos()',
+        np_list = ['exp()', 'log10()', 'ln()', 'sqrt()', 'sin()', 'cos()',
                    'tan()', 'cot()', 'asin()', 'acos()', 'atan()',
                    'acot()']
         op = change['new']
@@ -119,6 +119,8 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
             return
         if op in np_list:
             need_numpy = True
+            if op == 'ln()':
+                op == 'log()'
             op = 'np.' + op
         else:
             op = ' ' + op + ' '

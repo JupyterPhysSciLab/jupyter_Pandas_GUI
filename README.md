@@ -14,6 +14,9 @@ They are intended for new or occasional users of Pandas. However,
 sophisticated users may find them useful for doing simple one-off tasks where 
 the ability to choose python objects from menus can reduce errors.
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JupyterPhysSciLab/jupyter_Pandas_GUI.git/HEAD)
+Try the demonstration notebooks.
+
 #### Current Features:
 
 The user can pass the GUI tools a list of Pandas 
