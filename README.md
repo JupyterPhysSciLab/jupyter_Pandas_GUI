@@ -12,9 +12,10 @@ Pandas DataFrames in the interactive session.
 
 Currently defined GUIs:
 
-* A GUI with four steps to lead the user through formulating an expression
-  for a new column.
-* A GUI with four steps to lead the user through plotting Pandas data as a
+* `new_pandas_column_GUI()`: A GUI with four steps to lead the user through 
+  formulating an expression for a new column.
+* `plot_pandas_GUI()`: A GUI with four steps to lead the user through plotting 
+  Pandas data as a
   scatter or line plot using plotly.
 
 **Wishlist:**
