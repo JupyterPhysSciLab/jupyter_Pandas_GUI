@@ -532,6 +532,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
         display(JS('Jupyter.notebook.get_selected_cell().execute()'))
+        # remove the GUI cell
+        select_containing_cell('pandasplotGUI')
+        delete_selected_cell()
         pass
     makeplotbut = Button(description = 'Make Plot', disabled = True)
     makeplotbut.on_click(makeplt_click)
