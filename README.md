@@ -1,19 +1,27 @@
 **jupyter_Pandas_GUI**
 
-GUI to help the user construct Pandas expressions such as a new calculated
-column. This GUI is meant to run in an interactive Jupyter notebook.
-It is based on Jupyter widgets.
+GUI tools to help the user construct Pandas expressions such as a new 
+calculated column. The tools are meant to run in an interactive Jupyter 
+notebook. All tools are based on Jupyter widgets.
 
 **Current Features:**
 
+A few GUIs have been defined. The user can pass them a list of Pandas 
+DataFrames to work with. If no list is passed the GUI will look for Pandas
+DataFrames in the interactive session.
+
+Currently defined GUIs:
+
 * A GUI with four steps to lead the user through formulating an expression
   for a new column.
-* In development: a GUI to lead the user through plotting Pandas data.
+* A GUI with four steps to lead the user through plotting Pandas data as a
+  scatter or line plot using plotly.
 
 **Wishlist:**
 
-* A GUI for doing simple fits (linear, polynomial, exponetial, etc...) on
+  * A GUI for doing simple fits (linear, polynomial, exponetial, etc...) on
   Pandas data.
+  * GUIs for plots beyond scatter/line plots.
   
 **Installation**
 
