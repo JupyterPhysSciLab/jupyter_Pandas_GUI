@@ -105,7 +105,7 @@ def find_pandas_dataframe_names():
     DataFrame objects. It will not find DataFrames that are children
     of objects in the interactive namespace. You will need to provide
     your own operation for finding those.
-    :return: List of string names for objects in the global interactive
+    :return: type: list of string names for objects in the global interactive
     namespace that are pandas DataFrames.
     """
     from pandas import DataFrame as df
@@ -126,8 +126,8 @@ def find_figure_names():
     FigureWidgets that are children of other objects. You will need to
     provide your own operation for finding those.
 
-    :return: List of string names for the objects in the global interactive
-    namespace that are plotly Figures or FigureWidgets.
+    :return: type: list of string names for the objects in the global
+    interactive namespace that are plotly Figures or FigureWidgets.
     """
     from plotly.graph_objects import Figure, FigureWidget
     from IPython import get_ipython
@@ -149,7 +149,19 @@ class iconselector():
     that can be displayed or incorporated into more complex ipywidget
     constructs to interact with the user.
     """
+    #####
+    # TODO: add .observe option to icon selector...change object to extend
+    # the appropriate widget type?
+    #####
     def __init__(self,iconlist, selected = None):
+        """
+
+        :param iconlist: list of string names for the font awsome icons to
+        display. The names should not be prefixed with 'fa-'.
+        :type iconlist: list of str
+        :param selected: name of selected icon (default = None).
+        :type selected: str
+        """
         from ipywidgets import HBox, Button, Layout
         self.buttons = []
         self.selected = selected # This will be the selected icon name
@@ -179,3 +191,81 @@ class iconselector():
     @property
     def value(self):
         return self.selected
+
+class notice_group():
+    """
+    A notice group contains a list of strings that are referred to by their
+    index. The group keeps track of which notices are 'active'. A call to the
+    `.notice_html()` method returns an unordered html formatted list of the
+    notice texts. This can be used to display or update notice text
+    for the user.
+
+    Optional notice group color, header and footers can be provided.
+    """
+    def __init__(self, noticelist, header='', footer = '', color = ''):
+        """
+
+        :param noticelist: list of strings of the text for each notice
+        :type noticelist: list
+        :param header: string providing a header for this notice group
+        :type header: str
+        :param footer: string providing a footer for this notice group
+        :type footer: str
+        :param color: string compatible with css color attribute, used to
+        color the displayed notices. The color not impact headers and footers.
+        :type color: str
+        """
+        self.header = header
+        self.noticelist = noticelist
+        self.footer = footer
+        self.color = color
+        self.active = []
+
+    def get_active(self):
+        return self.active
+
+    def set_active(self,whichnotices):
+        """
+        Used to set a specific list of notices to active. This will remove
+        active notices that are not in the provided list.
+        :param whichnotices:
+        """
+        self.active = whichnotices
+        pass
+
+    def activate_notice(self, notice_id):
+        """
+        adds one of the notices to the active list
+        :param notice_id:
+        :return:
+        """
+        if notice_id not in self.active:
+            self.active.append(notice_id)
+        pass
+
+    def deactivate_notice(self, notice_id):
+        """
+        removes a notice from the active list
+        :param notice_id:
+        :return:
+        """
+        if notice_id in self.active:
+            self.active.remove(notice_id)
+        pass
+
+    def notice_html(self):
+        """
+        Provides an html formatted string displaying the active notices.
+        :return: string of html.
+        """
+        notice_header = ''
+        if self.header !='':
+            notice_header = '<h4 style="text-align:center;">'+self.header+\
+                            ' </h4><ul>'
+        notice_footer = self.footer+'</ul>'
+        notice_txt = notice_header
+        itemstart = '<li style="color:'+self.color+';">'
+        for j in self.active:
+            notice_txt += itemstart + self.noticelist[j]+'</li>'
+        notice_txt += notice_footer
+        return notice_txt

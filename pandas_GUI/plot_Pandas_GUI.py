@@ -32,7 +32,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
-        delete_selected_cell, iconselector
+        delete_selected_cell, iconselector, notice_group
 
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
@@ -40,7 +40,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         for k in find_pandas_dataframe_names():
             dfs_info.append([k,k])
     friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
-
+    noticelst = [] # for keeping track of notices
     figname = kwargs.pop('figname',None)
     from .utils import find_figure_names
     figlst = find_figure_names()
@@ -63,25 +63,26 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         "the plotly scatter plot</a> capabilities.</div>"))
 
     longdesc = {'description_width':'initial'}
-    def notice_html(whichnotices):
 
-        notice_header = '<h4 style="text-align:center;">Notices:</h4><ul>'
-        notice_footer = '</ul>'
-        notice_list = [
-            '<li style="color:red;">Data set (DataFrame) required.</li>',
-            '<li style="color:red;">X- and Y-coordinates required.</li>',
-            '<li style="color:red;">Incomplete or inconsistent error '
-            'specification(s).</li>',
-        ]
-        notice_txt = notice_header
-        for j in whichnotices:
-            notice_txt += notice_list[j]
-        notice_txt += notice_footer
-        return notice_txt
+    # Notices for the Final Check Tab.
+    makeplot_notices = notice_group(['At least one trace required.',
+                                     'Axes must have labels.'],
+                                    'Notices:','','red')
+    makeplot_notices.set_active([0,1])
 
     # 1. Pick Traces*
     #   a. Select Y vs. X pairs* (DataFrame, X and Y, which must be from single
     #       frame.
+    # Notices for the Pick Trace(s) tab.
+    notice_list = [
+        'Data set (DataFrame) required.',
+        'X- and Y-coordinates required.',
+        'Incomplete or inconsistent error specification(s).',
+        'Non-default trace formatting left from previous trace.',
+        'X-Error settings left from previous trace.</li>',
+        'Y-Error settings left from previous trace.',
+    ]
+    trace_notices = notice_group(notice_list, 'Notices:','','red')
     step1instr = richLabel(value = 'For each trace you wish to include: '
                                    '<ol><li>Select a DataFrame (Data '
                                    'set);</li>'
@@ -100,7 +101,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    'include it in your plot.</li></ol>')
 
     step1instracc = Accordion(children = [step1instr])
-    step1instracc.set_title(0,'Instructions.')
+    step1instracc.set_title(0,'Instructions')
     step1instracc.selected_index = None
 
     # DataFrame selection
@@ -120,7 +121,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             Ycoord.disabled = True
             add_trace_but.disabled = True
             add_trace_but.button_style = ''
-            add_trace_notices.value = notice_html([0,1])
+            trace_notices.activate_notice(0)
+            trace_notices.activate_notice(1)
+            add_trace_notices.value = trace_notices.notice_html()
             return
         tempopt = ['Choose column for coordinate.']
         for k in tempcols:
@@ -133,7 +136,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         Ycoord.options = tempopt
         Xcoord.disabled = False
         Ycoord.disabled = False
-        add_trace_notices.value = notice_html([1])
+        trace_notices.activate_notice(1)
+        trace_notices.deactivate_notice(0)
+        add_trace_notices.value =trace_notices.notice_html()
         pass
     whichframe.observe(update_columns, names='value')
 
@@ -141,7 +146,6 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     Xcoord = Dropdown(options=['Choose X-coordinate.'],
                            description='X: ',
                            disabled = True)
-
     Ycoord = Dropdown(options=['Choose Y-coordinate.'],
                            description='Y: ',
                            disabled = True)
@@ -157,7 +161,8 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             yerrtype.disabled = False
             xerrtype.disabled = False
             trace_name.disabled = False
-            add_trace_notices.value = notice_html([])
+            trace_notices.deactivate_notice(1)
+            add_trace_notices.value = trace_notices.notice_html()
         else:
             add_trace_but.disabled = True
             add_trace_but.button_style = ''
@@ -166,7 +171,8 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             yerrtype.disabled = True
             xerrtype.disabled = True
             trace_name.disabled = True
-            add_trace_notices.value = notice_html([1])
+            trace_notices.activate_notice(1)
+            add_trace_notices.value = trace_notices.notice_html()
         pass
 
     Ycoord.observe(trace_name_update,names='value')
@@ -177,11 +183,18 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                       disabled = True)
 
     #   b. Trace Style (optional)
+    def trace_format_update(change):
+        trace_notices.deactivate_notice(3)
+        add_trace_notices.value = trace_notices.notice_html()
+        pass
+
     modedrop = Dropdown(options = ['lines','markers','lines+markers'],
                     description = 'Trace Style: ')
+    modedrop.observe(trace_format_update)
     colordrop = Dropdown(options=['default','blue','orange','green','purple',
                               'red','gold','brown','black'],
                      description = 'Color: ')
+    colordrop.observe(trace_format_update)
     iconlist = ['circle', 'square', 'caret-up', 'star', 'plus', 'times',
                 'caret-down', 'caret-left', 'caret-right']
     icontoplotly = {'circle': 'circle', 'square': 'square',
@@ -194,16 +207,20 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     filled_open = Checkbox(value = True,
                            description = 'Filled (uncheck for open)',
                            style={'description_width':'initial'})
+    filled_open.observe(trace_format_update)
     markersize = BoundedIntText(value = 6, min = 2, max = 25, step = 1,
                                 description = 'Marker Size (px): ',
                                 style=longdesc)
+    markersize.observe(trace_format_update)
     markerhbox = HBox([markerlabel,filled_open,markersize])
     markervbox = VBox([markerhbox, marker_selector.box])
     line_style = Dropdown(options = ['solid','dot','dash','dashdot'],
                           description = 'Line style: ')
+    line_style.observe(trace_format_update)
     line_width = BoundedIntText(value = 2, min = 1, max = 25, step = 1,
                                 description = 'Linewidth (px): ',
                                 style=longdesc)
+    line_width.observe(trace_format_update)
     linehbox = HBox([line_style,line_width])
 
     formatHbox1 = HBox([modedrop,colordrop])
@@ -254,11 +271,13 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if error_settings_OK():
             add_trace_but.disabled = False
             add_trace_but.button_style = 'success'
-            add_trace_notices.value = notice_html([])
+            trace_notices.deactivate_notice(2)
         else:
             add_trace_but.disabled = True
             add_trace_but.button_style = ''
-            add_trace_notices.value = notice_html([2])
+            trace_notices.activate_notice(2)
+        trace_notices.deactivate_notice(5)
+        add_trace_notices.value = trace_notices.notice_html()
         pass
 
     yerrtype.observe(yerr_change, names = 'value')
@@ -273,11 +292,12 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if error_settings_OK():
             add_trace_but.disabled = False
             add_trace_but.button_style = 'success'
-            add_trace_notices.value = notice_html([])
+            trace_notices.deactivate_notice(2)
         else:
             add_trace_but.disabled = True
             add_trace_but.button_style = ''
-            add_trace_notices.value = notice_html([2])
+            trace_notices.activate_notice(2)
+        add_trace_notices.value = trace_notices.notice_html()
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
@@ -310,11 +330,13 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if error_settings_OK():
             add_trace_but.disabled = False
             add_trace_but.button_style = 'success'
-            add_trace_notices.value = notice_html([])
+            trace_notices.deactivate_notice(2)
         else:
             add_trace_but.disabled = True
             add_trace_but.button_style = ''
-            add_trace_notices.value = notice_html([2])
+            trace_notices.activate_notice(2)
+        trace_notices.deactivate_notice(4)
+        add_trace_notices.value = trace_notices.notice_html()
         pass
 
     xerrtype.observe(xerr_change, names = 'value')
@@ -327,7 +349,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     xerrdata.observe(errdata_change, names = 'value')
     xerrrow1 = HBox([xerrtype,xerrvalue])
     xerror = VBox([xerrrow1,xerrdata])
-    step1erracc = Accordion([yerror,xerror])
+    step1erracc = Accordion(children = [yerror,xerror])
     step1erracc.set_title(0, 'Y error bars')
     step1erracc.set_title(1, 'X error bars')
     step1erracc.selected_index = None
@@ -391,27 +413,123 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         text += figname + '.add_trace(scat)'
         select_cell_immediately_below()
         insert_newline_at_end_of_current_cell(text)
+        if (modedrop.value != 'lines') or (colordrop.value != 'default') or \
+            (line_style.value != 'solid') or (line_width.value != 2) or \
+            (icontoplotly[marker_selector.value] != 'circle') or \
+            (not filled_open.value) or (markersize.value != 6):
+            trace_notices.activate_notice(3)
+        if (xerrtype.value != 'none'):
+            trace_notices.activate_notice(4)
+        if (yerrtype.value != 'none'):
+            trace_notices.activate_notice(5)
+        add_trace_notices.value = trace_notices.notice_html()
+        makeplot_notices.deactivate_notice(0)
+        step4noticebox.value = makeplot_notices.notice_html()
         pass
     add_trace_but.on_click(do_add_trace)
 
-    add_trace_notices = richLabel(value = notice_html([0,1]))
+    trace_notices.set_active([0,1])
+    add_trace_notices = richLabel(value = trace_notices.notice_html())
     step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
     step1actionbox = VBox([add_trace_but, add_trace_notices])
     step1hbox = HBox([step1tracebox,step1actionbox])
     step1optbox = VBox([step1formatacc, step1erracc])
-    step1opt = Accordion([step1optbox])
+    step1opt = Accordion(children = [step1optbox])
     step1opt.set_title(0, 'Optional (Trace formatting, error bars...)')
     step1opt.selected_index = None
     step1 = VBox([step1instracc, step1hbox, step1opt])
 
     # 2. Set Axes Labels (will use column names by default).
+    step2instr = richLabel(value = 'You must set the axes labels to something '
+                           'appropriate. For example if the X - values '
+                           'represent time in seconds "Time (s)" is a good '
+                           'choice. If the Y - values for the traces all '
+                           'have the same units using the units as the label '
+                                   'is a good choice. If the Y - values '
+                                   'have different unit quantites the best '
+                                   'option is probably "values" and making '
+                                   'sure that the trace names used for the '
+                                   'legend contain the units for each trace.')
+    step2instracc = Accordion(children = [step2instr])
+    step2instracc.set_title(0,'Instructions')
+    step2instracc.selected_index = None
+    X_label = Text(placeholder = 'Provide an X-axis label (usually has units)',
+                   description = 'X-axis label: ',
+                   style = longdesc,
+                   layout=Layout(width='45%'))
+    Y_label = Text(placeholder = 'Provide a Y-axis label (usually has units)',
+                   description = 'Y-axis label: ',
+                   style = longdesc,
+                   layout=Layout(width='45%'))
+    step2hbox = HBox([X_label,Y_label])
+    step2 = VBox([step2instracc,step2hbox])
+    # 3.Title, Format ...
+    plot_title = Text(value = figname,
+                       description = 'Plot title: ',
+                      layout = Layout(width='80%'))
+    def mirror_axes_change(change):
+        if change['new']:
+            mirror_ticks.disabled= False
+        else:
+            mirror_ticks.disabled= True
+            mirror_ticks.value = False
+        pass
 
-    # 3. Format, Title ...
+    mirror_axes = Checkbox(value = False,
+                           description = 'Display Mirror Axes',
+                           style = longdesc)
+    mirror_axes.observe(mirror_axes_change, names = 'value')
+    mirror_ticks = Checkbox(value = False,
+                            description = 'Mirror Tick Marks',
+                            disabled = True)
+    plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
+                                    'seaborn',
+                                 'plotly', 'plotly_white', 'plotly_dark',
+                                 'presentation', 'xgridoff''ygridoff',
+                                 'gridon'],
+                        value='simple_white',
+                        description = 'Plot Styling: ',
+                        style = longdesc)
+    step3hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
+    step3 = VBox([plot_title,step3hbox2])
 
-    # 4. Check the code*
+    # 4. Final Check*
+    step4instr = richLabel(value = 'Things to check before clicking "Make '
+                                   'Plot": <ul>'
+                                   '<li>Fix any problems listed in '
+                                   '"Notices".</li>'
+                                   '<li>Look at the code below to make sure '
+                                   'you have included all the traces you '
+                                   'intended to (look for "name").</li>'
+                                   '<li>Check for any unpaired parentheses, '
+                                   'brackets or braces (usually highlighted '
+                                   'in red).</li>'
+                                   '<li>Check that all single and double '
+                                   'quotes are paired.</li>'
+                                   '<li>If you did any manual editing '
+                                   'double-check for typos.</li>')
+    step4noticebox = richLabel(value = makeplot_notices.notice_html())
+    makeplotbut = Button(description = 'Make Plot', disabled = True)
+    step4vbox = VBox([makeplotbut,step4noticebox])
+    step4 = HBox([step4instr,step4vbox])
 
-    steps = Tab([step1])
+
+    steps = Tab([step1, step2, step3, step4])
     steps.set_title(0,'1. Pick Trace(s)*')
+    steps.set_title(1,'2. Label Axes*')
+    steps.set_title(2,'3. Title, Format ...')
+    steps.set_title(3,'4. Final Check*')
+    def tab_changed(change):
+        # print(change['new'])
+        if change['new'] ==3:
+            if X_label.value == '' or Y_label.value == '':
+                makeplot_notices.activate_notice(1)
+            else:
+                makeplot_notices.deactivate_notice(1)
+            step4noticebox.value = makeplot_notices.notice_html()
+        pass
+
+    steps.observe(tab_changed, names = 'selected_index')
     display(steps)
     select_containing_cell('pandasplotGUI')
     new_cell_immediately_below()
