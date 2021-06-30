@@ -1,8 +1,8 @@
 ## jupyter_Pandas_GUI
-[Introduction](#introduction) | [Current Features](#current_features) | 
+[Introduction](#introduction) | [Current Features](#current-features) | 
 [Wishlist](#wishlist) | [Usage](#usage) | [Installation](#installation) | 
-[Issues or comments](#issues_or_comments) | 
-[License](#this_software_is_distributed_under_the_gnu_v3_license)
+[Issues or comments](#issues-or-comments) | 
+[License](#this-software-is-distributed-under-the-gnu-v3-license)
 #### Introduction:
 
 GUI tools to help the user construct Pandas expressions such as a new 
