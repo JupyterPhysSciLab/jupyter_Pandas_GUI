@@ -105,7 +105,7 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
               'Your choices will replace selected ' \
               'text or insert at the current cursor position.')
     oplst = ['Choose an operation to insert.', '+', '-', '*', '/', '**',
-             'exp()', 'log()', 'ln()', 'sqrt()', 'sin()', 'cos()',
+             'exp()', 'log10()', 'ln()', 'sqrt()', 'sin()', 'cos()',
              'tan()', 'cot()', 'asin()', 'acos()', 'atan()', 'acot()']
     whichop = Dropdown(options=oplst,
                        description='Operation: ')
