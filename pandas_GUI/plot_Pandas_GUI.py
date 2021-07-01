@@ -37,11 +37,14 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
+        from IPython import get_ipython
+        global_dict = get_ipython().user_ns
         dfs_info = []
         for k in find_pandas_dataframe_names():
-            dfs_info.append([k,k])
-    friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
-    noticelst = [] # for keeping track of notices
+            dfs_info.append([global_dict[k],k,k])
+    friendly_to_globalname = {k[2]:k[1] for k in dfs_info}
+    friendly_to_object = {k[2]:k[0] for k in dfs_info}
+
     figname = kwargs.pop('figname',None)
     from .utils import find_figure_names
     figlst = find_figure_names()
@@ -109,15 +112,14 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     tempopts = []
     tempopts.append('Choose data set.')
     for k in dfs_info:
-        tempopts.append(k[1])
+        tempopts.append(k[2])
     whichframe = Dropdown(options=tempopts,
                                 description='DataFrame: ',)
 
     def update_columns(change):
-        dfname = friendly_to_globalname[change['new']]
-        user_ns = get_ipython().user_ns
-        tempcols = user_ns[dfname].columns.values
-        if dfname == 'Choose data set.':
+        df = friendly_to_object[change['new']]
+        tempcols = df.columns.values
+        if change['new'] == 'Choose data set.':
             Xcoord.disabled = True
             Ycoord.disabled = True
             add_trace_but.disabled = True
@@ -131,10 +133,12 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             if show_text_col:
                 tempopt.append(k)
             else:
-                if user_ns[dfname][k].dtype != 'O':
+                if df[k].dtype != 'O':
                     tempopt.append(k)
         Xcoord.options = tempopt
+        Xcoord.value = tempopt[0]
         Ycoord.options = tempopt
+        Ycoord.value = tempopt[0]
         Xcoord.disabled = False
         Ycoord.disabled = False
         trace_notices.activate_notice(1)
@@ -249,8 +253,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         return check
 
     def yerr_change(change):
-        dfname = friendly_to_globalname[whichframe.value]
-        user_ns = get_ipython().user_ns
+        df = friendly_to_object[whichframe.value]
         if change['new'] == 'percent' or change['new'] == 'constant':
             yerrvalue.disabled = False
             yerrdata.disabled = True
@@ -260,9 +263,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 add_trace_but.disabled = True
                 add_trace_but.button_style = ''
             tempopts = ['Choose error column.']
-            tempcols = user_ns[dfname].columns.values
+            tempcols = df.columns.values
             for k in tempcols:
-                if user_ns[dfname][k].dtype != 'O':
+                if df[k].dtype != 'O':
                     tempopts.append(k)
             yerrdata.options=tempopts
             yerrdata.disabled = False
@@ -308,8 +311,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                         description = 'Error Type: ',
                         disabled = True)
     def xerr_change(change):
-        dfname = friendly_to_globalname[whichframe.value]
-        user_ns = get_ipython().user_ns
+        df = friendly_to_object[whichframe.value]
         if change['new'] == 'percent' or change['new'] == 'constant':
             xerrvalue.disabled = False
             xerrdata.disabled = True
@@ -319,9 +321,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 add_trace_but.disabled = True
                 add_trace_but.button_style = ''
             tempopts = ['Choose error column.']
-            tempcols = user_ns[dfname].columns.values
+            tempcols = df.columns.values
             for k in tempcols:
-                if user_ns[dfname][k].dtype != 'O':
+                if df[k].dtype != 'O':
                     tempopts.append(k)
             xerrdata.options = tempopts
             xerrdata.disabled = False
@@ -359,9 +361,10 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     add_trace_but = Button(description = 'Add Trace',
                            disabled = True)
     def do_add_trace(change):
-        text = 'scat = go.Scatter(x = '+whichframe.value+'[\'' \
+        dfname = friendly_to_globalname[whichframe.value]
+        text = 'scat = go.Scatter(x = '+dfname+'[\'' \
                +Xcoord.value+'\'],'
-        text += ' y = ' +whichframe.value+'[\''+Ycoord.value+ \
+        text += ' y = ' +dfname+'[\''+Ycoord.value+ \
                                           '\'],\\n'
         text += '        mode = \''+modedrop.value+'\', name = \'' \
                                                +trace_name.value+'\','
@@ -396,7 +399,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             text +='\\n        '
             if yerrtype.value == 'data':
                 text += 'error_y_type=\'data\', ' \
-                        'error_y_array='+whichframe.value
+                        'error_y_array='+dfname
                 text += '[\''+yerrdata.value+'\'],'
             else:
                 text += 'error_y_type=\''+yerrtype.value+'\', error_y_value='
@@ -405,7 +408,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             text +='\\n        '
             if xerrtype.value == 'data':
                 text += 'error_x_type=\'data\', ' \
-                        'error_x_array='+whichframe.value
+                        'error_x_array='+dfname
                 text += '[\''+xerrdata.value+'\'],'
             else:
                 text += 'error_x_type=\''+xerrtype.value+'\', error_x_value='
