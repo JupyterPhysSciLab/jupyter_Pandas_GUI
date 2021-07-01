@@ -32,9 +32,10 @@ _Currently defined GUIs:_
 
 * `new_pandas_column_GUI()`: A GUI with four steps to lead the user through 
   formulating an expression for a new column.
+  ![new column GUI](DataSets/new_col_GUI.png)
 * `plot_pandas_GUI()`: A GUI with four steps to lead the user through plotting 
-  Pandas data as a
-  scatter or line plot using plotly.
+  Pandas data as a scatter or line plot using plotly.
+  ![plot pandas GUI](DataSets/plot_GUI.png)
 
 #### Wishlist:
 
