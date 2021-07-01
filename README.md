@@ -76,7 +76,7 @@ available in your command shell. More discussion:
 1. Navigate to the directory where this package will be installed.
 1. Start a shell in the environment `$ pipenv shell`.
 1. Install using pip.
-    1. `$ pip install jupyter_Pandas_GUI`. This will install 
+    1. `$ pip install jupyter-Pandas-GUI`. This will install 
        Jupyter into the same virtual
     environment if you do not already have it on your machine. If Jupyter is already
     installed the virtual environment will use the existing installation. This takes
@@ -104,7 +104,7 @@ available in your command shell. More discussion:
     
 _Development_
 
-Simply replace `$ pip install jupyter_Pandas_GUI` with `$ pip 
+Simply replace `$ pip install jupyter-Pandas-GUI` with `$ pip 
 install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
