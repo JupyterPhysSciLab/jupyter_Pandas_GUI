@@ -13,8 +13,10 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     :param show_text_col: bool (default = False). When True columns containing
     text will be shown.
-    :param dfs_info: List of Lists of strings [[globalname, userfriendly]
+    :param dfs_info: List of Lists of strings [[object,globalname,
+    userfriendly]
     ],..]
+        :object: pandas.DataFrame
         :globalname: string name of the object in the user global name space.
         :userfriendly: string name to display for user selection.
     :return:
@@ -33,10 +35,13 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
+        from IPython import get_ipython
+        global_dict = get_ipython().user_ns
         dfs_info = []
         for k in find_pandas_dataframe_names():
-            dfs_info.append([k,k])
-    friendly_to_globalname = {k[1]:k[0] for k in dfs_info}
+            dfs_info.append([global_dict[k],k,k])
+    friendly_to_globalname = {k[2]:k[1] for k in dfs_info}
+    friendly_to_object = {k[2]:k[0] for k in dfs_info}
 
     #### Define GUI Elements ####
 
@@ -45,20 +50,19 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
     tempopts = []
     tempopts.append('Choose')
     for k in dfs_info:
-        tempopts.append(k[1])
+        tempopts.append(k[2])
     whichframe = Dropdown(options=tempopts,
                                 description='DataFrame: ',)
 
     def update_columns(change):
-        dfname = friendly_to_globalname[change['new']]
-        user_ns = get_ipython().user_ns
-        tempcols = user_ns[dfname].columns.values
+        df = friendly_to_object[change['new']]
+        tempcols = df.columns.values
         tempopt = ['Choose column to insert.']
         for k in tempcols:
             if show_text_col:
                 tempopt.append(k)
             else:
-                if user_ns[dfname][k].dtype != 'O':
+                if df[k].dtype != 'O':
                     tempopt.append(k)
         whichcolumn.options = tempopt
         pass
@@ -190,26 +194,4 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
     display(steps)
     select_containing_cell('newcolGUI')
     new_cell_immediately_below()
-    pass
-
-
-def tstGUI():
-    from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
-        Dropdown, Label, Text, Button, Checkbox
-    from IPython.display import display, HTML
-    from IPython import get_ipython
-    from pandas import DataFrame as df
-    def tstobs(change):
-        global_dict = get_ipython().user_ns
-        print(global_dict[change['new']].columns)
-        pass
-
-    global_dict = get_ipython().user_ns
-    dataframes = []
-    for k in global_dict:
-        if not (str.startswith(k, '_')) and isinstance(global_dict[k], df):
-            dataframes.append(k)
-    tstdrp = Dropdown(options = dataframes)
-    tstdrp.observe(tstobs,names='value')
-    display(tstdrp)
     pass
