@@ -23,6 +23,7 @@ setuptools.setup(
         'numpy>=1.19.0',
         'plotly>=4.14.3',
         'ipywidgets>=7.6.2',
+        'JPSLUtils>=0.5.3',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
