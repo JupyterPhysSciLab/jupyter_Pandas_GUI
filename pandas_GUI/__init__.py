@@ -14,3 +14,4 @@ mydir = os.path.dirname(__file__)
 
 from pandas_GUI.new_pandas_column_GUI import new_pandas_column_GUI
 from pandas_GUI.plot_Pandas_GUI import plot_pandas_GUI
+import JPSLUtils
