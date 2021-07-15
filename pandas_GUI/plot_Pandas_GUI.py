@@ -533,6 +533,20 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             text = figname+'.update_layout(title = \''+plot_title.value+'\', '
             text += 'template = \''+ plot_template.value +'\')'
             insert_newline_at_end_of_current_cell(text)
+        text = figname +'.show()'
+        insert_newline_at_end_of_current_cell(text)
+        text = '# Force save widget states so that graph will still be'
+        insert_newline_at_end_of_current_cell(text)
+        text = '# available when notebook next opened in trusted state.'
+        insert_newline_at_end_of_current_cell(text)
+        #text = 'jscode = \'Jupyter.actions.call'
+        #text += '("widgets:save-with-widgets");\''
+        #insert_newline_at_end_of_current_cell(text)
+        text = 'from IPython.display import Javascript as JS'
+        insert_newline_at_end_of_current_cell(text)
+        jscode = 'Jupyter.actions.call(\\"widgets:save-with-widgets\\");'
+        text = 'display(JS(\''+jscode+'\'))'
+        insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
         display(JS('Jupyter.notebook.get_selected_cell().execute()'))
         # remove the GUI cell
