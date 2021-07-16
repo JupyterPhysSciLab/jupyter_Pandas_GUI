@@ -34,6 +34,7 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell, iconselector, notice_group
+    import JPSLUtils
 
     if dfs_info == None:
         from .utils import find_pandas_dataframe_names
@@ -533,11 +534,21 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             text = figname+'.update_layout(title = \''+plot_title.value+'\', '
             text += 'template = \''+ plot_template.value +'\')'
             insert_newline_at_end_of_current_cell(text)
+        text = figname +'.show()'
+        insert_newline_at_end_of_current_cell(text)
+        text = '# Force save widget states so that graph will still be'
+        insert_newline_at_end_of_current_cell(text)
+        text = '# available when notebook next opened in trusted state.'
+        insert_newline_at_end_of_current_cell(text)
+        jscode = 'Jupyter.actions.call(\\"widgets:save-with-widgets\\");'
+        text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+        insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
-        display(JS('Jupyter.notebook.get_selected_cell().execute()'))
+        JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
         # remove the GUI cell
         select_containing_cell('pandasplotGUI')
         delete_selected_cell()
+        from time import sleep
         pass
     makeplotbut = Button(description = 'Make Plot', disabled = True)
     makeplotbut.on_click(makeplt_click)

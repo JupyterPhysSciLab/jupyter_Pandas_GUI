@@ -1,7 +1,7 @@
 ## jupyter_Pandas_GUI
 [Introduction](#introduction) | [Current Features](#current-features) | 
 [Wishlist](#wishlist) | [Usage](#usage) | [Installation](#installation) | 
-[Issues or comments](#issues-or-comments) | 
+[Change Log](#change-log) | [Issues or comments](#issues-or-comments) | 
 [License](#this-software-is-distributed-under-the-gnu-v3-license)
 #### Introduction:
 
@@ -107,7 +107,15 @@ _Development_
 Simply replace `$ pip install jupyter-Pandas-GUI` with `$ pip 
 install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
-
+#### Change Log
+* 0.5.2 
+  * Widget states autosaved when a new plot is made.
+  * Began making use of [JPSLUtils](https://github.com/JupyterPhysSciLab/JPSLUtils).  
+* 0.5.1
+  * Possible to use pandas dataframes in namespaces other than the
+    user global namespace.
+  * Readme updates.
+* 0.5.0 Initial beta release.
 #### Issues or comments
 
 [JupyterPhysSciLab/jupyter_Pandas_GUI](https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI)
