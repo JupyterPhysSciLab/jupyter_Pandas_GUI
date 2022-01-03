@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     """
     If passed no parameters this will look for all the dataframes in the user
@@ -27,6 +30,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
         RadioButtons, BoundedIntText
     from ipywidgets import HTML as richLabel
+    from ipywidgets import HTMLMath as texLabel
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
     from IPython import get_ipython
@@ -57,12 +61,18 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     if figname == None:
         figname = 'Figure_'+str(len(figlst)+1)
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
-                 'GuassianModel']
+                 'GaussianModel']
     fitmodeleqns = {
-    'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$',
-    'PolynomialModel':'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n}$',
-    'ExponentialModel':,
-    'GuassianModel':
+    'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where a = slope,' \
+                  r' b = intercept',
+    'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n}$',
+    'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
+                        r'{\color{red}{\tau}}\right)$, where A = amplitude,' \
+                        r'$ \tau$ = decay',
+    'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
+                     r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
+                     r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
+                     r'A = amplitude, $\sigma$ = sigma, $\mu$ = center'
     }
     #### Define GUI Elements ####
     # Those followed by a * are required.
@@ -73,7 +83,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         "code that will generate the fit is being "
         "built in the cell immediately below.</div><div "
         "style='text-align:center;'>This composer uses a subset of "
-        "<a href ='https://lmfit.github.io/lmfit-py/'> lmfit package</a>"
+        "<a href ='https://lmfit.github.io/lmfit-py/'> the lmfit package</a>"
         " and <a href ='https://plotly.com/python/line-and-scatter/#'> "
         "the plotly scatter plot</a> capabilities.</div>"))
 
@@ -93,12 +103,10 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     notice_list = [
         'Data set (DataFrame) required.',
         'X- and Y-values required.',
-        'Y error unspecified. All data weighted equally.',
     ]
     trace_notices = notice_group(notice_list, 'Notices:','','red')
-    trace_notices.set_active([0,1,2])
-    step1instr = richLabel(value = 'For your fit: '
-                                   '<ol><li>Select a DataFrame (Data '
+    trace_notices.set_active([0,1])
+    step1instr = richLabel(value = '<ol><li>Select a DataFrame (Data '
                                    'set);</li>'
                                    '<li>Select the column containing the X '
                                    'values;</li>'
@@ -106,9 +114,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    'values (what is being fit);</li>'
                                    '<li>Provide a name for the trace if you do'
                                    ' not like the default. This text will be '
-                                   'used for the legend;</li>'
-                                   '<li> Set the error in the '
-                                   'Y-values;</li>')
+                                   'used for the legend;</li></ol>'
+                           )
     step1instracc = Accordion(children = [step1instr])
     step1instracc.set_title(0,'Instructions')
     step1instracc.selected_index = None
@@ -122,8 +129,6 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                 description='DataFrame: ',)
 
     def update_columns(change):
-        df = friendly_to_object[change['new']]
-        tempcols = df.columns.values
         if change['new'] == 'Choose data set.':
             Xcoord.disabled = True
             Ycoord.disabled = True
@@ -134,6 +139,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             trace_notices.activate_notice(2)
             add_trace_notices.value = trace_notices.notice_html()
             return
+        df = friendly_to_object[change['new']]
+        tempcols = df.columns.values
         tempopt = ['Choose column for coordinate.']
         for k in tempcols:
             if show_text_col:
@@ -165,15 +172,11 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             trace_name.value = Ycoord.value
         if Xcoord.value != 'Choose column for coordinate.' and Ycoord.value \
                 != 'Choose column for coordinate.':
-            add_trace_but.disabled = False
-            add_trace_but.button_style = 'success'
             yerrtype.disabled = False
             trace_name.disabled = False
             trace_notices.deactivate_notice(1)
             add_trace_notices.value = trace_notices.notice_html()
         else:
-            add_trace_but.disabled = True
-            add_trace_but.button_style = ''
             yerrtype.disabled = True
             trace_name.disabled = True
             trace_notices.activate_notice(1)
@@ -187,48 +190,16 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                       description = 'Trace name: ',
                       disabled = True)
 
-    # TODO: Replace or remove Add Trace button
-    add_trace_but = Button(description = 'Add Trace',
-                           disabled = True)
-    def do_add_trace(change):
-        dfname = friendly_to_globalname[whichframe.value]
-        text = 'scat = go.Scatter(x = '+dfname+'[\'' \
-               +Xcoord.value+'\'],'
-        text += ' y = ' +dfname+'[\''+Ycoord.value+ \
-                                          '\'],\\n'
-        text += '        mode = \''+modedrop.value+'\', name = \'' \
-                                               +trace_name.value+'\','
-        # in here add other formatting items using ifs.
-        if yerrtype.value != 'none':
-            text +='\\n        '
-            if yerrtype.value == 'data':
-                text += 'error_y_type=\'data\', ' \
-                        'error_y_array='+dfname
-                text += '[\''+yerrdata.value+'\'],'
-            else:
-                text += 'error_y_type=\''+yerrtype.value+'\', error_y_value='
-                text += str(yerrvalue.value)+','
-        text += ')\\n'
-        text += figname + '.add_trace(scat)'
-        select_cell_immediately_below()
-        insert_newline_at_end_of_current_cell(text)
-        if (yerrtype.value != 'none'):
-            trace_notices.activate_notice(5)
-        add_trace_notices.value = trace_notices.notice_html()
-        makeplot_notices.deactivate_notice(0)
-        step4noticebox.value = makeplot_notices.notice_html()
-        pass
-    add_trace_but.on_click(do_add_trace)
-
-    trace_notices.set_active([0,1,2])
+    trace_notices.set_active([0,1])
     add_trace_notices = richLabel(value = trace_notices.notice_html())
     step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
-    step1actionbox = VBox([add_trace_but, add_trace_notices])
+    step1actionbox = VBox([add_trace_notices])
     step1hbox = HBox([step1tracebox,step1actionbox])
-    step1 = VBox([step1instracc, step1hbox, step1erracc])
+    step1 = VBox([step1instracc, step1hbox])
 
     # 2. Set data uncertainty
-    step2instr = richLabel(value = 'If you know the uncertainty, you should '
+    step2instr = richLabel(value = 'If you know the uncertainty in your data '
+                                   'values (Y-values)you should '
                                    'specify it, as the uncertainty impacts '
                                    'the final uncertainty in the fit '
                                    'parameters. '
@@ -241,7 +212,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    'percentage of each value; data (a '
                                    'column) specifying the uncertainty for '
                                    'every data point.')
-    # Error
+
     yerrtype = Dropdown(options = ['none','percent','constant','data'],
                         description = 'Error Type: ',
                         disabled = True)
@@ -270,10 +241,6 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if change['new'] == 'none':
             yerrvalue.disabled = True
             yerrdata.disabled = True
-        if error_settings_OK():
-            trace_notices.deactivate_notice(2)
-        else:
-            trace_notices.activate_notice(2)
         add_trace_notices.value = trace_notices.notice_html()
         pass
 
@@ -287,25 +254,30 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     def errdata_change(change):
         if error_settings_OK():
-            trace_notices.deactivate_notice(2)
+            #trace_notices.deactivate_notice(2)
+            pass
         else:
-            trace_notices.activate_notice(2)
+            #trace_notices.activate_notice(2)
+            pass
         add_trace_notices.value = trace_notices.notice_html()
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
     yerrrow1 = HBox([yerrtype,yerrvalue])
     yerror = VBox([yerrrow1,yerrdata])
-
+    step2instracc = Accordion(children=[step2instr])
+    step2instracc.selected_index = None
     step2 = VBox([step2instr,yerror])
 
     # 3. Set fit parameters
     step3instr = richLabel(value = '<ol><li>Choose the fit type ('
-                                   'functional form)</li>'
+                                   'functional form). Red symbols are the '
+                                   'fit parameters.</li>'
                                    '<li>You may use the default settings for '
                                    'the '
-                                   'initial guesses, and parameter ranges or '
-                                   'you may set them. To fix a value at the '
+                                   'initial guesses and parameter ranges or '
+                                   'you may set them.</li>'
+                                   '<li>To fix a value at the '
                                    'initial guess select the "fix" checkbox. '
                                    'You must provide an initial guess if you '
                                    'fix a parameter.</li></ol>')
@@ -314,11 +286,62 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step3instracc.selected_index = None
     # TODO: get selected fit model and update parameters list.
     modeldrop = Dropdown(options=fitmodels)
-    modeleqn = richLabel(value = fitmodeleqns[modeldrop.value])
-    # TODO: get list of parameters and defaults for the model chosen.
-    # TODO: build settings list for each parameter (a table?).
-    step3 = VBox([step3instracc,HBox([modeldrop,modeleqn])])
-    # TODO: handle any updates necessary as settings are chosen.
+    modeleqn = texLabel(value = fitmodeleqns[modeldrop.value])
+    def getcurrmodel_param(modelname):
+        '''
+        Using the model name return ipywidgets for setting the fit 
+        parameters and constraints, populated with the default values.
+        :param string modelname: The string name for the lmfit model.
+        :return list: of VBoxes containing the fields for the parameters.
+        '''
+        currmodel = getattr(models,modelname)()
+        currmodel_param = []
+        for k in currmodel.param_names:
+            namefield = Text(value = k, disabled = True, style=longdesc)
+            fix = False
+            value = None
+            min = -np.inf
+            max = np.inf
+            expr = None # Not used, maybe for arbitrary functions.
+            hints = currmodel.param_hints.get(k,None)
+            if isinstance(hints,dict):
+                fix = not(hints.get('vary',True))
+                value = hints.get('value',None)
+                min = hints.get('min',-np.inf)
+                max = hints.get('max',np.inf)
+                expr = hints.get('expr',None)
+            fixcheck = Checkbox(value = fix,
+                                description = 'Fix (hold)',
+                                disabled = False,
+                                style=longdesc)
+            valuefield = FloatText(value = value,
+                                   description = 'Value: ',
+                                   disabled = False,
+                                   style=longdesc)
+            minfield = FloatText(value = min,
+                                 description = 'Min: ',
+                                 disabled = False,
+                                 style=longdesc)
+            maxfield = FloatText(value = max,
+                                 description = 'Max: ',
+                                 disabled = False,
+                                 style=longdesc)
+            parambox = VBox([Label(k),HBox([fixcheck,valuefield,minfield,
+                                    maxfield])])
+            currmodel_param.append(parambox)
+        return currmodel_param
+    params_set = VBox(getcurrmodel_param(modeldrop.value))
+# TODO: set up 7 possible paramboxes. Fill only the ones needed. Hide the
+    #  others, as it does not seem to be possible to add and subtract widgets.
+
+    def modeldrop_change(change):
+        modeleqn.value=fitmodeleqns[modeldrop.value]
+        params_set = VBox(getcurrmodel_param(modeldrop.value))
+        pass
+
+    modeldrop.observe(modeldrop_change, names = 'value')
+
+    step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
 
     # 4.Title, Axes, Format ...
     step4instr = richLabel(value = 'You must set the axes labels to something '
@@ -362,7 +385,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                         style = longdesc)
     step4hbox1 = HBox([X_label, Y_label])
     step4hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step4 = VBox([step3instr, plot_title, step4hbox1, step4hbox2])
+    step4 = VBox([step4instr, plot_title, step4hbox1, step4hbox2])
 
     # 5. Final Check*
     step5instr = richLabel(value = 'Things to check before clicking "Do '
@@ -379,7 +402,26 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step5noticebox = richLabel(value = makeplot_notices.notice_html())
     def dofit_click(change):
         select_cell_immediately_below()
-        text = figname + '.update_xaxes(title= \''+X_label.value+'\''
+        dfname = friendly_to_globalname[whichframe.value]
+        text = 'scat = go.Scatter(x = '+dfname+'[\'' \
+               +Xcoord.value+'\'],'
+        text += ' y = ' +dfname+'[\''+Ycoord.value+ \
+                                          '\'],\\n'
+        text += '        mode = \''+modedrop.value+'\', name = \'' \
+                                               +trace_name.value+'\','
+        # in here add other formatting items using ifs.
+        if yerrtype.value != 'none':
+            text +='\\n        '
+            if yerrtype.value == 'data':
+                text += 'error_y_type=\'data\', ' \
+                        'error_y_array='+dfname
+                text += '[\''+yerrdata.value+'\'],'
+            else:
+                text += 'error_y_type=\''+yerrtype.value+'\', error_y_value='
+                text += str(yerrvalue.value)+','
+        text += ')\\n'
+        text += figname + '.add_trace(scat)\\n'
+        text += figname + '.update_xaxes(title= \''+X_label.value+'\''
         def get_mirror_text():
             if mirror_axes.value:
                 mirror_text = ', mirror = True)'
@@ -409,7 +451,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         # run the cell to build the plot
         JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
         # remove the GUI cell
-        select_containing_cell('pandasplotGUI')
+        select_containing_cell('pandasfitGUI')
         delete_selected_cell()
         from time import sleep
         pass
@@ -423,7 +465,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     steps.set_title(0,'1. Pick Data*')
     steps.set_title(1,'2. Data Uncertainty*')
     steps.set_title(2,'3. Set up Model*')
-    steps.set_title(3,'4. Title, Axes*, Format...')
+    steps.set_title(3,'4. Axes Format*')
     steps.set_title(4, '5. Final Check*')
     def tab_changed(change):
         if change['new'] ==4:
@@ -446,7 +488,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 dofitbut.button_style = ''
             else:
                 makeplot_notices.deactivate_notice(1)
-            step4noticebox.value = makeplot_notices.notice_html()
+            step5noticebox.value = makeplot_notices.notice_html()
         if len(makeplot_notices.get_active()) == 0:
             dofitbut.disabled = False
             dofitbut.button_style = 'success'
