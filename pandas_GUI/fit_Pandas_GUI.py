@@ -287,59 +287,85 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     # TODO: get selected fit model and update parameters list.
     modeldrop = Dropdown(options=fitmodels)
     modeleqn = texLabel(value = fitmodeleqns[modeldrop.value])
-    def getcurrmodel_param(modelname):
+    def getcurrmodel_param(modelname, params_set):
         '''
         Using the model name return ipywidgets for setting the fit 
         parameters and constraints, populated with the default values.
         :param string modelname: The string name for the lmfit model.
-        :return list: of VBoxes containing the fields for the parameters.
+        :param VBox params_set: The VBox containing the HBoxes for parameter
+            guesses and constraints.
+        :return VBox: params_set with fields reset and those available visible.
         '''
         currmodel = getattr(models,modelname)()
         currmodel_param = []
-        for k in currmodel.param_names:
-            namefield = Text(value = k, disabled = True, style=longdesc)
+        for i in range(0,6):
+            labeltext = ''
             fix = False
             value = None
             min = -np.inf
             max = np.inf
-            expr = None # Not used, maybe for arbitrary functions.
-            hints = currmodel.param_hints.get(k,None)
-            if isinstance(hints,dict):
-                fix = not(hints.get('vary',True))
-                value = hints.get('value',None)
-                min = hints.get('min',-np.inf)
-                max = hints.get('max',np.inf)
-                expr = hints.get('expr',None)
-            fixcheck = Checkbox(value = fix,
-                                description = 'Fix (hold)',
-                                disabled = False,
+            expr = None  # Not used, maybe for arbitrary functions.
+            if i < len(currmodel.param_names):
+                labeltext = currmodel.param_names[i]
+                hints = currmodel.param_hints.get(labeltext,None)
+                if isinstance(hints,dict):
+                    fix = not(hints.get('vary',True))
+                    value = hints.get('value',None)
+                    min = hints.get('min',-np.inf)
+                    max = hints.get('max',np.inf)
+                    expr = hints.get('expr',None)
+                params_set.children[i].layout.display=''
+            else:
+                labeltext = str(i)
+                params_set.children[i].layout.display='none'
+        params_set.children[i].children[0].value = labeltext
+        params_set.children[i].children[1].children[0].value = fix
+        params_set.children[i].children[1].children[1].value = value
+        params_set.children[i].children[1].children[2].value = min
+        params_set.children[i].children[1].children[3].value = max
+        pass
+
+    def make_param_set():
+        '''
+        Creates at VBox with 7 parameters each having fields in an HBox:
+        1. fixcheck (checkbox for fixing the value)
+        2. valuefield (floatText for setting the value)
+        3. minfield (floatText for setting the minimum allowed value)
+        4. maxfield (floatText for setting the maximum allowed value)
+        By default the all VBox components have their `layout.display=none`.
+        :return: VBox
+        '''
+        currmodel_param=[]
+        for i in range (0,6):
+            fixcheck = Checkbox(value=False,
+                                description='Fix (hold)',
+                                disabled=False,
                                 style=longdesc)
-            valuefield = FloatText(value = value,
-                                   description = 'Value: ',
-                                   disabled = False,
+            valuefield = FloatText(value=None,
+                                   description='Value: ',
+                                   disabled=False,
                                    style=longdesc)
-            minfield = FloatText(value = min,
-                                 description = 'Min: ',
-                                 disabled = False,
+            minfield = FloatText(value=None,
+                                 description='Min: ',
+                                 disabled=False,
                                  style=longdesc)
-            maxfield = FloatText(value = max,
-                                 description = 'Max: ',
-                                 disabled = False,
+            maxfield = FloatText(value=None,
+                                 description='Max: ',
+                                 disabled=False,
                                  style=longdesc)
-            parambox = VBox([Label(k),HBox([fixcheck,valuefield,minfield,
+            parambox = HBox([Label(str(i)),HBox([fixcheck,valuefield,minfield,
                                     maxfield])])
+            parambox.layout.display = 'none'
             currmodel_param.append(parambox)
-        return currmodel_param
-    params_set = VBox(getcurrmodel_param(modeldrop.value))
-# TODO: set up 7 possible paramboxes. Fill only the ones needed. Hide the
-    #  others, as it does not seem to be possible to add and subtract widgets.
+        params_set = VBox(currmodel_param)
+        return params_set
 
     def modeldrop_change(change):
         modeleqn.value=fitmodeleqns[modeldrop.value]
-        params_set = VBox(getcurrmodel_param(modeldrop.value))
+        getcurrmodel_param(modeldrop.value,params_set)
         pass
-
     modeldrop.observe(modeldrop_change, names = 'value')
+    params_set = make_param_set()
 
     step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
 
