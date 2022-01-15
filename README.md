@@ -14,7 +14,7 @@ They are intended for new or occasional users of Pandas. However,
 sophisticated users may find them useful for doing simple one-off tasks where 
 the ability to choose python objects from menus can reduce errors.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JupyterPhysSciLab/jupyter_Pandas_GUI.git/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JupyterPhysSciLab/jupyter_Pandas_GUI.git/HEAD?urlpath=/tree/Demonstration%20of%20jupyter_Pandas_GUI.ipynb)
 Try the demonstration notebooks.
 
 #### Current Features:
