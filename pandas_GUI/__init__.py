@@ -2,7 +2,7 @@ name = "pandas_GUI"
 """
 This code utilizes Jupyter widgets to provide python expression composer GUIs:
 * to generate code to add a new column to an existing Pandas DataFrame;
-* to generate code to plot exisitng Pandas date using Plotly;
+* to generate code to plot exisitng Pandas data using Plotly;
 * to generate code to fit Pandas data using lmfit (under development).
 """
 

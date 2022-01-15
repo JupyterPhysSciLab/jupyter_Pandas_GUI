@@ -1,5 +1,19 @@
 import numpy as np
 
+def calcresid(result):
+    '''
+    lmfit has empty values for residuals where the weighting is infinite or not defined.
+    This calculates all the residuals based on the actual data and fit results.
+    :param ModelResult result: An lmfit ModelResult.
+
+    :return np.array residuals: The residuals.
+    '''
+    import numpy as np
+    import lmfit as lmfit
+    resid = []
+    for i in range(0, len(results.data)):
+        resid.append(results.data[i] - results.best_fit[i])
+    return np.array(resid)
 
 def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     """
@@ -17,14 +31,15 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     To allow inclusion of text columns pass True for show_text_col.
 
-    :param show_text_col: bool (default = False). When True columns containing
+    :param bool show_text_col: (default = False). When True columns
+    containing
     text will be shown.
-    :param dfs_info: List of Lists of strings [[globalname, userfriendly]
+    :param list dfs_info: List of Lists of strings [[globalname, userfriendly]
     ],..]
         :globalname: string name of the object in the user global name space.
         :userfriendly: string name to display for user selection.
-    :keyword figname: string used to override default python name for figure.
-    :return:
+    :keyword string figname: string used to override default python name for
+    figure.
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
@@ -61,18 +76,24 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     if figname == None:
         figname = 'Figure_'+str(len(figlst)+1)
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
-                 'GaussianModel']
+                 'GaussianModel','SineModel']
     fitmodeleqns = {
     'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where a = slope,' \
                   r' b = intercept',
-    'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n}$',
+    'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n} = '
+                       r'\color{red}{c_0} + \color{red}{c_1}x + \color{red}{'
+                       r'c_2}x^2 + ...$',
     'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
                         r'{\color{red}{\tau}}\right)$, where A = amplitude,' \
                         r'$ \tau$ = decay',
     'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
                      r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
                      r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
-                     r'A = amplitude, $\sigma$ = sigma, $\mu$ = center'
+                     r'A = amplitude, $\sigma$ = sigma, $\mu$ = center',
+        'SineModel': r'$fit = \color{red}{A} \sin \left ( \color{red}{f}x + '
+                     r'\color{red}{\phi} \right)$, '
+                     r'where A = ' \
+                     r'amplitude, f = frequency, $\phi$ = shift'
     }
     #### Define GUI Elements ####
     # Those followed by a * are required.
@@ -298,19 +319,24 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         '''
         currmodel = getattr(models,modelname)()
         currmodel_param = []
-        for i in range(0,6):
-            labeltext = ''
+        labeltext = ''
+        fix = False
+        value = np.nan
+        min = -np.inf
+        max = np.inf
+        expr = None  # Not used, maybe for arbitrary functions.
+        for i in range(0,8):
             fix = False
-            value = None
+            value = np.nan
             min = -np.inf
             max = np.inf
             expr = None  # Not used, maybe for arbitrary functions.
             if i < len(currmodel.param_names):
-                labeltext = currmodel.param_names[i]
+                labeltext = str(currmodel.param_names[i])
                 hints = currmodel.param_hints.get(labeltext,None)
                 if isinstance(hints,dict):
                     fix = not(hints.get('vary',True))
-                    value = hints.get('value',None)
+                    value = hints.get('value',np.nan)
                     min = hints.get('min',-np.inf)
                     max = hints.get('max',np.inf)
                     expr = hints.get('expr',None)
@@ -318,11 +344,11 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             else:
                 labeltext = str(i)
                 params_set.children[i].layout.display='none'
-        params_set.children[i].children[0].value = labeltext
-        params_set.children[i].children[1].children[0].value = fix
-        params_set.children[i].children[1].children[1].value = value
-        params_set.children[i].children[1].children[2].value = min
-        params_set.children[i].children[1].children[3].value = max
+            params_set.children[i].children[0].value = labeltext+':'
+            params_set.children[i].children[1].children[0].value = fix
+            params_set.children[i].children[1].children[1].value = value
+            params_set.children[i].children[1].children[2].value = min
+            params_set.children[i].children[1].children[3].value = max
         pass
 
     def make_param_set():
@@ -336,24 +362,25 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         :return: VBox
         '''
         currmodel_param=[]
-        for i in range (0,6):
+        for i in range (0,8):
             fixcheck = Checkbox(value=False,
                                 description='Fix (hold)',
                                 disabled=False,
                                 style=longdesc)
-            valuefield = FloatText(value=None,
+            valuefield = FloatText(value=np.nan,
                                    description='Value: ',
                                    disabled=False,
                                    style=longdesc)
-            minfield = FloatText(value=None,
+            minfield = FloatText(value=-np.inf,
                                  description='Min: ',
                                  disabled=False,
                                  style=longdesc)
-            maxfield = FloatText(value=None,
+            maxfield = FloatText(value=np.inf,
                                  description='Max: ',
                                  disabled=False,
                                  style=longdesc)
-            parambox = HBox([Label(str(i)),HBox([fixcheck,valuefield,minfield,
+            paramlabel = Label(value = str(i)+':',style=longdesc)
+            parambox = VBox([paramlabel,HBox([fixcheck,valuefield,minfield,
                                     maxfield])])
             parambox.layout.display = 'none'
             currmodel_param.append(parambox)
@@ -366,7 +393,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         pass
     modeldrop.observe(modeldrop_change, names = 'value')
     params_set = make_param_set()
-
+    getcurrmodel_param(modeldrop.value, params_set)
     step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
 
     # 4.Title, Axes, Format ...
