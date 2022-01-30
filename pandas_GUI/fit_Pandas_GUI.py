@@ -46,6 +46,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         RadioButtons, BoundedIntText
     from ipywidgets import HTML as richLabel
     from ipywidgets import HTMLMath as texLabel
+    import plotly.graph_objects as go
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
     from IPython import get_ipython
@@ -53,7 +54,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
-        delete_selected_cell, iconselector, notice_group
+        delete_selected_cell, iconselector, notice_group, \
+        replace_text_of_current_cell
     import JPSLUtils
     from lmfit import models
 
@@ -78,23 +80,37 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
                  'GaussianModel','SineModel']
     fitmodeleqns = {
-    'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where a = slope,' \
-                  r' b = intercept',
+    'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where $\color{'
+                  r'red}{a}$ = slope, $\color{red}{b}$ = intercept',
     'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n} = '
                        r'\color{red}{c_0} + \color{red}{c_1}x + \color{red}{'
                        r'c_2}x^2 + ...$',
     'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
-                        r'{\color{red}{\tau}}\right)$, where A = amplitude,' \
-                        r'$ \tau$ = decay',
+                        r'{\color{red}{\tau}}\right)$, where $\color{red}{A}$ '
+                        r'= amplitude, $ \color{red}{\tau}$ = decay',
     'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
                      r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
                      r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
-                     r'A = amplitude, $\sigma$ = sigma, $\mu$ = center',
+                     r'$\color{red}{A}$ = amplitude, $\color{red}{\sigma}$ = sigma, '
+                     r'$\color{red}{\mu}$ = center',
         'SineModel': r'$fit = \color{red}{A} \sin \left ( \color{red}{f}x + '
                      r'\color{red}{\phi} \right)$, '
-                     r'where A = ' \
-                     r'amplitude, f = frequency, $\phi$ = shift'
+                     r'where $\color{red}{A}$ = ' \
+                     r'amplitude, $\color{red}{f}$ = frequency, '\
+                     r'$\color{red}{\phi}$ = shift'
     }
+
+    importstr = r'# Imports\n' \
+                r'import lmfit as lmfit\n' \
+                r'import round_using_error as rue\n' \
+                r'from plotly import graph_objects as go\n\n'
+    step1str = ''
+    step2str = ''
+    step3str = ''
+    step4str = ''
+    step5str = ''
+    step6str = ''
+
     #### Define GUI Elements ####
     # Those followed by a * are required.
     display(HTML(
@@ -153,8 +169,6 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if change['new'] == 'Choose data set.':
             Xcoord.disabled = True
             Ycoord.disabled = True
-            add_trace_but.disabled = True
-            add_trace_but.button_style = ''
             trace_notices.activate_notice(0)
             trace_notices.activate_notice(1)
             trace_notices.activate_notice(2)
@@ -203,7 +217,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             trace_notices.activate_notice(1)
             add_trace_notices.value = trace_notices.notice_html()
         pass
-
+    Xcoord.observe(trace_name_update,names='value')
     Ycoord.observe(trace_name_update,names='value')
 
     # Trace name
@@ -292,8 +306,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     # 3. Set fit parameters
     step3instr = richLabel(value = '<ol><li>Choose the fit type ('
-                                   'functional form). Red symbols are the '
-                                   'fit parameters.</li>'
+                                   'functional form). <span '
+                                   'style="color:red">Red symbols are '
+                                   'the fit parameters.</span></li>'
                                    '<li>You may use the default settings for '
                                    'the '
                                    'initial guesses and parameter ranges or '
@@ -305,7 +320,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step3instracc = Accordion(children = [step3instr])
     step3instracc.set_title(0,'Instructions')
     step3instracc.selected_index = None
-    # TODO: get selected fit model and update parameters list.
+    # get selected fit model and update parameters list.
     modeldrop = Dropdown(options=fitmodels)
     modeleqn = texLabel(value = fitmodeleqns[modeldrop.value])
     def getcurrmodel_param(modelname, params_set):
@@ -440,8 +455,58 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step4hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
     step4 = VBox([step4instr, plot_title, step4hbox1, step4hbox2])
 
-    # 5. Final Check*
-    step5instr = richLabel(value = 'Things to check before clicking "Do '
+    # 5. Pick Fit Range(s)
+    step5instr = richLabel(value ='This step is optional. '
+                                  'If you define no range(s) all data '
+                                  'points will be used in the fit. <ul>'
+                                  '<li> Click on points to select the '
+                                  'beginning and ending of each range of '
+                                  'data to include in the fit.</li>'
+                                  '<li> Hold down the `ctrl` key while '
+                                  'clicking on a point to deselect it.</li>'
+                                  '<li> Nearest neighbor pairs of points '
+                                  'starting with the lowest point index '
+                                  'number are used to define each range. If '
+                                  'you select an odd number of points, '
+                                  'the last point will be ignored.</li>'
+                                  '<li> Check the `Extend fitted function '
+                                  'plot` box if you want to display '
+                                  'calculations of the fitted function and '
+                                  'residuals in regions that were not fit '
+                                  'to.</li></ul>')
+    extend_fit = Checkbox(value=False,
+                           description='Extend fitted function plot',
+                           style=longdesc)
+    range_plot =  go.FigureWidget(layout_template='simple_white')
+    range_plot_line_color = 'blue'
+    range_plot_hilight = 'cyan'
+    range_plot_marker_size = 6
+    range_plot_hilight_size = 20
+    ranges=[]
+    def update_range_point(trace, points, selector):
+        if len(trace['marker']['color'])!=len(trace['x']):
+            c = [range_plot_line_color]*len(trace['x'])
+            s = [range_plot_marker_size]*len(trace['x'])
+        else:
+            c = list(trace['marker']['color'])
+            s = list(trace['marker']['size'])
+        for i in points.point_inds:
+            if selector.ctrl:
+                c[i]=range_plot_line_color
+                s[i] = range_plot_marker_size
+            else:
+                c[i] = range_plot_hilight
+                s[i] = range_plot_hilight_size
+        with range_plot.batch_update():
+            trace.marker.color = c
+            trace.marker.size = s
+        pass
+    step5instacc = Accordion(children =[step5instr])
+    step5instacc.set_title(0,'Instructions (optional step)')
+    step5instacc.selected_index = None
+    step5 = VBox([step5instacc,extend_fit,range_plot])
+    # 6. Final Check*
+    step6instr = richLabel(value = 'Things to check before clicking "Do '
                                    'Fit": <ul>'
                                    '<li>Fix any problems listed in '
                                    '"Notices".</li>'
@@ -452,7 +517,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                    'quotes are paired.</li>'
                                    '<li>If you did any manual editing '
                                    'double-check for typos.</li>')
-    step5noticebox = richLabel(value = makeplot_notices.notice_html())
+    step6noticebox = richLabel(value = makeplot_notices.notice_html())
     def dofit_click(change):
         select_cell_immediately_below()
         dfname = friendly_to_globalname[whichframe.value]
@@ -510,18 +575,72 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         pass
     dofitbut = Button(description = 'Do Fit', disabled = True)
     dofitbut.on_click(dofit_click)
-    step5vbox = VBox([dofitbut,step5noticebox])
-    step5 = HBox([step5instr,step5vbox])
+    step6vbox = VBox([dofitbut,step6noticebox])
+    step6 = HBox([step6instr,step6vbox])
 
 
-    steps = Tab([step1, step2, step3, step4, step5])
+    steps = Tab([step1, step2, step3, step4, step5, step6])
     steps.set_title(0,'1. Pick Data*')
     steps.set_title(1,'2. Data Uncertainty*')
     steps.set_title(2,'3. Set up Model*')
     steps.set_title(3,'4. Axes Format*')
-    steps.set_title(4, '5. Final Check*')
+    steps.set_title(4, '5. Pick Fit Range(s)')
+    steps.set_title(5, '6. Final Check*')
     def tab_changed(change):
-        if change['new'] ==4:
+        nonlocal importstr, step1str, step2str, step3str, step4str, step5str
+        if change['old'] == 0:
+            # Update step 1 string
+            step1str = '# Define data and trace name\\n'
+            step1str += 'Xvals = '+str(whichframe.value)+'[\\"'
+            step1str += str(Xcoord.value)+'\\"]\\n'
+            step1str += 'Yvals = ' + str(whichframe.value) +'[\\"'
+            step1str += str(Ycoord.value)+'\\"]\\n'
+            step1str += 'tracename = \\"'+str(trace_name.value)+'\\"\\n\\n'
+            pass
+        if change['old'] == 1:
+            # update step 2 string
+            if yerrtype!='none':
+                step2str = '# Define error (uncertainty)\\n'
+            pass
+        if change['old']== 2:
+            # update step 3 string
+            pass
+        if change['old'] == 3:
+            # update step 4 string
+            pass
+        if change['old'] == 4:
+            # update ranges
+            range_start = True
+            ranges = []
+            new_range = []
+            for i in range(len(range_plot.data[0].marker.color)):
+                if range_plot.data[0].marker.color[i] == range_plot_hilight:
+                    new_range.append(i)
+                    if not range_start:
+                        ranges.append(new_range)
+                        new_range = []
+                    range_start = not range_start
+                # update step 5 string
+                pass
+        if change['new'] == 4:
+            df = friendly_to_object[whichframe.value]
+            rangex = df[Xcoord.value]
+            rangey = df[Ycoord.value]
+            c =[]
+            s = []
+            if len(range_plot.data) > 0:
+                c = list(range_plot.data[0].marker.color)
+                s = list(range_plot.data[0].marker.size)
+            range_plot.data=[]
+            range_plot.add_scatter(x=rangex,y=rangey, mode = 'markers',
+                                   line_color = range_plot_line_color,
+                                   marker_size = range_plot_marker_size)
+            if len(range_plot.data[0]['x']) == len(c):
+                with range_plot.batch_update():
+                    range_plot.data[0].marker.color = c
+                    range_plot.data[0].marker.size = s
+            range_plot.data[0].on_click(update_range_point)
+        if change['new'] ==6:
             if X_label.value == '' or Y_label.value == '':
                 makeplot_notices.activate_notice(2)
                 dofitbut.disabled = True
@@ -541,19 +660,19 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 dofitbut.button_style = ''
             else:
                 makeplot_notices.deactivate_notice(1)
-            step5noticebox.value = makeplot_notices.notice_html()
+            step6noticebox.value = makeplot_notices.notice_html()
         if len(makeplot_notices.get_active()) == 0:
             dofitbut.disabled = False
             dofitbut.button_style = 'success'
+        select_containing_cell('pandasfitGUI')
+        select_cell_immediately_below()
+        # replace_text_of_current_cell(importstr + step1str + step2str +
+        #                              step3str + step4str + step5str)
+        replace_text_of_current_cell(importstr + step1str + step2str)
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
     display(steps)
     select_containing_cell('pandasfitGUI')
     new_cell_immediately_below()
-    text = 'from plotly import graph_objects as go\\n'
-    text += 'import lmfit as lmfit\\n'
-    text += str(figname) + ' = go.FigureWidget(' \
-                          'layout_template=\\"simple_white\\")'
-    insert_text_into_next_cell(text)
     pass

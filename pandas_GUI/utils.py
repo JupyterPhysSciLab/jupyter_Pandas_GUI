@@ -37,6 +37,11 @@ def insert_text_into_next_cell(text):
                'replaceSelection("' + text + '");'))
     pass
 
+def replace_text_of_current_cell(text):
+    from IPython.display import display, HTML
+    from IPython.display import Javascript as JS
+    display(JS('Jupyter.notebook.get_selected_cell().set_text("' + text +'");'))
+
 
 def insert_text_at_beginning_of_current_cell(text):
     # append \n to line insert as a separate line.
