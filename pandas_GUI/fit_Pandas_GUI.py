@@ -100,9 +100,11 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                      r'$\color{red}{\phi}$ = shift'
     }
 
-    importstr = r'# Imports\n' \
+    importstr = r'# Imports (no effect if already imported)\n' \
+                r'import numpy as np\n' \
                 r'import lmfit as lmfit\n' \
                 r'import round_using_error as rue\n' \
+                r'import copy as copy\n' \
                 r'from plotly import graph_objects as go\n\n'
     step1str = ''
     step2str = ''
@@ -411,8 +413,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     getcurrmodel_param(modeldrop.value, params_set)
     step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
 
-    # 4.Title, Axes, Format ...
-    step4instr = richLabel(value = 'You must set the axes labels to something '
+    # 5.Title, Axes, Format ...
+    step5instr = richLabel(value = 'You must set the axes labels to something '
                            'appropriate. For example if the X - values '
                            'represent time in seconds "Time (s)" is a good '
                            'choice. Likewise, choose an appropriate label '
@@ -451,12 +453,12 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step4hbox1 = HBox([X_label, Y_label])
-    step4hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step4 = VBox([step4instr, plot_title, step4hbox1, step4hbox2])
+    step5hbox1 = HBox([X_label, Y_label])
+    step5hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
+    step5 = VBox([step5instr, plot_title, step5hbox1, step5hbox2])
 
-    # 5. Pick Fit Range(s)
-    step5instr = richLabel(value ='This step is optional. '
+    # 4. Pick Fit Range(s)
+    step4instr = richLabel(value ='This step is optional. '
                                   'If you define no range(s) all data '
                                   'points will be used in the fit. <ul>'
                                   '<li> Click on points to select the '
@@ -501,10 +503,10 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             trace.marker.color = c
             trace.marker.size = s
         pass
-    step5instacc = Accordion(children =[step5instr])
-    step5instacc.set_title(0,'Instructions (optional step)')
-    step5instacc.selected_index = None
-    step5 = VBox([step5instacc,extend_fit,range_plot])
+    step4instacc = Accordion(children =[step4instr])
+    step4instacc.set_title(0,'Instructions (optional step)')
+    step4instacc.selected_index = None
+    step4 = VBox([step4instacc,extend_fit,range_plot])
     # 6. Final Check*
     step6instr = richLabel(value = 'Things to check before clicking "Do '
                                    'Fit": <ul>'
@@ -583,8 +585,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     steps.set_title(0,'1. Pick Data*')
     steps.set_title(1,'2. Data Uncertainty*')
     steps.set_title(2,'3. Set up Model*')
-    steps.set_title(3,'4. Axes Format*')
-    steps.set_title(4, '5. Pick Fit Range(s)')
+    steps.set_title(3,'4. Pick Fit Range(s)')
+    steps.set_title(4, '5. Axes & Format*')
     steps.set_title(5, '6. Final Check*')
     def tab_changed(change):
         nonlocal importstr, step1str, step2str, step3str, step4str, step5str
@@ -598,17 +600,57 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             step1str += 'tracename = \\"'+str(trace_name.value)+'\\"\\n\\n'
             pass
         if change['old'] == 1:
+            # TODO need do something in case  tab is changed before a click
+            # occurs outside a box that was just change. blur things will
+            # require ipywidgets v8+
             # update step 2 string
-            if yerrtype!='none':
-                step2str = '# Define error (uncertainty)\\n'
+            step2str = '# Define error (uncertainty)\\n'
+            if yerrtype.value == 'none':
+                step2str += 'Yerr = ' + str(whichframe.value) + '[\\"'
+                step2str += str(Ycoord.value) + '\\"]*0 + 1\\n\\n'
+            if yerrtype.value=='constant':
+                step2str += 'Yerr = ' + str(whichframe.value)+'[\\"'
+                step2str += str(Ycoord.value)+'\\"]*0 + ' + str(
+                    yerrvalue.value) + '\\n\\n'
+            if yerrtype.value == 'percent':
+                step2str += 'Yerr = ' + str(whichframe.value)+'[\\"'
+                step2str += str(Ycoord.value)+'\\"]*0.01*' + str(
+                    yerrvalue.value) + '\\n\\n'
+            if yerrtype.value == 'data':
+                step2str += 'Yerr = ' + str(whichframe.value)+'[\\"'
+                step2str += str(yerrdata.value)+'\\"]\\n\\n'
             pass
         if change['old']== 2:
             # update step 3 string
+            step3str = '# Define the fit model, initial guesses, and contraints\\n'
+            step3str += 'fitmod = lmfit.models.'+str(modeldrop.value)+'()\\n'
+            currmodel = getattr(models, str(modeldrop.value))()
+            for k in params_set.children:
+                param_name = str(k.children[0].value.split(':')[0])
+                if param_name in currmodel.param_names:
+                    step3str += 'fitmod.set_param_hint(\\"'+param_name+'\\",'
+                    step3str += ' vary = '+str(not(k.children[1].children[
+                        0].value))
+                    temp_val = k.children[1].children[1].value
+                    def tst_temp_val(temp_val):
+                        if (temp_val != np.nan) and (temp_val != np.inf) and\
+                                (temp_val != -np.inf) and (str(temp_val) != \
+                                'nan'):
+                            return True
+                        else:
+                            return False
+                    if tst_temp_val(temp_val):
+                        step3str += ', value = ' + str(temp_val)
+                    temp_val = k.children[1].children[2].value
+                    if tst_temp_val(temp_val):
+                        step3str += ', min = ' + str(temp_val)
+                    temp_val = k.children[1].children[3].value
+                    if tst_temp_val(temp_val):
+                        step3str += ', max = ' + str(temp_val)
+                    step3str += ')\\n'
+            step3str +='\\n'
             pass
         if change['old'] == 3:
-            # update step 4 string
-            pass
-        if change['old'] == 4:
             # update ranges
             range_start = True
             ranges = []
@@ -620,15 +662,64 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                         ranges.append(new_range)
                         new_range = []
                     range_start = not range_start
+            # update step 4 string
+            if len(ranges) > 0:
+                step4str = '# Define fit ranges\\n'
+                step4str += 'Yfiterr = copy.deepcopy(Yerr) # ranges not to ' \
+                            'fit = np.inf\\n'
+                step4str += 'Xfitdata = copy.deepcopy(Xvals) # ranges where ' \
+                            'fit not displayed = np.nan\\n'
+                for i in range(len(ranges)):
+                    if i == 0 and ranges[0][0]>0:
+                        step4str += 'Yfiterr[0:'+str(ranges[0][0])+'] = ' \
+                                                                   'np.inf\\n'
+                        if not(extend_fit.value):
+                            step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
+                                        '] = np.nan\\n'
+                    if (i + 1) < len(ranges):
+                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
+                                    ':'+str(ranges[i+1][0])+'] = np.inf\\n'
+                        if not(extend_fit.value):
+                            step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
+                                        ':'+str(ranges[i+1][0])+'] = np.nan\\n'
+                    if i+1 == len(ranges):
+                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
+                                    ':'+str(len(range_plot.data[0].marker.
+                                                color))+'] = np.inf\\n'
+                        if not(extend_fit.value):
+                            step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
+                                    ':'+str(len(range_plot.data[0].marker.
+                                                color))+'] = np.nan\\n'
+                step4str += '\\n'
+                step4str += '# Do fit\\n'
+                step4str += 'results = fitmod.fit(Yvals, x=Xvals, ' \
+                            'weights = 1/Yfiterr, scale_covar = False, ' \
+                            'nan_policy = \\"omit\\")\\n\\n'
+            else:
+                step4str = '# Do fit\\n'
+                step4str += 'results = fitmod.fit(Yvals, x=Xvals, ' \
+                            'weights = 1/Yerr, scale_covar = False, ' \
+                            'nan_policy = \\"omit\\")\\n\\n'
+            step4str += '# Calculate residuals (data - fit) because lmfit\\n'
+            step4str += '#  does not calculate for all points under all ' \
+                        'conditions\\n'
+            step4str += 'resid = []\\n'
+            step4str += 'for i in range(0,len(results.data)):\\n'
+            step4str += '    resid.append(results.data[i]-results.best_fit[' \
+                        'i])\\n\\n'
+            pass
+        if change['old'] == 4:
                 # update step 5 string
+                step5str = '# Display Results\\n'
                 pass
-        if change['new'] == 4:
+        if change['new'] == 3:
             df = friendly_to_object[whichframe.value]
             rangex = df[Xcoord.value]
             rangey = df[Ycoord.value]
             c =[]
             s = []
-            if len(range_plot.data) > 0:
+            if len(range_plot.data)> 0 and len(range_plot.data[
+                0].marker.color) == len(range_plot.data[0]['x']):
                 c = list(range_plot.data[0].marker.color)
                 s = list(range_plot.data[0].marker.size)
             range_plot.data=[]
@@ -664,11 +755,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if len(makeplot_notices.get_active()) == 0:
             dofitbut.disabled = False
             dofitbut.button_style = 'success'
-        select_containing_cell('pandasfitGUI')
-        select_cell_immediately_below()
-        # replace_text_of_current_cell(importstr + step1str + step2str +
-        #                              step3str + step4str + step5str)
-        replace_text_of_current_cell(importstr + step1str + step2str)
+        JPSLUtils.select_containing_cell('pandasfitGUI')
+        JPSLUtils.replace_text_of_next_cell(importstr + step1str + step2str +
+                                     step3str + step4str + step5str)
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
