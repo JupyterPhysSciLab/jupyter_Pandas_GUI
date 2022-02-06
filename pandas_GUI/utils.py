@@ -145,6 +145,27 @@ def find_figure_names():
             fignames.append(k)
     return fignames
 
+def find_fit_names():
+    """
+    This operation will search the interactive namespace for objects that are
+    lmfit results (lmfit.model.ModelResults). It will not find fit results
+    that are children of other objects. You will need to
+    provide your own operation for finding those.
+
+    :return: type: list of string names for the objects in the global
+    interactive namespace that are lmfit fit results.
+    """
+    from lmfit.model import ModelResult
+    from IPython import get_ipython
+
+    fitnames = []
+    global_dict = get_ipython().user_ns
+    for k in global_dict:
+        if not (str.startswith(k, '_')) and isinstance(global_dict[k],
+                                                       ModelResult):
+            fitnames.append(k)
+    return fitnames
+
 class iconselector():
     """
     This class provides a self updating set of small buttons showing the

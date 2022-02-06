@@ -40,6 +40,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         :userfriendly: string name to display for user selection.
     :keyword string figname: string used to override default python name for
     figure.
+    :keyword string fitname: string used to override default python name for
+    fit.
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
@@ -69,6 +71,15 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     friendly_to_globalname = {k[2]:k[1] for k in dfs_info}
     friendly_to_object = {k[2]:k[0] for k in dfs_info}
 
+    fitname = kwargs.pop('fitname',None)
+    from .utils import find_fit_names
+    fitlst = find_fit_names()
+    if fitname in fitlst:
+        raise UserWarning (str(fitname) + ' already exists. Choose a '
+                                          'different name for the fit.')
+    if fitname == None:
+        fitname = 'Fit_'+str(len(fitlst)+1)
+
     figname = kwargs.pop('figname',None)
     from .utils import find_figure_names
     figlst = find_figure_names()
@@ -76,7 +87,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         raise UserWarning (str(figname) + ' already exists. Choose a '
                                           'different name for the figure.')
     if figname == None:
-        figname = 'Figure_'+str(len(figlst)+1)
+        figname = str(fitname) + '_Figure'
+
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
                  'GaussianModel','SineModel']
     fitmodeleqns = {
@@ -112,7 +124,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step4str = ''
     step5str = ''
     step6str = ''
-
+    range_chosen = False
     #### Define GUI Elements ####
     # Those followed by a * are required.
     display(HTML(
@@ -589,7 +601,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     steps.set_title(4, '5. Axes & Format*')
     steps.set_title(5, '6. Final Check*')
     def tab_changed(change):
-        nonlocal importstr, step1str, step2str, step3str, step4str, step5str
+        nonlocal importstr, step1str, step2str, step3str, step4str, step5str, \
+            range_chosen
         if change['old'] == 0:
             # Update step 1 string
             step1str = '# Define data and trace name\\n'
@@ -664,6 +677,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     range_start = not range_start
             # update step 4 string
             if len(ranges) > 0:
+                range_chosen = True
                 step4str = '# Define fit ranges\\n'
                 step4str += 'Yfiterr = copy.deepcopy(Yerr) # ranges not to ' \
                             'fit = np.inf\\n'
@@ -673,44 +687,89 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     if i == 0 and ranges[0][0]>0:
                         step4str += 'Yfiterr[0:'+str(ranges[0][0])+'] = ' \
                                                                    'np.inf\\n'
-                        if not(extend_fit.value):
-                            step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
-                                        '] = np.nan\\n'
+                        step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
+                                    '] = np.nan\\n'
                     if (i + 1) < len(ranges):
                         step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
                                     ':'+str(ranges[i+1][0])+'] = np.inf\\n'
-                        if not(extend_fit.value):
-                            step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
-                                        ':'+str(ranges[i+1][0])+'] = np.nan\\n'
+                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
+                                    ':'+str(ranges[i+1][0])+'] = np.nan\\n'
                     if i+1 == len(ranges):
                         step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
                                     ':'+str(len(range_plot.data[0].marker.
                                                 color))+'] = np.inf\\n'
-                        if not(extend_fit.value):
-                            step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
-                                    ':'+str(len(range_plot.data[0].marker.
-                                                color))+'] = np.nan\\n'
+                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
+                                ':'+str(len(range_plot.data[0].marker.
+                                            color))+'] = np.nan\\n'
                 step4str += '\\n'
                 step4str += '# Do fit\\n'
-                step4str += 'results = fitmod.fit(Yvals, x=Xvals, ' \
+                step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
                             'weights = 1/Yfiterr, scale_covar = False, ' \
                             'nan_policy = \\"omit\\")\\n\\n'
             else:
+                range_chosen = False
                 step4str = '# Do fit\\n'
-                step4str += 'results = fitmod.fit(Yvals, x=Xvals, ' \
+                step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
                             'weights = 1/Yerr, scale_covar = False, ' \
                             'nan_policy = \\"omit\\")\\n\\n'
             step4str += '# Calculate residuals (data - fit) because lmfit\\n'
             step4str += '#  does not calculate for all points under all ' \
                         'conditions\\n'
             step4str += 'resid = []\\n'
-            step4str += 'for i in range(0,len(results.data)):\\n'
-            step4str += '    resid.append(results.data[i]-results.best_fit[' \
-                        'i])\\n\\n'
+            step4str += 'for i in range(0,len('+str(fitname)+'.data)):\\n'
+            step4str += '    resid.append('+str(fitname)+'.data[' \
+                                        'i]-'+str(fitname)+'.best_fit[i])\\n\\n'
             pass
         if change['old'] == 4:
                 # update step 5 string
-                step5str = '# Display Results\\n'
+                # the plot
+                step5str = '# Plot Results\\n'
+                step5str += str(figname) + ' = go.FigureWidget(' \
+                                    'layout_template=\\"simple_white\\")\\n'
+                step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
+                                           'row_heights=[0.2,0.8], ' \
+                                           'shared_xaxes=True)\\n'
+                if range_chosen:
+                    xstr = 'Xfitdata'
+                else:
+                    xstr = 'Xvals'
+                errbarstr = ''
+                if yerrtype.value!='none':
+                    errbarstr = ', error_y_type=\\"data\\", error_y_array=Yerr'
+                step5str += 'scat = go.Scatter(y=resid,x='+xstr+', ' \
+                                    'mode=\\"markers\\",' \
+                                    'name = \\"residuals\\"'+errbarstr+')\\n'
+                step5str += str(figname) + '.update_yaxes(title = ' \
+                                        '\\"Residuals\\", ' \
+                            'row=1, col=1, zeroline=True, zerolinecolor = ' \
+                            '\\"lightgrey\\")\\n'
+                step5str += str(figname) + '.add_trace(scat,col=1,row=1)\\n'
+                step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
+                            'mode=\\"markers\\", name=tracename'+errbarstr+')\\n'
+                step5str += str(figname) + '.add_trace(scat, col=1, ' \
+                                           'row = 2)\\n'
+                step5str += str(figname) + '.update_yaxes(title = ' \
+                                           '\\"'+Y_label.value+'\\", row=2, ' \
+                                                               'col=1)\\n'
+                step5str += str(figname) + '.update_xaxes(title = ' \
+                                           '\\"'+X_label.value+'\\", row=2, ' \
+                                                               'col=1)\\n'
+                if extend_fit.value:
+                    step5str += 'scat = go.Scatter(y='+str(
+                        fitname)+'.best_fit, x=Xvals, mode=\\"lines\\", '\
+                                'line_color = \\"black\\", ' \
+                                'name=\\"extrapolated\\",' \
+                                 'line_dash=\\"dash\\")\\n'
+                    step5str += str(figname) + '.add_trace(scat, col=1, ' \
+                                               'row=2)\\n'
+                step5str += 'scat = go.Scatter(y='+str(fitname)+'.best_fit,' \
+                                    'x='+xstr+', mode=\\"lines\\", ' \
+                                    'name=\\"fit\\", line_color = ' \
+                                    '\\"black\\", line_dash=\\"solid\\")\\n'
+                step5str += str(figname) + '.add_trace(scat,col=1,row=2)\\n'
+                step5str += str(figname) + '.show()\\n\\n'
+                # the best fit equation
+                step5str += '# Display best fit equation\\n'
                 pass
         if change['new'] == 3:
             df = friendly_to_object[whichframe.value]
