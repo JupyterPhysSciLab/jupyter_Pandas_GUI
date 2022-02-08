@@ -356,7 +356,11 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         expr = None  # Not used, maybe for arbitrary functions.
         for i in range(0,8):
             fix = False
-            value = np.nan
+            if modelname == 'PolynomialModel':
+                # PolynomialModel requires that the initial value be a number
+                value = 0
+            else:
+                value = np.nan
             min = -np.inf
             max = np.inf
             expr = None  # Not used, maybe for arbitrary functions.
@@ -534,58 +538,11 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step6noticebox = richLabel(value = makeplot_notices.notice_html())
     def dofit_click(change):
         select_cell_immediately_below()
-        dfname = friendly_to_globalname[whichframe.value]
-        text = 'scat = go.Scatter(x = '+dfname+'[\'' \
-               +Xcoord.value+'\'],'
-        text += ' y = ' +dfname+'[\''+Ycoord.value+ \
-                                          '\'],\\n'
-        text += '        mode = \''+modedrop.value+'\', name = \'' \
-                                               +trace_name.value+'\','
-        # in here add other formatting items using ifs.
-        if yerrtype.value != 'none':
-            text +='\\n        '
-            if yerrtype.value == 'data':
-                text += 'error_y_type=\'data\', ' \
-                        'error_y_array='+dfname
-                text += '[\''+yerrdata.value+'\'],'
-            else:
-                text += 'error_y_type=\''+yerrtype.value+'\', error_y_value='
-                text += str(yerrvalue.value)+','
-        text += ')\\n'
-        text += figname + '.add_trace(scat)\\n'
-        text += figname + '.update_xaxes(title= \''+X_label.value+'\''
-        def get_mirror_text():
-            if mirror_axes.value:
-                mirror_text = ', mirror = True)'
-                if mirror_ticks.value:
-                    mirror_text = ', mirror= \'ticks\')'
-            else:
-                mirror_text = ')'
-            return mirror_text
-        text += get_mirror_text()
-        insert_newline_at_end_of_current_cell(text)
-        text = figname + '.update_yaxes(title= \''+Y_label.value+'\''
-        text += get_mirror_text()
-        insert_newline_at_end_of_current_cell(text)
-        if plot_title.value !='' or plot_template.value != 'simple_white':
-            text = figname+'.update_layout(title = \''+plot_title.value+'\', '
-            text += 'template = \''+ plot_template.value +'\')'
-            insert_newline_at_end_of_current_cell(text)
-        text = figname +'.show()'
-        insert_newline_at_end_of_current_cell(text)
-        text = '# Force save widget states so that graph will still be'
-        insert_newline_at_end_of_current_cell(text)
-        text = '# available when notebook next opened in trusted state.'
-        insert_newline_at_end_of_current_cell(text)
-        jscode = 'Jupyter.actions.call(\\"widgets:save-with-widgets\\");'
-        text = 'JPSLUtils.OTJS(\''+jscode+'\')'
-        insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
         JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
         # remove the GUI cell
         select_containing_cell('pandasfitGUI')
         delete_selected_cell()
-        from time import sleep
         pass
     dofitbut = Button(description = 'Do Fit', disabled = True)
     dofitbut.on_click(dofit_click)
@@ -626,8 +583,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 step2str += str(Ycoord.value)+'\\"]*0 + ' + str(
                     yerrvalue.value) + '\\n\\n'
             if yerrtype.value == 'percent':
-                step2str += 'Yerr = ' + str(whichframe.value)+'[\\"'
-                step2str += str(Ycoord.value)+'\\"]*0.01*' + str(
+                step2str += 'Yerr = np.fabs('+ str(whichframe.value)+'[\\"'
+                step2str += str(Ycoord.value)+'\\"])*0.01*' + str(
                     yerrvalue.value) + '\\n\\n'
             if yerrtype.value == 'data':
                 step2str += 'Yerr = ' + str(whichframe.value)+'[\\"'
@@ -663,7 +620,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     step3str += ')\\n'
             step3str +='\\n'
             pass
-        if change['old'] == 3:
+        if change['new']>=4:
             # update ranges
             range_start = True
             ranges = []
@@ -722,38 +679,53 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             pass
         if change['old'] == 4:
                 # update step 5 string
-                # the plot
-                step5str = '# Plot Results\\n'
-                step5str += str(figname) + ' = go.FigureWidget(' \
-                                    'layout_template=\\"simple_white\\")\\n'
-                step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
-                                           'row_heights=[0.2,0.8], ' \
-                                           'shared_xaxes=True)\\n'
+                step5str = ''
                 if range_chosen:
                     xstr = 'Xfitdata'
+                    if not(extend_fit.value):
+                        step5str += '# Delete residuals in ranges not fit\\n'
+                        step5str += 'for i in range(len(resid)):\\n'
+                        step5str += '    if np.isnan(Xfitdata[i]):\\n'
+                        step5str += '        resid[i] = np.nan\\n\\n'
                 else:
                     xstr = 'Xvals'
                 errbarstr = ''
                 if yerrtype.value!='none':
                     errbarstr = ', error_y_type=\\"data\\", error_y_array=Yerr'
-                step5str += 'scat = go.Scatter(y=resid,x='+xstr+', ' \
+                xresidstr = xstr
+                if extend_fit.value:
+                    xresidstr = 'Xvals'
+                mirrorstr = ''
+                if mirror_axes.value:
+                    mirrorstr = ', mirror = True'
+                    if mirror_ticks.value:
+                        mirrorstr = ', mirror = \\"ticks\\"'
+                # the plot
+                step5str += '# Plot Results\\n'
+                step5str += str(figname) + ' = go.FigureWidget(' \
+                                    'layout_template=\\"'+str(
+                                    plot_template.value)+'\\")\\n'
+                step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
+                                           'row_heights=[0.2,0.8], ' \
+                                           'shared_xaxes=True)\\n'
+                step5str += 'scat = go.Scatter(y=resid,x='+xresidstr+', ' \
                                     'mode=\\"markers\\",' \
                                     'name = \\"residuals\\"'+errbarstr+')\\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
                                         '\\"Residuals\\", ' \
                             'row=1, col=1, zeroline=True, zerolinecolor = ' \
-                            '\\"lightgrey\\")\\n'
+                            '\\"lightgrey\\"'+str(mirrorstr)+')\\n'
                 step5str += str(figname) + '.add_trace(scat,col=1,row=1)\\n'
                 step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
                             'mode=\\"markers\\", name=tracename'+errbarstr+')\\n'
                 step5str += str(figname) + '.add_trace(scat, col=1, ' \
                                            'row = 2)\\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
-                                           '\\"'+Y_label.value+'\\", row=2, ' \
-                                                               'col=1)\\n'
+                                           '\\"'+Y_label.value+'\\", ' \
+                                           'row=2, col=1'+str(mirrorstr)+')\\n'
                 step5str += str(figname) + '.update_xaxes(title = ' \
-                                           '\\"'+X_label.value+'\\", row=2, ' \
-                                                               'col=1)\\n'
+                                           '\\"'+X_label.value+'\\", ' \
+                                           'row=2, col=1'+str(mirrorstr)+')\\n'
                 if extend_fit.value:
                     step5str += 'scat = go.Scatter(y='+str(
                         fitname)+'.best_fit, x=Xvals, mode=\\"lines\\", '\
@@ -790,7 +762,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     range_plot.data[0].marker.color = c
                     range_plot.data[0].marker.size = s
             range_plot.data[0].on_click(update_range_point)
-        if change['new'] ==6:
+        if change['new'] ==5:
             if X_label.value == '' or Y_label.value == '':
                 makeplot_notices.activate_notice(2)
                 dofitbut.disabled = True
