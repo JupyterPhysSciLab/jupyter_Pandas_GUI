@@ -464,8 +464,10 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
                                     'seaborn',
                                  'plotly', 'plotly_white', 'plotly_dark',
-                                 'presentation', 'xgridoff''ygridoff',
-                                 'gridon'],
+                                 'presentation', 'xgridoff', 'ygridoff',
+                                 'gridon', 'simple_white+presentation',
+                                      'simple_white+gridon', 
+                                      'simple_white+presentation+gridon'],
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
@@ -523,6 +525,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     step4instacc.set_title(0,'Instructions (optional step)')
     step4instacc.selected_index = None
     step4 = VBox([step4instacc,extend_fit,range_plot])
+
     # 6. Final Check*
     step6instr = richLabel(value = 'Things to check before clicking "Do '
                                    'Fit": <ul>'
@@ -715,6 +718,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                         '\\"Residuals\\", ' \
                             'row=1, col=1, zeroline=True, zerolinecolor = ' \
                             '\\"lightgrey\\"'+str(mirrorstr)+')\\n'
+                if mirror_axes.value:
+                    step5str += str(figname) + '.update_xaxes(' \
+                                           'row=1, col=1'+str(mirrorstr)+')\\n'
                 step5str += str(figname) + '.add_trace(scat,col=1,row=1)\\n'
                 step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
                             'mode=\\"markers\\", name=tracename'+errbarstr+')\\n'

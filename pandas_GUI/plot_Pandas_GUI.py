@@ -490,8 +490,10 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
                                     'seaborn',
                                  'plotly', 'plotly_white', 'plotly_dark',
-                                 'presentation', 'xgridoff''ygridoff',
-                                 'gridon'],
+                                 'presentation', 'xgridoff', 'ygridoff',
+                                 'gridon', 'simple_white+presentation',
+                                      'simple_white+gridon',
+                                      'simple_white+presentation+gridon'],
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
