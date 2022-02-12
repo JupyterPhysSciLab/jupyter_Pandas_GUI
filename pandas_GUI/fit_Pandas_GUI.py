@@ -112,6 +112,74 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                      r'$\color{red}{\phi}$ = shift'
     }
 
+    def polymodelresultstr(resultname):
+        template = r'' \
+          'for k in %result.params.keys():\n' \
+          '    pwr = int(str(k)[-1:])\n' \
+          '    if %result.params[k].vary:\n' \
+          '        if termcount > 0:\n' \
+          '            fitstr += ' + '\n' \
+          '        fitstr += r\'(\color{red}{\'+rue.latex_rndwitherr(' \
+                                         '%result.params[k].value,\n' \
+          '                               %result.params[k].stderr, ' \
+                                         'errdig=1, lowmag=-3)+\'})\'\n' \
+          '        if pwr == 1:\n' \
+          '            fitstr += \'x\'\n' \
+          '        if pwr > 1:\n' \
+          '            fitstr += \'x^\'+str(pwr)\n' \
+          '        termcount+=1\n' \
+          '    else:\n' \
+          '        if %result.params[k].value!=0:\n' \
+          '            if termcount > 0:\n' \
+          '                fitstr += \'+\'\n' \
+          '            fitstr += r\'(\color{red}{\'+rue.latex_rndwitherr(' \
+                                         '%result.params[k].value, 0,\n' \
+          '                        errdig=1,lowmag=-3)+\'})x^\'+str(pwr)\n' \
+          'fitstr+=\'$\'\n' \
+          'captionstr=\'<p>Use the command <code>%result</code> as the' \
+          'last line of a code cell for more details.</p>\'\n' \
+          'display(HTML(fitstr+captionstr))\'\n'
+        return template.replace('%result', str(resultname))
+
+    def sinmodelresultstr(resultname):
+        template = r'' \
+       'ampstr = \'\'\n' \
+       'freqstr = \'\'\n' \
+       'shiftstr = \'\'\n' \
+       'for k in %results.params.keys():\n' \
+       '    if %results.params[k].vary:\n' \
+       '        paramstr = \'(\color{red}{\'+rue.latex_rndwitherr(%results.params[k].value,\n' \
+       '                                       %results.params[k].stderr,\n' \
+       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '    else:\n' \
+       '        paramstr = \'(\color{red}{\'+rue.latex_rndwitherr(%results.params[k].value,\n' \
+       '                                       0, errdig=1, lowmag=-3)+\'})\'\n' \
+       '    if k == \'amplitude\':\n' \
+       '        ampstr = paramstr\n' \
+       '    if k == \'frequency\':\n' \
+       '        freqstr = paramstr\n' \
+       '    if k == \'shift\' and %results.params[k].value != 0:\n' \
+       '        shiftstr = \' + \' + paramstr\n' \
+       'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
+       'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+       'last line of a code cell for more details.</p>\'\n' \
+       'display(HTML(fitstr+captionstr))'
+        return template.replace('%results', resultname)
+
+    fitresultstrs = {
+    'LinearModel':r'$fit = \red{%a}x + \red{%b) $',
+    'PolynomialModel': polymodelresultstr,
+    'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
+                        r'{\color{red}{\tau}}\right)$, where $\color{red}{A}$ '
+                        r'= amplitude, $ \color{red}{\tau}$ = decay',
+    'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
+                     r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
+                     r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
+                     r'$\color{red}{A}$ = amplitude, $\color{red}{\sigma}$ = sigma, '
+                     r'$\color{red}{\mu}$ = center',
+        'SineModel': sinmodelresultstr
+    }
+
     importstr = r'# Imports (no effect if already imported)\n' \
                 r'import numpy as np\n' \
                 r'import lmfit as lmfit\n' \
