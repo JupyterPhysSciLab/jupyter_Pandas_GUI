@@ -114,70 +114,109 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     def polymodelresultstr(resultname):
         template = r'' \
-          'for k in %result.params.keys():\n' \
-          '    pwr = int(str(k)[-1:])\n' \
-          '    if %result.params[k].vary:\n' \
-          '        if termcount > 0:\n' \
-          '            fitstr += ' + '\n' \
-          '        fitstr += r\'(\color{red}{\'+rue.latex_rndwitherr(' \
-                                         '%result.params[k].value,\n' \
+          'for k in %result.params.keys():\\n' \
+          '    pwr = int(str(k)[-1:])\\n' \
+          '    if %result.params[k].vary:\\n' \
+          '        if termcount > 0:\\n' \
+          '            fitstr += ' + '\\n' \
+          '        fitstr += r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                                         '%result.params[k].value,\\n' \
           '                               %result.params[k].stderr, ' \
-                                         'errdig=1, lowmag=-3)+\'})\'\n' \
-          '        if pwr == 1:\n' \
-          '            fitstr += \'x\'\n' \
-          '        if pwr > 1:\n' \
-          '            fitstr += \'x^\'+str(pwr)\n' \
-          '        termcount+=1\n' \
-          '    else:\n' \
-          '        if %result.params[k].value!=0:\n' \
-          '            if termcount > 0:\n' \
-          '                fitstr += \'+\'\n' \
-          '            fitstr += r\'(\color{red}{\'+rue.latex_rndwitherr(' \
-                                         '%result.params[k].value, 0,\n' \
-          '                        errdig=1,lowmag=-3)+\'})x^\'+str(pwr)\n' \
-          'fitstr+=\'$\'\n' \
+                                         'errdig=1, lowmag=-3)+\'})\'\\n' \
+          '        if pwr == 1:\\n' \
+          '            fitstr += \'x\'\\n' \
+          '        if pwr > 1:\\n' \
+          '            fitstr += \'x^\'+str(pwr)\\n' \
+          '        termcount+=1\\n' \
+          '    else:\\n' \
+          '        if %result.params[k].value!=0:\\n' \
+          '            if termcount > 0:\\n' \
+          '                fitstr += \'+\'\\n' \
+          '            fitstr += r\'(\\\color{blue}{\'+str(' \
+                                         '%result.params[k].value\\n' \
+          '                          )+\'})x^\'+str(pwr)\\n' \
+          'fitstr+=\'$\'\\n' \
           'captionstr=\'<p>Use the command <code>%result</code> as the' \
-          'last line of a code cell for more details.</p>\'\n' \
-          'display(HTML(fitstr+captionstr))\'\n'
+          'last line of a code cell for more details.</p>\'\\n' \
+          'display(HTML(fitstr+captionstr))\''
         return template.replace('%result', str(resultname))
+
+    def linmodelresultstr(resultname):
+        template = r'' \
+       'slopestr = ''\'\'\\n' \
+       'interceptstr = ''\'\'\\n' \
+       'for k in %results.params.keys():\\n' \
+       '    if %results.params[k].vary:\\n' \
+       '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                   '%results.params[k].value,\\n' \
+       '                                       %results.params[k].stderr,\\n' \
+       '                                       errdig=1,lowmag=-3)+\'})\'\\n' \
+       '    else:\\n' \
+       '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
+                   'k].value,' \
+                   '\\n' \
+       '                                       )+\'}\'\\n' \
+       '    if k == \'slope\':\\n' \
+       '        slopestr = paramstr\\n' \
+       '    if k == \'intercept\' and %results.params[k].value != 0:\\n' \
+       '        interceptstr = \' + \' + paramstr\\n' \
+       'fitstr = r\'$fit = \'+slopestr + \'x\' + interceptstr + \'$\'\\n' \
+       'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+       'last line of a code cell for more details.</p>\'\\n' \
+       'display(HTML(fitstr+captionstr))'
+        return template.replace('%results', resultname)
+
+    def expmodelresultstr(resultname):
+        # TODO
+        template = r'' \
+        'fitstr = \'\'\\n' \
+        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+        'last line of a code cell for more details.</p>\'\\n' \
+        'display(HTML(fitstr+captionstr))'
+        return template.replace('%results',resultname)
+
+    def gausmodelresultstr(resultname):
+        # TODO
+        template = r'' \
+        'fitstr = \'\'\\n' \
+        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+        'last line of a code cell for more details.</p>\'\\n' \
+        'display(HTML(fitstr+captionstr))'
+        return template.replace('%results',resultname)
 
     def sinmodelresultstr(resultname):
         template = r'' \
-       'ampstr = \'\'\n' \
-       'freqstr = \'\'\n' \
-       'shiftstr = \'\'\n' \
-       'for k in %results.params.keys():\n' \
-       '    if %results.params[k].vary:\n' \
-       '        paramstr = \'(\color{red}{\'+rue.latex_rndwitherr(%results.params[k].value,\n' \
-       '                                       %results.params[k].stderr,\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
-       '    else:\n' \
-       '        paramstr = \'(\color{red}{\'+rue.latex_rndwitherr(%results.params[k].value,\n' \
-       '                                       0, errdig=1, lowmag=-3)+\'})\'\n' \
-       '    if k == \'amplitude\':\n' \
-       '        ampstr = paramstr\n' \
-       '    if k == \'frequency\':\n' \
-       '        freqstr = paramstr\n' \
-       '    if k == \'shift\' and %results.params[k].value != 0:\n' \
-       '        shiftstr = \' + \' + paramstr\n' \
-       'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
+       'ampstr = \'\'\\n' \
+       'freqstr = \'\'\\n' \
+       'shiftstr = \'\'\\n' \
+       'for k in %results.params.keys():\\n' \
+       '    if %results.params[k].vary:\\n' \
+       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                   '%results.params[k].value,\\n' \
+       '                                       %results.params[k].stderr,\\n' \
+       '                                       errdig=1,lowmag=-3)+\'})\'\\n' \
+       '    else:\\n' \
+       '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value,' \
+                   '\\n' \
+       '                                       )+\'}\'\\n' \
+       '    if k == \'amplitude\':\\n' \
+       '        ampstr = paramstr\\n' \
+       '    if k == \'frequency\':\\n' \
+       '        freqstr = paramstr\\n' \
+       '    if k == \'shift\' and %results.params[k].value != 0:\\n' \
+       '        shiftstr = \' + \' + paramstr\\n' \
+       'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\\n' \
        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
-       'last line of a code cell for more details.</p>\'\n' \
+       'last line of a code cell for more details.</p>\'\\n' \
        'display(HTML(fitstr+captionstr))'
         return template.replace('%results', resultname)
 
     fitresultstrs = {
-    'LinearModel':r'$fit = \red{%a}x + \red{%b) $',
+    'LinearModel': linmodelresultstr,
     'PolynomialModel': polymodelresultstr,
-    'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
-                        r'{\color{red}{\tau}}\right)$, where $\color{red}{A}$ '
-                        r'= amplitude, $ \color{red}{\tau}$ = decay',
-    'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
-                     r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
-                     r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
-                     r'$\color{red}{A}$ = amplitude, $\color{red}{\sigma}$ = sigma, '
-                     r'$\color{red}{\mu}$ = center',
-        'SineModel': sinmodelresultstr
+    'ExponentialModel': expmodelresultstr,
+    'GaussianModel': gausmodelresultstr,
+    'SineModel': sinmodelresultstr
     }
 
     importstr = r'# Imports (no effect if already imported)\n' \
@@ -185,7 +224,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 r'import lmfit as lmfit\n' \
                 r'import round_using_error as rue\n' \
                 r'import copy as copy\n' \
-                r'from plotly import graph_objects as go\n\n'
+                r'from plotly import graph_objects as go\n' \
+                r'from IPython.display import HTML\n\n'
     step1str = ''
     step2str = ''
     step3str = ''
@@ -816,6 +856,7 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 step5str += str(figname) + '.show()\\n\\n'
                 # the best fit equation
                 step5str += '# Display best fit equation\\n'
+                step5str += fitresultstrs[modeldrop.value](fitname)
                 pass
         if change['new'] == 3:
             df = friendly_to_object[whichframe.value]
