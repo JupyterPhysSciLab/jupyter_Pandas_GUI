@@ -114,11 +114,13 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     def polymodelresultstr(resultname):
         template = r'' \
+          'fitstr = r\'$fit = \'\\n' \
+          'termcount = 0\\n' \
           'for k in %result.params.keys():\\n' \
           '    pwr = int(str(k)[-1:])\\n' \
           '    if %result.params[k].vary:\\n' \
           '        if termcount > 0:\\n' \
-          '            fitstr += ' + '\\n' \
+          '            fitstr += \' + \'\\n' \
           '        fitstr += r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\\n' \
           '                               %result.params[k].stderr, ' \
@@ -133,12 +135,16 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
           '            if termcount > 0:\\n' \
           '                fitstr += \'+\'\\n' \
           '            fitstr += r\'(\\\color{blue}{\'+str(' \
-                                         '%result.params[k].value\\n' \
-          '                          )+\'})x^\'+str(pwr)\\n' \
+                                         '%result.params[k].value)+\'})\'\\n' \
+          '            termcount +=1\\n' \
+          '            if pwr == 1:\\n' \
+          '                fitstr += \'x\'\\n' \
+          '            if pwr > 1:\\n' \
+          '                fitstr += \'x^\'+str(pwr)\\n' \
           'fitstr+=\'$\'\\n' \
           'captionstr=\'<p>Use the command <code>%result</code> as the' \
           'last line of a code cell for more details.</p>\'\\n' \
-          'display(HTML(fitstr+captionstr))\''
+          'display(HTML(fitstr+captionstr))'
         return template.replace('%result', str(resultname))
 
     def linmodelresultstr(resultname):
