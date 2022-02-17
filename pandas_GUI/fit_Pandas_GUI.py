@@ -175,16 +175,33 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     def expmodelresultstr(resultname):
         # TODO
         template = r'' \
-        'fitstr = \'\'\\n' \
+        'ampstr = ''\'\'\\n' \
+        'decaystr = ''\'\'\\n' \
+        'for k in %results.params.keys():\\n' \
+        '    if %results.params[k].vary:\\n' \
+        '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '%results.params[k].value,\\n' \
+        '                                 %results.params[k].stderr,\\n' \
+        '                                 errdig=1, lowmag=-3)+\'})\'\\n' \
+        '    else:\\n' \
+        '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
+                                               'k].value, \\n' \
+        '                                       )+\'}\'\\n' \
+        '    if k == \'amplitude\':\\n' \
+        '        ampstr = paramstr\\n' \
+        '    if k == \'decay\':\\n' \
+        '        decaystr = paramstr\\n' \
+        'fitstr = r\'$$fit = \'+ampstr+r\'\\\exp \\\left( %FRAC{-x}' \
+                        r'{\'+decaystr+r\'}\\right)$$\'\n' \
         'captionstr = \'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\\n' \
         'display(HTML(fitstr+captionstr))'
-        return template.replace('%results',resultname)
+        return template.replace('%results',resultname).replace('%FRAC',r'\\frac')
 
     def gausmodelresultstr(resultname):
         # TODO
         template = r'' \
-        'fitstr = \'\'\\n' \
+        'fitstr = r\'\'\\n' \
         'captionstr = \'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\\n' \
         'display(HTML(fitstr+captionstr))'
@@ -202,9 +219,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
        '                                       %results.params[k].stderr,\\n' \
        '                                       errdig=1,lowmag=-3)+\'})\'\\n' \
        '    else:\\n' \
-       '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value,' \
-                   '\\n' \
-       '                                       )+\'}\'\\n' \
+       '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value' \
+                   ')+\'}\'\\n' \
        '    if k == \'amplitude\':\\n' \
        '        ampstr = paramstr\\n' \
        '    if k == \'frequency\':\\n' \
@@ -488,6 +504,14 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     max = hints.get('max',np.inf)
                     expr = hints.get('expr',None)
                 params_set.children[i].layout.display=''
+                if modelname == 'ExponentialModel':
+                    df = friendly_to_object[whichframe.value]
+                    xvals = df[Xcoord.value]
+                    yvals = df[Ycoord.value]
+                    if labeltext == 'amplitude':
+                        value = np.mean(yvals)
+                    if labeltext == 'decay':
+                        value = (np.max(xvals) - np.min(xvals))/3.0
             else:
                 labeltext = str(i)
                 params_set.children[i].layout.display='none'
@@ -750,6 +774,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                         new_range = []
                     range_start = not range_start
             # update step 4 string
+            covscalestr = 'False'
+            if yerrtype.value == 'none':
+                covscalestr = 'True'
             if len(ranges) > 0:
                 range_chosen = True
                 step4str = '# Define fit ranges\\n'
@@ -778,14 +805,14 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 step4str += '\\n'
                 step4str += '# Do fit\\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
-                            'weights = 1/Yfiterr, scale_covar = False, ' \
-                            'nan_policy = \\"omit\\")\\n\\n'
+                    'weights = 1/Yfiterr, scale_covar = '+covscalestr+', ' \
+                    'nan_policy = \\"omit\\")\\n\\n'
             else:
                 range_chosen = False
                 step4str = '# Do fit\\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
-                            'weights = 1/Yerr, scale_covar = False, ' \
-                            'nan_policy = \\"omit\\")\\n\\n'
+                    'weights = 1/Yerr, scale_covar = '+covscalestr+', ' \
+                    'nan_policy = \\"omit\\")\\n\\n'
             step4str += '# Calculate residuals (data - fit) because lmfit\\n'
             step4str += '#  does not calculate for all points under all ' \
                         'conditions\\n'
@@ -860,9 +887,6 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                                     '\\"black\\", line_dash=\\"solid\\")\\n'
                 step5str += str(figname) + '.add_trace(scat,col=1,row=2)\\n'
                 step5str += str(figname) + '.show()\\n\\n'
-                # the best fit equation
-                step5str += '# Display best fit equation\\n'
-                step5str += fitresultstrs[modeldrop.value](fitname)
                 pass
         if change['new'] == 3:
             df = friendly_to_object[whichframe.value]
@@ -907,9 +931,12 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if len(makeplot_notices.get_active()) == 0:
             dofitbut.disabled = False
             dofitbut.button_style = 'success'
+        # the best fit equation
+        step6str = '# Display best fit equation\\n'
+        step6str += fitresultstrs[modeldrop.value](fitname)
         JPSLUtils.select_containing_cell('pandasfitGUI')
         JPSLUtils.replace_text_of_next_cell(importstr + step1str + step2str +
-                                     step3str + step4str + step5str)
+                                     step3str + step4str + step5str + step6str)
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
