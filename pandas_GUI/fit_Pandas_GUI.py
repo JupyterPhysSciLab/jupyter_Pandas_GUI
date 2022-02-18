@@ -828,9 +828,13 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                     xstr = 'Xfitdata'
                     if not(extend_fit.value):
                         step5str += '# Delete residuals in ranges not fit\\n'
+                        step5str += '# and fit values that are not ' \
+                                    'displayed.\\n'
                         step5str += 'for i in range(len(resid)):\\n'
                         step5str += '    if np.isnan(Xfitdata[i]):\\n'
-                        step5str += '        resid[i] = np.nan\\n\\n'
+                        step5str += '        resid[i] = np.nan\\n'
+                        step5str += '        '+str(fitname)+'.best_fit[i] = ' \
+                                                   'np.nan\\n\\n'
                 else:
                     xstr = 'Xvals'
                 errbarstr = ''
