@@ -581,7 +581,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     display(steps)
     select_containing_cell('pandasplotGUI')
     new_cell_immediately_below()
-    text = 'from plotly import graph_objects as go\\n'
+    text = '# CODE BLOCK generated using plot_pandas_GUI(). See '
+    text += 'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\\n'
+    text += 'from plotly import graph_objects as go\\n'
     text += str(figname) + ' = go.FigureWidget(' \
                           'layout_template=\\"simple_white\\")'
     insert_text_into_next_cell(text)

@@ -173,7 +173,6 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         return template.replace('%results', resultname)
 
     def expmodelresultstr(resultname):
-        # TODO
         template = r'' \
         'ampstr = ''\'\'\\n' \
         'decaystr = ''\'\'\\n' \
@@ -201,11 +200,33 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     def gausmodelresultstr(resultname):
         # TODO
         template = r'' \
-        'fitstr = r\'\'\\n' \
+        'ampstr = ''\'\'\\n' \
+        'centstr = ''\'\'\\n' \
+        'sigmastr = ''\'\'\\n' \
+        'for k in %results.params.keys():\\n' \
+        '    if %results.params[k].vary:\\n' \
+        '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                                          '%results.params[k].value,\\n' \
+        '                                 %results.params[k].stderr,\\n' \
+        '                                 errdig=1, lowmag=-3)+\'})\'\\n' \
+        '    else:\\n' \
+        '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
+                                               'k].value, \\n' \
+        '                                       )+\'}\'\\n' \
+        '    if k == \'amplitude\':\\n' \
+        '        ampstr = paramstr\\n' \
+        '    if k == \'center\':\\n' \
+        '        centstr = paramstr\\n' \
+        '    if k == \'sigma\':\\n' \
+        '        sigmastr = paramstr\\n' \
+        'fitstr = r\'$$fit = %FRAC{\'+ampstr+\'}{' \
+                   r'\'+sigmastr+r\'\\\sqrt{2\\\pi}}\\\exp \\\left( %FRAC{' \
+                   r'-\\left[x-\'+centstr+r\'\\right]^2}' \
+                   r'{2\'+sigmastr+r\'^2}\\right)$$\'\n' \
         'captionstr = \'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\\n' \
         'display(HTML(fitstr+captionstr))'
-        return template.replace('%results',resultname)
+        return template.replace('%results',resultname).replace('%FRAC',r'\\frac')
 
     def sinmodelresultstr(resultname):
         template = r'' \
@@ -241,7 +262,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     'SineModel': sinmodelresultstr
     }
 
-    importstr = r'# Imports (no effect if already imported)\n' \
+    importstr = r'# CODE BLOCK generated using fit_pandas_GUI(). See '\
+                r'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\n' \
+                r'# Imports (no effect if already imported)\n' \
                 r'import numpy as np\n' \
                 r'import lmfit as lmfit\n' \
                 r'import round_using_error as rue\n' \
