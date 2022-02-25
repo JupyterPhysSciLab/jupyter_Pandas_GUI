@@ -4,6 +4,7 @@ def calcresid(result):
     '''
     lmfit has empty values for residuals where the weighting is infinite or not defined.
     This calculates all the residuals based on the actual data and fit results.
+
     :param ModelResult result: An lmfit ModelResult.
 
     :return np.array residuals: The residuals.
