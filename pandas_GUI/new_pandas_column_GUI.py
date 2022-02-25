@@ -11,15 +11,14 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     To allow inclusion of text columns pass True for show_text_col.
 
-    :param show_text_col: bool (default = False). When True columns containing
-    text will be shown.
-    :param dfs_info: List of Lists of strings [[object,globalname,
-    userfriendly]
-    ],..]
-        :object: pandas.DataFrame
-        :globalname: string name of the object in the user global name space.
-        :userfriendly: string name to display for user selection.
-    :return:
+    :param bool show_text_col: (default = False). When True columns
+    containing text will be shown.
+
+    :param list dfs_info: List of Lists [[object,globalname,
+    userfriendly]],..]
+      * object -- pandas.DataFrame
+      * globalname -- string name of the object in the user global name space.
+      * userfriendly -- string name to display for user selection.
     """
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \

@@ -1,3 +1,7 @@
+""" pandas_GUI.utils
+The Jupyter JS call utils below are being deprecated by utilites in the
+package JPSLUtils (https://github.com/JupyterPhysSciLab/JPSLUtils).
+"""
 ######
 # Jupyter JS call utilities
 ######
@@ -110,7 +114,8 @@ def find_pandas_dataframe_names():
     DataFrame objects. It will not find DataFrames that are children
     of objects in the interactive namespace. You will need to provide
     your own operation for finding those.
-    :return: type: list of string names for objects in the global interactive
+
+    :return list: string names for objects in the global interactive
     namespace that are pandas DataFrames.
     """
     from pandas import DataFrame as df
@@ -131,7 +136,7 @@ def find_figure_names():
     FigureWidgets that are children of other objects. You will need to
     provide your own operation for finding those.
 
-    :return: type: list of string names for the objects in the global
+    :return list: of string names for the objects in the global
     interactive namespace that are plotly Figures or FigureWidgets.
     """
     from plotly.graph_objects import Figure, FigureWidget
@@ -152,7 +157,7 @@ def find_fit_names():
     that are children of other objects. You will need to
     provide your own operation for finding those.
 
-    :return: type: list of string names for the objects in the global
+    :return list: of string names for the objects in the global
     interactive namespace that are lmfit fit results.
     """
     from lmfit.model import ModelResult
@@ -182,11 +187,10 @@ class iconselector():
     def __init__(self,iconlist, selected = None):
         """
 
-        :param iconlist: list of string names for the font awsome icons to
+        :param list iconlist: list of string names for the font awsome icons to
         display. The names should not be prefixed with 'fa-'.
-        :type iconlist: list of str
-        :param selected: name of selected icon (default = None).
-        :type selected: str
+
+        :param string selected: name of selected icon (default = None).
         """
         from ipywidgets import HBox, Button, Layout
         self.buttons = []
@@ -231,15 +235,15 @@ class notice_group():
     def __init__(self, noticelist, header='', footer = '', color = ''):
         """
 
-        :param noticelist: list of strings of the text for each notice
-        :type noticelist: list
-        :param header: string providing a header for this notice group
-        :type header: str
-        :param footer: string providing a footer for this notice group
-        :type footer: str
-        :param color: string compatible with css color attribute, used to
-        color the displayed notices. The color not impact headers and footers.
-        :type color: str
+        :param list noticelist: list of strings of the text for each notice
+
+        :param string header: string providing a header for this notice group
+
+        :param string footer: string providing a footer for this notice group
+
+        :param string color: string compatible with css color attribute,
+        used to color the displayed notices. The color not impact headers
+        and footers.
         """
         self.header = header
         self.noticelist = noticelist
@@ -255,7 +259,8 @@ class notice_group():
         """
         Used to set a specific list of notices to active. This will remove
         active notices that are not in the provided list.
-        :param whichnotices:
+
+        :param  list whichnotices:
         """
         self.active = whichnotices
         pass
@@ -263,8 +268,8 @@ class notice_group():
     def activate_notice(self, notice_id):
         """
         adds one of the notices to the active list
-        :param notice_id:
-        :return:
+
+        :param int notice_id:
         """
         if notice_id not in self.active:
             self.active.append(notice_id)
@@ -273,8 +278,8 @@ class notice_group():
     def deactivate_notice(self, notice_id):
         """
         removes a notice from the active list
-        :param notice_id:
-        :return:
+
+        :param int notice_id:
         """
         if notice_id in self.active:
             self.active.remove(notice_id)
@@ -283,7 +288,8 @@ class notice_group():
     def notice_html(self):
         """
         Provides an html formatted string displaying the active notices.
-        :return: string of html.
+
+        :return string: string of html.
         """
         notice_header = ''
         if self.header !='':

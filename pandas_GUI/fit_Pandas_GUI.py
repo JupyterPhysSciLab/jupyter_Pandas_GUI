@@ -32,14 +32,16 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     To allow inclusion of text columns pass True for show_text_col.
 
     :param bool show_text_col: (default = False). When True columns
-    containing
-    text will be shown.
-    :param list dfs_info: List of Lists of strings [[globalname, userfriendly]
-    ],..]
-        :globalname: string name of the object in the user global name space.
-        :userfriendly: string name to display for user selection.
+    containing text will be shown.
+
+    :param list dfs_info: List of Lists [[object,globalname,
+    userfriendly]],..]
+      * object -- pandas.DataFrame
+      * globalname -- string name of the object in the user global name space.
+      * userfriendly -- string name to display for user selection.
     :keyword string figname: string used to override default python name for
     figure.
+
     :keyword string fitname: string used to override default python name for
     fit.
     """
