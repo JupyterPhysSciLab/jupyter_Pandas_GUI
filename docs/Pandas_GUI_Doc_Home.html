@@ -3,17 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Pandas GUI</title>
+    <style type="text/css">
+        #nav{
+        position:fixed;
+        top:0px;
+        width:14em;
+        height:100%;
+        //display:block;
+        border-right:solid;
+        overflow:scroll;
+        }
+        #icon{
+        max-width:75%;
+        max-height:120px;
+        }
+        #desc {
+        position:fixed;
+        left:15em;
+        }
+        h1 {
+        text-align: center;
+        }
+    </style>
 </head>
 <body>
-<H1>Pandas GUI</H1>
-    This provides a Graphical User Interface to help Jupyter users generate
-code to analyze, plot and fit data in Pandas DataFrames (see: <a href
-    ="https://pandas.pydata.org/">Pandas Website</a>
+<div id = "nav">
+<img id = "icon" src="API/Pandas_GUI_Icon.svg"/>
 
-<H1>Examples</H1>
+<H3>Examples</H3>
 <ul></ul>
 
-<H1><a href = "API/index.html">API Documentation</a></H1>
+<H3><a href = "API/index.html">API Documentation</a></H3>
 
+    <h3><a href="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI">GIT
+        Repository</a></h3>
+</div>
+<div id="desc"><h1>Pandas GUI</h1>
+    This package provides Graphical User Interface (GUI) tools to
+    help Jupyter users generate code to analyze, plot and fit data in Pandas
+    DataFrames (see: <a href
+    ="https://pandas.pydata.org/">Pandas Website</a> for more about
+    Pandas).</div>
 </body>
 </html>
