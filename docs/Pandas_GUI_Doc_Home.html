@@ -9,9 +9,11 @@
         top:0px;
         width:14em;
         height:100%;
-        //display:block;
         border-right:solid;
         overflow:scroll;
+        background-color:#eeeeee;
+        border-color:#eeeeee;
+        text-indent:1em;
         }
         #icon{
         max-width:75%;
@@ -28,21 +30,28 @@
 </head>
 <body>
 <div id = "nav">
-<img id = "icon" src="API/Pandas_GUI_Icon.svg"/>
+<img id = "icon" src="Pandas_GUI_Icon.svg"/>
 
 <H3>Examples</H3>
 <ul></ul>
 
-<H3><a href = "API/index.html">API Documentation</a></H3>
+<H3><a href = "pandas_GUI.html">Documentation</a></H3>
 
     <h3><a href="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI">GIT
         Repository</a></h3>
 </div>
 <div id="desc"><h1>Pandas GUI</h1>
-    This package provides Graphical User Interface (GUI) tools to
-    help Jupyter users generate code to analyze, plot and fit data in Pandas
-    DataFrames (see: <a href
+    <p>This package provides Graphical User Interface (GUI) tools to
+    help Jupyter users generate code to analyze, plot and fit tabulated data
+        that has been loaded into Pandas DataFrames (see: <a href
     ="https://pandas.pydata.org/">Pandas Website</a> for more about
-    Pandas).</div>
+    Pandas).</p>
+    <p>These tools are based on
+        <a href="https://ipywidgets.readthedocs.io/en/latest/">Jupyter
+            Widgets</a> and expect to work in a
+        <a href="https://python.org">Python</a> 3 kernel. See the <a href
+        ="pandas_GUI.html">documentation</a>
+        for more detailed information on usage and installation.</p>
+</div>
 </body>
 </html>

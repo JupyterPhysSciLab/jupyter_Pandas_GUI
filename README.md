@@ -36,15 +36,15 @@ understand the code.
 * `new_pandas_column_GUI()`: A GUI with four steps to lead the user through 
   formulating an expression for a new column.
 
-  <img src = "DataSets/new_col_GUI.png" style="width:90%;"/>
+  <img src = "../DataSets/new_col_GUI.png" style="width:90%;"/>
 * `plot_pandas_GUI()`: A GUI with four steps to lead the user through plotting 
   Pandas data as a scatter or line plot using plotly.
 
-  <img src = "DataSets/plot_GUI.png" style="width:90%;"/>
+  <img src = "../DataSets/plot_GUI.png" style="width:90%;"/>
 * `fit_pandas_GUI()`: A GUI with six steps to lead the user through fitting 
   Pandas data to a line, polynomial, exponential, Gaussian or sine function.
 
-  <img src = "DataSets/GUI_fitexp_1.png" style="width:90%;"/>
+  <img src = "../DataSets/GUI_fitexp_1.png" style="width:90%;"/>
 
 #### Wishlist:
 
