@@ -1,6 +1,6 @@
 name = "pandas_GUI"
 """
-.. include:: ../docs/README.md
+.. include:: ../docs/intro.md
 """
 __docformat__ = "numpy"
 
