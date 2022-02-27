@@ -17,3 +17,8 @@
    docs pandas_GUI`
 5. Edit the created `index.html` so that the refresh points to 
    `Pandas_GUI_Doc_Home.html`.
+
+## Tasks for Documentation
+* Try in binder links at top of example pages.
+* Links to other example pages need to go to static versions.
+* Use pdoc default css on first documentation page.
