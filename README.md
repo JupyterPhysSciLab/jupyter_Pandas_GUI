@@ -1,8 +1,14 @@
-## jupyter_Pandas_GUI
+## Pandas_GUI (aka: jupyter_Pandas_GUI)
+
 [Introduction](#introduction) | [Current Features](#current-features) | 
 [Wishlist](#wishlist) | [Usage](#usage) | [Installation](#installation) | 
 [Change Log](#change-log) | [Issues or comments](#issues-or-comments) | 
-[License](#this-software-is-distributed-under-the-gnu-v3-license)
+[License](#this-software-is-distributed-under-the-gnu-v3-license) |
+[PyPi link](https://pypi.org/project/jupyter-Pandas-GUI/)
+
+**[Documentation / Website
+](https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/)**
+
 #### Introduction:
 
 This package provides GUI tools to help the user construct Pandas and Python 

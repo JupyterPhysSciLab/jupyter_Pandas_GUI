@@ -1,5 +1,8 @@
 [General](#general-notes) | [Make Docs](#constructing-the-documentation)
 ## General Notes
+1. Have not completely converted to JPSLUtils for javascript tools and 
+   accessing code cells. This will need to be complete before trying to 
+   make the software JLab vs ClassicNB aware.
 
 ## Constructing the Documentation
 
@@ -19,9 +22,6 @@ https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/ -html -o docs pandas_GUI
    `Pandas_GUI_Doc_Home.html`.
 
 ## Tasks for Documentation
-* Try in binder links at top of example pages.
-* Links to other example pages need to go to static versions.
-* Use pdoc default css on first documentation page.
 * Version number in docs footer
 * Need more examples:
   * New calculated column

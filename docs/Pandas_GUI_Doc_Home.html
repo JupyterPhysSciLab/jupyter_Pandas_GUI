@@ -48,30 +48,30 @@
 <a href="https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/">            <img src="Pandas_GUI_Icon.svg" class="logo" alt="project logo"/>
 </a>
 
-<H3>Examples</H3>
+<H3>Usage Examples</H3>
 <ul>
     <li>Plotting
         <ul><li>
             <a href = "Step-by-step_making_a_simple_plot.html">
                 Step-by-step simple plot</a>
-        </li><li>
+        </li><li class="pdoc-muted">
             Trace formatting
-        </li><li>
+        </li><li class="pdoc-muted">
             Error bars
-        </li><li>
+        </li><li class="pdoc-muted">
             Plot styling
         </li>
         </ul>
     </li><li>Fitting
-    <ul><li>
+    <ul><li class="pdoc-muted">
         Linear
-    </li><li>
+    </li><li class="pdoc-muted">
         Polynomial
     </li><li>
         <a href="Fit_Exponential_Data.html">Exponential</a>
-    </li><li>
+    </li><li class="pdoc-muted">
         Gaussian
-    </li><li>
+    </li><li class="pdoc-muted">
         Sine
     </li>
     </ul>
@@ -79,6 +79,7 @@
 </ul>
 
 <H3><a href = "pandas_GUI.html">Documentation</a></H3>
+            <p>(Includes API)</p>
 
     <h3><a href="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI">GIT
         Repository</a></h3>
@@ -120,27 +121,6 @@
         }
     }
 
-    function getSearchTerm() {
-        return (new URL(window.location)).searchParams.get("search");
-    }
-
-    const searchBox = document.querySelector(".pdoc input[type=search]");
-    searchBox.addEventListener("input", function () {
-        let url = new URL(window.location);
-        if (searchBox.value.trim()) {
-            url.hash = "";
-            url.searchParams.set("search", searchBox.value);
-        } else {
-            url.searchParams.delete("search");
-        }
-        history.replaceState("", "", url.toString());
-        onInput();
-    });
-    window.addEventListener("popstate", onInput);
-
-
-    let search, searchErr;
-
     async function initialize() {
         try {
             search = await new Promise((resolve, reject) => {
@@ -165,115 +145,6 @@
             }
         });
     }
-
-    function onInput() {
-        setContent((() => {
-            const term = getSearchTerm();
-            if (!term) {
-                return null
-            }
-            if (searchErr) {
-                return `<h3>Error: ${searchErr}</h3>`
-            }
-            if (!search) {
-                return "<h3>Searching...</h3>"
-            }
-
-            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
-
-            const results = search(term);
-
-            let html;
-            if (results.length === 0) {
-                html = `No search results for '${escapeHTML(term)}'.`
-            } else {
-                html = `<h4>${results.length} search result${results.length > 1 ? "s" : ""} for '${escapeHTML(term)}'.</h4>`;
-            }
-            for (let result of results.slice(0, 10)) {
-                let doc = result.doc;
-                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
-                if (doc.qualname) {
-                    url += `#${doc.qualname}`;
-                }
-
-                let heading;
-                switch (result.doc.type) {
-                    case "function":
-                        heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span><span class="signature">${doc.signature}:</span>`;
-                        break;
-                    case "class":
-                        heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;
-                        if (doc.bases)
-                            heading += `<wbr>(<span class="base">${doc.bases}</span>)`;
-                        heading += `:`;
-                        break;
-                    case "variable":
-                        heading = `<span class="name">${doc.fullname}</span>`;
-                        if (doc.annotation)
-                            heading += `<span class="annotation">${doc.annotation}</span>`;
-                        if (doc.default_value)
-                            heading += `<span class="default_value">${doc.default_value}</span>`;
-                        break;
-                    default:
-                        heading = `<span class="name">${doc.fullname}</span>`;
-                        break;
-                }
-                html += `
-                        <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
-                        <div class="docstring">${doc.doc}</div>
-                        </section>
-                    `;
-
-            }
-            return html;
-        })());
-    }
-
-    if (getSearchTerm()) {
-        initialize();
-        searchBox.value = getSearchTerm();
-        onInput();
-    } else {
-        searchBox.addEventListener("focus", initialize, {once: true});
-    }
-
-    searchBox.addEventListener("keydown", e => {
-        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
-            let focused = currentContent.querySelector(".search-result.focused");
-            if (!focused) {
-                currentContent.querySelector(".search-result").classList.add("focused");
-            } else if (
-                e.key === "ArrowDown"
-                && focused.nextElementSibling
-                && focused.nextElementSibling.classList.contains("search-result")
-            ) {
-                focused.classList.remove("focused");
-                focused.nextElementSibling.classList.add("focused");
-                focused.nextElementSibling.scrollIntoView({
-                    behavior: "smooth",
-                    block: "nearest",
-                    inline: "nearest"
-                });
-            } else if (
-                e.key === "ArrowUp"
-                && focused.previousElementSibling
-                && focused.previousElementSibling.classList.contains("search-result")
-            ) {
-                focused.classList.remove("focused");
-                focused.previousElementSibling.classList.add("focused");
-                focused.previousElementSibling.scrollIntoView({
-                    behavior: "smooth",
-                    block: "nearest",
-                    inline: "nearest"
-                });
-            } else if (
-                e.key === "Enter"
-            ) {
-                focused.querySelector("a").click();
-            }
-        }
-    });
 </script>
 </body>
 </html>
