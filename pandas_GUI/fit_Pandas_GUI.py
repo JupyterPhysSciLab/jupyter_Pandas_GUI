@@ -792,13 +792,14 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             range_start = True
             ranges = []
             new_range = []
-            for i in range(len(range_plot.data[0].marker.color)):
-                if range_plot.data[0].marker.color[i] == range_plot_hilight:
-                    new_range.append(i)
-                    if not range_start:
-                        ranges.append(new_range)
-                        new_range = []
-                    range_start = not range_start
+            if len(range_plot.data)>0:
+                for i in range(len(range_plot.data[0].marker.color)):
+                    if range_plot.data[0].marker.color[i] == range_plot_hilight:
+                        new_range.append(i)
+                        if not range_start:
+                            ranges.append(new_range)
+                            new_range = []
+                        range_start = not range_start
             # update step 4 string
             covscalestr = 'False'
             if yerrtype.value == 'none':
