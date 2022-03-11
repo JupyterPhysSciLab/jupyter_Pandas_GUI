@@ -880,6 +880,8 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
                 step5str += str(figname) + ' = go.FigureWidget(' \
                                     'layout_template=\\"'+str(
                                     plot_template.value)+'\\")\\n'
+                step5str += str(figname)+ '.update_layout(title = \\"'+ \
+                                    str(plot_title.value)+'\\")\\n'
                 step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
                                            'row_heights=[0.2,0.8], ' \
                                            'shared_xaxes=True)\\n'
