@@ -16,6 +16,7 @@
     * Copy of README.md from the root level to `docs/intro.md`.
     * In the copy for each relative reference `src = "docs/DataSets/..."` 
       remove `docs/` so that they read `src = "DataSets/..."`.
+    * DONOT change absolute (full url) paths.
 3. Make edits to the file `Pandas_GUI_Doc_Home.html`.
 4. At the root level run pdoc `pdoc --logo Pandas_GUI_Icon.svg --logo-link 
 https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/ --footer-text 

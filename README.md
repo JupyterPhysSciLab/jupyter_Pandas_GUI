@@ -129,10 +129,11 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
-* 0.6.0rc0
+* 0.6.0
   * Documentation (Examples and API).
   * Addition of fitting GUI.
   * Minor bug and typo fixes.
+  * Images show up on Pypi page.
 * 0.5.2 
   * Widget states autosaved when a new plot is made.
   * Began making use of [JPSLUtils](https://github.com/JupyterPhysSciLab/JPSLUtils).  

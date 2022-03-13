@@ -39,17 +39,17 @@ understand the code.
 * `new_pandas_column_GUI()`: A GUI with four steps to lead the user through 
   formulating an expression for a new column.
 
-  <img src = "DataSets/new_col_GUI.png" style="width:90%;"/>
+  <img src = "https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets/new_col_GUI.png" style="width:90%;"/>
   
 * `plot_pandas_GUI()`: A GUI with four steps to lead the user through plotting 
   Pandas data as a scatter or line plot using plotly.
 
-  <img src = "DataSets/plot_GUI.png" style="width:90%;"/>
+  <img src = "https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets/plot_GUI.png" style="width:90%;"/>
   
 * `fit_pandas_GUI()`: A GUI with six steps to lead the user through fitting 
   Pandas data to a line, polynomial, exponential, Gaussian or sine function.
 
-  <img src = "DataSets/GUI_fitexp_1.png" style="width:90%;"/>
+  <img src = "https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets/GUI_fitexp_1.png" style="width:90%;"/>
 
 #### Wishlist:
 
@@ -129,10 +129,11 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
-* 0.6.0rc0
+* 0.6.0
   * Documentation (Examples and API).
   * Addition of fitting GUI.
   * Minor bug and typo fixes.
+  * Images show up on Pypi page.
 * 0.5.2 
   * Widget states autosaved when a new plot is made.
   * Began making use of [JPSLUtils](https://github.com/JupyterPhysSciLab/JPSLUtils).  
