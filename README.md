@@ -54,6 +54,7 @@ understand the code.
 #### Wishlist:
 
   * GUIs for plots beyond scatter/line plots.
+  * Make the GUIs work in Jupyter Lab.
   
 #### Usage:
 If the `jupyter_Pandas_GUI` is installed in your Jupyter/Python environment 
@@ -128,6 +129,10 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
+* 0.6.0rc0
+  * Documentation (Examples and API).
+  * Addition of fitting GUI.
+  * Minor bug and typo fixes.
 * 0.5.2 
   * Widget states autosaved when a new plot is made.
   * Began making use of [JPSLUtils](https://github.com/JupyterPhysSciLab/JPSLUtils).  
