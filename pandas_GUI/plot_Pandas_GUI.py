@@ -13,14 +13,16 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
 
     To allow inclusion of text columns pass True for show_text_col.
 
-    :param show_text_col: bool (default = False). When True columns containing
-    text will be shown.
-    :param dfs_info: List of Lists of strings [[globalname, userfriendly]
-    ],..]
-        :globalname: string name of the object in the user global name space.
-        :userfriendly: string name to display for user selection.
-    :keyword figname: string used to override default python name for figure.
-    :return:
+    :param bool show_text_col: (default = False). When True columns
+    containing text will be shown.
+
+    :param list dfs_info: List of Lists [[object,globalname,userfriendly]],..]
+      * object -- pandas.DataFrame
+      * globalname -- string name of the object in the user global name space.
+      * userfriendly -- string name to display for user selection.
+
+    :keyword string figname: string used to override default python name for
+    figure.
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
@@ -490,8 +492,10 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
                                     'seaborn',
                                  'plotly', 'plotly_white', 'plotly_dark',
-                                 'presentation', 'xgridoff''ygridoff',
-                                 'gridon'],
+                                 'presentation', 'xgridoff', 'ygridoff',
+                                 'gridon', 'simple_white+presentation',
+                                      'simple_white+gridon',
+                                      'simple_white+presentation+gridon'],
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
@@ -579,7 +583,9 @@ def plot_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     display(steps)
     select_containing_cell('pandasplotGUI')
     new_cell_immediately_below()
-    text = 'from plotly import graph_objects as go\\n'
+    text = '# CODE BLOCK generated using plot_pandas_GUI(). See '
+    text += 'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\\n'
+    text += 'from plotly import graph_objects as go\\n'
     text += str(figname) + ' = go.FigureWidget(' \
                           'layout_template=\\"simple_white\\")'
     insert_text_into_next_cell(text)

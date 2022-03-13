@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pandas GUI</title>
+    <link rel="stylesheet" type="text/css"
+          href="resources/bootstrap-reboot.min.css"/>
+     <link rel="stylesheet" type="text/css"
+          href="resources/content.css"/>
+      <link rel="stylesheet" type="text/css"
+          href="resources/layout.css"/>
+     <link rel="stylesheet" type="text/css"
+          href="resources/theme.css"/>
+     <link rel="stylesheet" type="text/css"
+          href="resources/syntax-highlighting.css"/>
+</head>
+<body>
+<nav class="pdoc">
+        <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
+        <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
+        <div>
+<a href="https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/">            <img src="Pandas_GUI_Icon.svg" class="logo" alt="project logo"/>
+</a>
+
+<H3>Usage Examples</H3>
+<ul>
+    <li><a href = "Overview_Demo_pandas_GUI.html">Quick Overview</a></li>
+    <li><a href="New_calculated_column.html">New Calculated Column</a></li>
+    <li>Plotting
+        <ul><li>
+            <a href = "Step-by-step_making_a_simple_plot.html">
+                Step-by-step simple plot</a>
+        </li><li>
+            <a href = "Trace_formatting.html">Trace formatting</a>
+        </li><li>
+            <a href = "Error_bars.html">Error bars</a>
+        </li><li>
+            <a href = "Plot_styling.html">Plot styling</a>
+        </li>
+        </ul>
+    </li><li>Fitting
+    <ul><li>
+        <a href="Fit_Linear_Data.html">Linear</a>
+    </li><li>
+        <a href="Fit_Polynomial_Data.html">Polynomial</a>
+    </li><li>
+        <a href="Fit_Exponential_Data.html">Exponential</a>
+    </li><li>
+        <a href="Fit_Gaussian_Data.html">Gaussian</a>
+    </li><li>
+        <a href="Fit_Sine_Data.html">Sine</a>
+    </li><li>
+        <a href="Fit_Linear_Data.html#Example-2:-Linear-fit-with-known-errors-in-the-measurements">
+            Error weighted fits</a>
+    </li>
+    </ul>
+</li>
+</ul>
+
+<H3><a href = "pandas_GUI.html">Documentation</a></H3>
+            <p>(Includes API)</p>
+
+    <h3><a href="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI">GIT
+        Repository</a></h3>
+</nav>
+<main class="pdoc"><h1>Pandas GUI</h1>
+    <p>This package provides Graphical User Interface (GUI) tools to
+    help Jupyter users generate code to analyze, plot and fit tabulated data
+        that has been loaded into Pandas DataFrames (see: <a href
+    ="https://pandas.pydata.org/">Pandas Website</a> for more about
+    Pandas).</p>
+    <img src="DataSets/Summary_Image.png" style="width:90%;"/>
+    <p>These tools are based on
+        <a href="https://ipywidgets.readthedocs.io/en/latest/">Jupyter
+            Widgets</a> and expect to work in a
+        <a href="https://python.org">Python</a> 3 kernel. See the <a href
+        ="pandas_GUI.html">documentation</a>
+        for more detailed information on usage and installation.</p>
+    <h5>Currently these tools only work in classic Jupyter notebooks. They
+    do not yet work in Jupyter Lab.</h5>
+</main>
+<script>
+    function escapeHTML(html) {
+        return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+    }
+
+    const originalContent = document.querySelector("main.pdoc");
+    let currentContent = originalContent;
+
+    function setContent(innerHTML) {
+        let elem;
+        if (innerHTML) {
+            elem = document.createElement("main");
+            elem.classList.add("pdoc");
+            elem.innerHTML = innerHTML;
+        } else {
+            elem = originalContent;
+        }
+        if (currentContent !== elem) {
+            currentContent.replaceWith(elem);
+            currentContent = elem;
+        }
+    }
+
+    async function initialize() {
+        try {
+            search = await new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.type = "text/javascript";
+                script.async = true;
+                script.onload = () => resolve(window.pdocSearch);
+                script.onerror = (e) => reject(e);
+                script.src = "search.js";
+                document.getElementsByTagName("head")[0].appendChild(script);
+            });
+        } catch (e) {
+            console.error("Cannot fetch pdoc search index");
+            searchErr = "Cannot fetch search index.";
+        }
+        onInput();
+
+        document.querySelector("nav.pdoc").addEventListener("click", e => {
+            if (e.target.hash) {
+                searchBox.value = "";
+                searchBox.dispatchEvent(new Event("input"));
+            }
+        });
+    }
+</script>
+</body>
+</html>

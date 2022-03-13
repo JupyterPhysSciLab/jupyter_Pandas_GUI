@@ -5,13 +5,14 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="jupyter_Pandas_GUI",
-    version="0.5.2",
+    version="0.6.0rc0",
     description="Pandas expression composers using Jupyter widgets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI",
     author="Jonathan Gutow",
     author_email="gutow@uwosh.edu",
+    keywords="fitting, data-analysis, plotting, learning to code",
     license="GPL-3.0+",
     packages=setuptools.find_packages(),
     package_data={},
@@ -21,9 +22,11 @@ setuptools.setup(
         'jupyter>=1.0.0',
         'pandas>=1.2.5',
         'numpy>=1.19.0',
-        'plotly>=4.14.3',
+        'plotly>=5.5.0',
         'ipywidgets>=7.6.2',
         'JPSLUtils>=0.5.3',
+        'lmfit>=1.0.3',
+        'round-using-error>=1.1.1',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
