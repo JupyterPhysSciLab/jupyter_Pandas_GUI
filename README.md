@@ -129,6 +129,8 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
+* 0.6.1 fixed `fit_pandas_GUI()` mishandling of user friendly names for the 
+  data frames.
 * 0.6.0
   * Documentation (Examples and API).
   * Addition of fitting GUI.
