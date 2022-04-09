@@ -731,9 +731,9 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
         if change['old'] == 0:
             # Update step 1 string
             step1str = '# Define data and trace name\\n'
-            step1str += 'Xvals = '+str(dfname.value)+'[\\"'
+            step1str += 'Xvals = '+dfname+'[\\"'
             step1str += str(Xcoord.value)+'\\"]\\n'
-            step1str += 'Yvals = ' + str(dfname.value) +'[\\"'
+            step1str += 'Yvals = ' + dfname +'[\\"'
             step1str += str(Ycoord.value)+'\\"]\\n'
             step1str += 'tracename = \\"'+str(trace_name.value)+'\\"\\n\\n'
             pass
@@ -744,18 +744,18 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
             # update step 2 string
             step2str = '# Define error (uncertainty)\\n'
             if yerrtype.value == 'none':
-                step2str += 'Yerr = ' + str(dfname.value) + '[\\"'
+                step2str += 'Yerr = ' + dfname + '[\\"'
                 step2str += str(Ycoord.value) + '\\"]*0 + 1\\n\\n'
             if yerrtype.value=='constant':
-                step2str += 'Yerr = ' + str(dfname.value)+'[\\"'
+                step2str += 'Yerr = ' + dfname +'[\\"'
                 step2str += str(Ycoord.value)+'\\"]*0 + ' + str(
                     yerrvalue.value) + '\\n\\n'
             if yerrtype.value == 'percent':
-                step2str += 'Yerr = np.fabs('+ str(dfname.value)+'[\\"'
+                step2str += 'Yerr = np.fabs('+ dfname +'[\\"'
                 step2str += str(Ycoord.value)+'\\"])*0.01*' + str(
                     yerrvalue.value) + '\\n\\n'
             if yerrtype.value == 'data':
-                step2str += 'Yerr = ' + str(dfname.value)+'[\\"'
+                step2str += 'Yerr = ' + dfname +'[\\"'
                 step2str += str(yerrdata.value)+'\\"]\\n\\n'
             pass
         if change['old']== 2:
