@@ -679,7 +679,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     def update_range_point(trace, points, selector):
         # size and color must be done separately as they may not be updated
         # in sync.
-        from collections import Iterable
+        try:
+            from collections.abc import Iterable
+        except ImportError(e):
+            from collections import Iterable            
         if not isinstance(trace['marker']['size'],Iterable):
             s = [range_plot_marker_size]*len(trace['x'])
         else:
