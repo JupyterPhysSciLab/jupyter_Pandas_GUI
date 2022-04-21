@@ -1,4 +1,4 @@
-def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
+def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     If passed no parameters this will look for all the dataframes in the user
     namespace and make them available for adding a new column to. Once a
@@ -7,18 +7,22 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
 
     If you wish to allow only certain dataframes or have them show up as
     user friendly names in the menus provide that information in the first
-    paramater dfs_info.
+    paramater df_info.
 
     To allow inclusion of text columns pass True for show_text_col.
 
     :param bool show_text_col: (default = False). When True columns
     containing text will be shown.
 
-    :param list dfs_info: List of Lists [[object,globalname,
+    :param list df_info: List of Lists [[object,globalname,
     userfriendly]],..]
       * object -- pandas.DataFrame
       * globalname -- string name of the object in the user global name space.
       * userfriendly -- string name to display for user selection.
+      
+    :keyword bool findframes: default = True. If set to false and dataframes
+    are passed in dfs_info, will not search for dataframes in the user
+    namespace.
     """
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
@@ -32,11 +36,15 @@ def new_pandas_column_GUI(dfs_info=None, show_text_col = False):
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell
 
-    if dfs_info == None:
-        from .utils import find_pandas_dataframe_names
-        from IPython import get_ipython
-        global_dict = get_ipython().user_ns
-        dfs_info = []
+    from .utils import find_pandas_dataframe_names
+    from IPython import get_ipython
+    global_dict = get_ipython().user_ns
+    dfs_info = []
+    if isinstance(df_info,list):
+        for k in df_info:
+            dfs_info.append(k)
+    findframes = kwargs.pop('findframes',True)
+    if findframes:
         for k in find_pandas_dataframe_names():
             dfs_info.append([global_dict[k],k,k])
     friendly_to_globalname = {k[2]:k[1] for k in dfs_info}
