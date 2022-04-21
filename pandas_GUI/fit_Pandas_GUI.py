@@ -668,12 +668,18 @@ def fit_pandas_GUI(dfs_info=None, show_text_col = False, **kwargs):
     range_plot_hilight_size = 20
     ranges=[]
     def update_range_point(trace, points, selector):
-        if len(trace['marker']['color'])!=len(trace['x']):
-            c = [range_plot_line_color]*len(trace['x'])
+        # size and color must be done separately as they may not be updated
+        # in sync.
+        from collections import Iterable
+        if not isinstance(trace['marker']['size'],Iterable):
             s = [range_plot_marker_size]*len(trace['x'])
         else:
-            c = list(trace['marker']['color'])
             s = list(trace['marker']['size'])
+        if (not isinstance(trace['marker']['color'],Iterable)) or isinstance(
+                trace['marker']['color'],str):
+            c = [range_plot_line_color]*len(trace['x'])
+        else:
+            c = list(trace['marker']['color'])
         for i in points.point_inds:
             if selector.ctrl:
                 c[i]=range_plot_line_color
