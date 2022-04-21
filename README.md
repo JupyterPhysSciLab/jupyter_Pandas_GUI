@@ -129,6 +129,7 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
+* 0.6.2.1 Fix for python move of `Iterable` to `collections.abc`
 * 0.6.2
   * Can now pass dataframes to the GUIs and they will search for additional 
     dataframes in the user namespace. Search can be turned off.
