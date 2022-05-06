@@ -655,8 +655,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                   '<li> Click on points to select the '
                                   'beginning and ending of each range of '
                                   'data to include in the fit.</li>'
-                                  '<li> Hold down the `ctrl` key while '
-                                  'clicking on a point to deselect it.</li>'
+                                  '<li> Click again on '
+                                  'a point to deselect it.</li>'
                                   '<li> Nearest neighbor pairs of points '
                                   'starting with the lowest point index '
                                   'number are used to define each range. If '
@@ -693,12 +693,12 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         else:
             c = list(trace['marker']['color'])
         for i in points.point_inds:
-            if selector.ctrl:
-                c[i]=range_plot_line_color
-                s[i] = range_plot_marker_size
-            else:
+            if c[i]==range_plot_line_color:
                 c[i] = range_plot_hilight
                 s[i] = range_plot_hilight_size
+            else:
+                c[i] = range_plot_line_color
+                s[i] = range_plot_marker_size
         with range_plot.batch_update():
             trace.marker.color = c
             trace.marker.size = s
