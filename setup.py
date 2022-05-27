@@ -24,7 +24,7 @@ setuptools.setup(
         'numpy>=1.19.0',
         'plotly>=5.5.0',
         'ipywidgets>=7.6.2',
-        'JPSLUtils>=0.5.8',
+        'JPSLUtils>=0.5.9',
         'lmfit>=1.0.3',
         'round-using-error>=1.1.1',
     ],
