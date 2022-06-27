@@ -4,6 +4,13 @@
 1. Have not completely converted to JPSLUtils for javascript tools and 
    accessing code cells. This will need to be complete before trying to 
    make the software JLab vs ClassicNB aware.
+2. Thoughts on GUI for loading data. Could use ipyfilechooser to select 
+   local files. A dropdown for html vs csv to filter and select the reader. 
+   A checkbox for the index (label) column or not in file. The html loader 
+   creates an array of dataframes, one for each table.
+3. To make it work across more platforms could try having the computed code 
+   block built in a textbox widget. This looses the syntax highlighting, 
+   but would allow copy and paste into cells in things like Colab.
 
 ## Constructing the Documentation
 
