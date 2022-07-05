@@ -2,6 +2,8 @@
 The Jupyter JS call utils below are being deprecated by utilites in the
 package JPSLUtils (https://github.com/JupyterPhysSciLab/JPSLUtils).
 """
+import ipywidgets
+
 ######
 # Jupyter JS call utilities
 ######
@@ -302,3 +304,47 @@ class notice_group():
             notice_txt += itemstart + self.noticelist[j]+'</li>'
         notice_txt += notice_footer
         return notice_txt
+
+class build_run_snip_widget(ipywidgets.GridBox):
+
+    def __init__(self, defaulttxt):
+        from ipywidgets import Textarea, Layout, Button, VBox, GridBox
+        from ipywidgets import HTML as richLabel
+        from IPython.display import display, HTML, clear_output
+        self.sniptext = Textarea(
+            layout=Layout(width='98%', height='180px'),
+            value=defaulttxt
+        )
+        self.dobutton = Button(description='Run Code')
+        self.instructions = richLabel(value = '<div style="line-height:1;">' \
+                                      '<span style="color:red;">If you are ' \
+                                      'running in Jupyter Lab</span>, '
+                                      'the results of running ' \
+                                      'the code will be output to the ' \
+                                      'console instead of the output of ' \
+                                      'this cell. To show the results in ' \
+                                      'the output of a code cell: ' \
+                                      '<ol><li>Open the console.</li>' \
+                                      '<li>Copy the code from the console ' \
+                                      'into a code cell.</li>' \
+                                      '<li>Run the cell.</li></ol></div>')
+        self.dobox = VBox([self.dobutton,self.instructions])
+        def onRunCode(change):
+            clear_output()
+            display(HTML(
+                '<details><summary style="cursor:pointer;"><span style="font-weight:bold;"><a>' \
+                'Code that was run</a></span>(click to toggle visibility)</summary>' \
+                '<div style="background:#eff0f1;white-space:pre-line;white-space:pre-wrap;">' \
+                '<pre>' + self.sniptext.value + '</pre></div></details>'))
+            display(HTML('<h3>Result<h3>'))
+            exec(str(self.sniptext.value))
+            pass
+
+        self.dobutton.on_click(onRunCode)
+
+        super(build_run_snip_widget, self).__init__([self.sniptext,
+                                             self.dobox],
+                                            layout=Layout(
+            grid_template_rows='auto',
+            grid_template_columns='75% 25%',
+            grid_template_areas="self.sniptext self.dobox"))

@@ -26,11 +26,11 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
-        Dropdown, Label, Text, Button, Checkbox
+        Dropdown, Label, Text, Textarea, Button, Checkbox
     from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
     from IPython import get_ipython
-    from .utils import new_cell_immediately_below,\
+    from JPSLUtils.utils import new_cell_immediately_below,\
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
@@ -131,7 +131,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         if op in np_list:
             need_numpy = True
             if op == 'ln()':
-                op == 'log()'
+                op = 'log()'
             op = 'np.' + op
         else:
             op = ' ' + op + ' '
