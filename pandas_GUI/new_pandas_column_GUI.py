@@ -1,3 +1,6 @@
+import JPSLUtils
+
+
 def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     If passed no parameters this will look for all the dataframes in the user
@@ -34,7 +37,8 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
-        delete_selected_cell
+        delete_selected_cell, replace_text_of_next_cell
+    from JPSLUtils import notebookenv
 
     from .utils import find_pandas_dataframe_names
     from IPython import get_ipython
@@ -52,6 +56,26 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
 
     #### Define GUI Elements ####
 
+    importstr = r'# CODE BLOCK generated using new_pandas_column_GUI(). See ' \
+                r'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/.\n' \
+                r'# Imports (no effect if already imported)\n' \
+                r'import numpy as np\n\n'
+    allbutlastline = importstr
+    lastline = ''
+    step2str = ''
+    step3str = ''
+
+    def split_to_all_but_last_and_last(text):
+        all_but_last = ''
+        last = ''
+        lines = text.split('\n')
+        for k in range(len(lines)):
+            if k < len(lines) - 1:
+                all_but_last += lines[k] + '\n'
+            else:
+                last = lines[k]
+        return all_but_last, last
+            
     # DataFrame Choice (Step 1)
     step1instr = Label(value = 'Select the DataFrame to work with.')
     tempopts = []
@@ -86,14 +110,16 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
 
     def do_insertname(change):
         framename = friendly_to_globalname[whichframe.value]
-        text = framename + '[\'' + newname.value + '\'] = '
-        insert_text_into_next_cell(text)
+        step2str = framename + '[\'' + newname.value + '\'] = '
+        codstr = step2str + step3str
+        replace_text_of_next_cell(importstr+codestr)
         pass
 
     insertname.on_click(do_insertname)
 
     step2 = VBox([step2instr, HBox([newname,
                                            insertname])])
+
     # Step 3
     whichcolumn = Dropdown(options=['Choose column to insert.'],
                            description='Column: ',
@@ -120,6 +146,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
              'tan()', 'cot()', 'asin()', 'acos()', 'atan()', 'acot()']
     whichop = Dropdown(options=oplst,
                        description='Operation: ')
+
     def op_insert(change):
         need_numpy = False
         np_list = ['exp()', 'log10()', 'ln()', 'sqrt()', 'sin()', 'cos()',
@@ -145,6 +172,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
 
     step3drops = HBox([whichcolumn, whichop])
     step3 = VBox([step3instr, step3drops])
+
     # Step 4
     step4instr1 = Label(
         value='Carefully check the expression for typos before selecting' \
@@ -201,4 +229,6 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     display(steps)
     select_containing_cell('newcolGUI')
     new_cell_immediately_below()
+    select_containing_cell('newcolGUI')
+    replace_text_of_next_cell(importstr+codestr)
     pass
