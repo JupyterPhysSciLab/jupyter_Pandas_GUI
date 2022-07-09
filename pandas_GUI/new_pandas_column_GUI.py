@@ -131,7 +131,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         if op in np_list:
             need_numpy = True
             if op == 'ln()':
-                op == 'log()'
+                op = 'log()'
             op = 'np.' + op
         else:
             op = ' ' + op + ' '
