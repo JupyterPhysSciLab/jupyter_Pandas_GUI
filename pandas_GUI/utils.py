@@ -315,6 +315,7 @@ class build_run_snip_widget(ipywidgets.GridBox):
             layout=Layout(width='98%', height='180px'),
             value=defaulttxt
         )
+        self.value = self.sniptext.value
         self.dobutton = Button(description='Run Code')
         self.instructions = richLabel(value = '<div style="line-height:1;">' \
                                       '<span style="color:red;">If you are ' \
@@ -327,9 +328,14 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       '<ol><li>Open the console.</li>' \
                                       '<li>Copy the code from the console ' \
                                       'into a code cell.</li>' \
-                                      '<li>Run the cell.</li></ol></div>')
+                                      '<li>Run the cell.</li></ol>' \
+                                      'Alternatively, copy the code at ' \
+                                      'left into a code cell '
+                                      'and run it.</div>')
         self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):
+            from IPython import get_ipython
+            shell = get_ipython()
             clear_output()
             display(HTML(
                 '<details><summary style="cursor:pointer;"><span style="font-weight:bold;"><a>' \
@@ -337,7 +343,7 @@ class build_run_snip_widget(ipywidgets.GridBox):
                 '<div style="background:#eff0f1;white-space:pre-line;white-space:pre-wrap;">' \
                 '<pre>' + self.sniptext.value + '</pre></div></details>'))
             display(HTML('<h3>Result<h3>'))
-            exec(str(self.sniptext.value))
+            exec(str(self.sniptext.value), shell.user_ns)
             pass
 
         self.dobutton.on_click(onRunCode)
