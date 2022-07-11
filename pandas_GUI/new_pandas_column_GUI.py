@@ -1,6 +1,5 @@
 import JPSLUtils
 
-
 def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     If passed no parameters this will look for all the dataframes in the user
@@ -110,16 +109,21 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     def do_insertname(change):
         framename = friendly_to_globalname[whichframe.value]
         codestr = framename + '[\'' + newname.value + '\'] = '
-        allbutlastline, lastline = split_to_all_but_last_and_last(
-            codearea.sniptext.value)
-        if lastline == '' or lastline == '\n':
-            codearea.sniptext.value = allbutlastline + '\n' + codestr
+        if JPSLUtils.notebookenv == 'NBClassic':
+            select_containing_cell('newcolGUI')
+            select_cell_immediately_below()
+            insert_newline_at_end_of_current_cell(codestr)
         else:
-            if lastline.endswith('\n'):
-                codearea.sniptext.value = allbutlastline + lastline + codestr
+            allbutlastline, lastline = split_to_all_but_last_and_last(
+                codearea.sniptext.value)
+            if lastline == '' or lastline == '\n':
+                codearea.sniptext.value = allbutlastline + '\n' + codestr
             else:
-                codearea.sniptext.value = allbutlastline + lastline + '\n' + \
-                               codestr
+                if lastline.endswith('\n'):
+                    codearea.sniptext.value = allbutlastline + lastline + codestr
+                else:
+                    codearea.sniptext.value = allbutlastline + lastline + '\n' + \
+                                   codestr
         pass
 
     insertname.on_click(do_insertname)
@@ -138,23 +142,26 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
             return
         framename = friendly_to_globalname[whichframe.value]
         text = framename + '[\'' + col + '\']'
-        allbutlastline, lastline = split_to_all_but_last_and_last(
-            codearea.sniptext.value)
-        if lastline.endswith('()') or lastline.endswith('+)') or \
-            lastline.endswith('-)') or lastline.endswith('*)') or \
-            lastline.endswith('/)') or lastline.endswith(' )'):
-            lastline = lastline[:-1] + text +')'
+        if JPSLUtils.notebookenv == 'NBClassic':
+            select_containing_cell('newcolGUI')
+            insert_text_into_next_cell(text)
         else:
-            lastline += text
-        codearea.sniptext.value = allbutlastline+lastline
-        # insert_text_into_next_cell(text)
+            allbutlastline, lastline = split_to_all_but_last_and_last(
+                codearea.sniptext.value)
+            if lastline.endswith('()') or lastline.endswith('+)') or \
+                lastline.endswith('-)') or lastline.endswith('*)') or \
+                lastline.endswith('/)') or lastline.endswith(' )'):
+                lastline = lastline[:-1] + text +')'
+            else:
+                lastline += text
+            codearea.sniptext.value = allbutlastline+lastline
         whichcolumn.value = 'Choose column to insert.'
         pass
 
     whichcolumn.observe(column_insert, names='value')
     step3instr = richLabel(
-        value='Add the calculation to the right hand side using the menus ' \
-              'to insert columns, math operations or functions. ' \
+        value='Add the calculation to the right hand side of the = using the '
+              'menus to insert columns, math operations or functions. ' \
               'Your choices will be appended to the end of the last line ' \
               'or inserted within the last set of parentheses. You can also' \
               ' manually edit the expression.')
@@ -179,16 +186,22 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
             op = 'np.' + op
         else:
             op = ' ' + op + ' '
-        allbutlastline, lastline = split_to_all_but_last_and_last(
-            codearea.sniptext.value)
-        if lastline.endswith('()') or lastline.endswith('+)') or \
-            lastline.endswith('-)') or lastline.endswith('*)') or \
-            lastline.endswith('/)') or lastline.endswith(' )') or \
-            lastline.endswith('])'):
-            lastline = lastline[:-1] + op +')'
+        if JPSLUtils.notebookenv == 'NBClassic':
+            select_containing_cell('newcolGUI')
+            insert_text_into_next_cell(op)
+            if need_numpy:
+                move_cursor_in_current_cell(-1)
         else:
-            lastline += op
-        codearea.sniptext.value = allbutlastline+lastline
+            allbutlastline, lastline = split_to_all_but_last_and_last(
+                codearea.sniptext.value)
+            if lastline.endswith('()') or lastline.endswith('+)') or \
+                lastline.endswith('-)') or lastline.endswith('*)') or \
+                lastline.endswith('/)') or lastline.endswith(' )') or \
+                lastline.endswith('])'):
+                lastline = lastline[:-1] + op +')'
+            else:
+                lastline += op
+            codearea.sniptext.value = allbutlastline+lastline
         whichop.value = 'Choose an operation to insert.'
         pass
 
@@ -200,7 +213,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     # Step 4
     step4instr = richLabel(
         value = 'Carefully check the expression for typos:' \
-            '<ul><li>Check that Parentheses, brackets or braces are properly ' \
+            '<ul><li>Check that parentheses, brackets or braces are properly ' \
               'paired.</li>' \
             '<li>Check that all double and single quotes are also ' \
               'properly paired.</li>' \
@@ -208,24 +221,25 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
               'an <code>np.</code>.</li></ul>' \
             'Uncheck "Display updated data set", if you do not wish to ' \
                 'display a summary of the updated data set. ' \
-            '<span style="color:red;">Click \'OK\' to do final code updates.' \
-            '</span>'
+            '<span style="color:red;">Click \'OK\' to do final code updates. ' \
+            '</span>In the classic Jupyter notebook this button will also ' \
+            'run the code and clear this GUI from the notebook.'
     )
-    show_updated_df_box = Checkbox(description='Display updated '
-                                                 'data set.',
-                                   value=True)
-    gen_col_but = Button(description='OK')
+    show_updated_df_box = Checkbox(description='Display updated data set.',
+                                   value=True,
+                                   layout=Layout(left='-90px'))
+    gen_col_but = Button(description='      OK      ')
 
     def run_new_col_decl(change):
         from IPython.display import display, HTML
         from IPython.display import Javascript as JS
-        if JPSLUtils.notebookenv == '#NBClassic':
-            select_cell_immediately_below()
         # if show updated dataframe is checked append dataframe name as last line.
         if show_updated_df_box.value == True:
             text = '# Display summary of updated data set.\n'
             text += 'display('+friendly_to_globalname[whichframe.value]+')'
-            if JPSLUtils.notebookenv == '#NBClassic':
+            if JPSLUtils.notebookenv == 'NBClassic':
+                select_containing_cell('newcolGUI')
+                select_cell_immediately_below()
                 insert_newline_at_end_of_current_cell(text)
             else:
                 allbutlastline, lastline = split_to_all_but_last_and_last(
@@ -237,7 +251,9 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
                                               '\n\n' + text
 
         # run composed operation
-        if JPSLUtils.notebookenv == '#NBClassic':
+        if JPSLUtils.notebookenv == 'NBClassic':
+            select_containing_cell('newcolGUI')
+            select_cell_immediately_below()
             display(JS('Jupyter.notebook.get_selected_cell().execute()'))
             select_containing_cell('newcolGUI')
             delete_selected_cell()
@@ -259,11 +275,12 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         "<h3 id ='newcolGUI' style='text-align:center;'>Pandas New Calculated "
         "Column "
         "Composer</h3>"))
-    #pdComposer = VBox([whichframe, steps])
     display(steps)
-    display(codearea)
-    select_containing_cell('newcolGUI')
-    # new_cell_immediately_below()
-    # select_containing_cell('newcolGUI')
-    # replace_text_of_next_cell(importstr+codestr)
+    if JPSLUtils.notebookenv == 'NBClassic':
+        select_containing_cell('newcolGUI')
+        new_cell_immediately_below()
+        select_containing_cell('newcolGUI')
+        replace_text_of_next_cell(importstr)
+    else:
+        display(codearea)
     pass

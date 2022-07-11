@@ -312,26 +312,29 @@ class build_run_snip_widget(ipywidgets.GridBox):
         from ipywidgets import HTML as richLabel
         from IPython.display import display, HTML, clear_output
         self.sniptext = Textarea(
-            layout=Layout(width='98%', height='180px'),
+            layout=Layout(width='98%', height='200px'),
             value=defaulttxt
         )
         self.value = self.sniptext.value
         self.dobutton = Button(description='Run Code')
         self.instructions = richLabel(value = '<div style="line-height:1;">' \
-                                      '<span style="color:red;">If you are ' \
-                                      'running in Jupyter Lab</span>, '
+                                      '<p><span style="color:red;">If you ' \
+                                      'are running in Jupyter Lab</span>, ' \
                                       'the results of running ' \
                                       'the code will be output to the ' \
                                       'console instead of the output of ' \
                                       'this cell. To show the results in ' \
-                                      'the output of a code cell: ' \
-                                      '<ol><li>Open the console.</li>' \
-                                      '<li>Copy the code from the console ' \
-                                      'into a code cell.</li>' \
-                                      '<li>Run the cell.</li></ol>' \
-                                      'Alternatively, copy the code at ' \
-                                      'left into a code cell '
-                                      'and run it.</div>')
+                                      'the output of a code cell, copy the ' \
+                                      'code at left into a code cell ' \
+                                      'and run it.</p>' \
+                                      '<p><span style = "color:blue;">' \
+                                      'If you are running in Colab</span>, ' \
+                                      'clicking on the "Run Code" button ' \
+                                      'will replace this GUI with the ' \
+                                      'results of running the code. Copying ' \
+                                      'the code to a code cell will prevent ' \
+                                      'it from being lost if outputs are ' \
+                                      'cleared.</p></div>')
         self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):
             from IPython import get_ipython
