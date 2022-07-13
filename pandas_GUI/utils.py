@@ -332,8 +332,10 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       'clicking on the "Run Code" button ' \
                                       'will replace this GUI with the ' \
                                       'results of running the code. Copying ' \
-                                      'the code to a code cell will prevent ' \
-                                      'it from being lost if outputs are ' \
+                                      'the code in the collapsed "Code ' \
+                                      'that was run" summary to a code cell ' \
+                                      'will prevent the code ' \
+                                      'from being lost if outputs are ' \
                                       'cleared.</p></div>')
         self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):

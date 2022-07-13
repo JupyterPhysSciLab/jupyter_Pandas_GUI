@@ -225,7 +225,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
             '</span>In the classic Jupyter notebook this button will also ' \
             'run the code and clear this GUI from the notebook.'
     )
-    show_updated_df_box = Checkbox(description='Display updated data set.',
+    show_updated_df_box = Checkbox(description='Show updated data set.',
                                    value=True,
                                    layout=Layout(left='-90px'))
     gen_col_but = Button(description='      OK      ')

@@ -10,7 +10,9 @@
    creates an array of dataframes, one for each table.
 3. To make it work across more platforms could try having the computed code 
    block built in a textbox widget. This looses the syntax highlighting, 
-   but would allow copy and paste into cells in things like Colab.
+   but would allow copy and paste into cells in things like Colab. Got this 
+   working for the new col GUI while still maintaining the desired behavior 
+   in classic notebook.
 
 ## Constructing the Documentation
 
