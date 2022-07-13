@@ -90,7 +90,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     importstr = '# CODE BLOCK generated using plot_pandas_GUI().\n# See ' \
         'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
         'from plotly import graph_objects as go\n' + str(figname) + \
-        ' = go.FigureWidget(layout_template=\"simple_white\")'
+        ' = go.FigureWidget(layout_template=\"simple_white\")\n'
     step1strdefault = '\n# Trace declaration(s) and trace formating\n'
     step1str = step1strdefault
     step2strdefault = '\n# Axes labels\n'
@@ -527,19 +527,18 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step3 = VBox([plot_title,step3hbox2])
 
     # 4. Final Check*
-    step4instr = richLabel(value = 'Things to check before clicking "Make '
-                                   'Plot": <ul>'
-                                   '<li>Fix any problems listed in '
-                                   '"Notices".</li>'
-                                   '<li>Look at the code below to make sure '
-                                   'you have included all the traces you '
-                                   'intended to (look for "name").</li>'
-                                   '<li>Check for any unpaired parentheses, '
-                                   'brackets or braces (usually highlighted '
-                                   'in red).</li>'
-                                   '<li>Check that all single and double '
-                                   'quotes are paired.</li>'
-                                   '<li>If you did any manual editing '
+    step4instr = richLabel(value = 'Things to check before clicking making ' \
+                                   'the plot: <ul>' \
+                                   '<li>Fix any problems listed in ' \
+                                   '"Notices".</li>' \
+                                   '<li>Look at the code below to make sure ' \
+                                   'you have included all the traces you ' \
+                                   'intended to (look for "name").</li>' \
+                                   '<li>Check for any unpaired parentheses, ' \
+                                   'brackets or braces.</li>' \
+                                   '<li>Check that all single and double ' \
+                                   'quotes are paired.</li>' \
+                                   '<li>If you did any manual editing ' \
                                    'double-check for typos.</li>')
     step4noticebox = richLabel(value = makeplot_notices.notice_html())
     def makeplt_click(change):
