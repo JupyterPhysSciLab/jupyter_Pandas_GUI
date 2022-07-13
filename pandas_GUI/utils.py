@@ -322,7 +322,7 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       'are running in Jupyter Lab</span>, ' \
                                       'the results of running ' \
                                       'the code will be output to the ' \
-                                      'console instead of the output of ' \
+                                      'log console instead of the output of ' \
                                       'this cell. To show the results in ' \
                                       'the output of a code cell, copy the ' \
                                       'code at left into a code cell ' \
