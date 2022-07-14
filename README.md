@@ -131,9 +131,9 @@ instructions.
 
 #### Change Log
 * 0.7.0rc1
-  * GUIs now also work in Google Colab and Jupyter Lab, although less 
-    elegently than in classic Jupyter. Range selection for fitting not yet 
-    supported in Colab.
+  * GUIs now also work in Jupyter Lab, although less 
+    elegently than in classic Jupyter. Only the `new_pandas_column_GUI()` 
+    and the `plot_pandas_GUI()` commands work in Colab.
   * Some minor bug fixes and clarification of instructions.
   * More and better comments in generated code.
   * Replacement of notebook cell javascript tools with those from JPSLUtils 
