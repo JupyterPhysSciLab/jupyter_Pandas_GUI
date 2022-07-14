@@ -14,9 +14,10 @@
 This package provides GUI tools to help the user construct Pandas and Python 
 expressions 
 to create things such as new calculated columns, plots or fits. The tools are 
-meant to run in an interactive Jupyter notebook.  **Currently, they only work 
-in the classic Jupyter notebook and not Jupyter lab.** All tools are based on 
-Jupyter widgets.
+meant to run in an interactive Jupyter notebook in 
+[classic Jupyter](https://jupyter-notebook.readthedocs.io/en/latest/), 
+[Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) 
+and [Google Colab](https://colab.research.google.com/). All tools are based on ipywidgets widgets.
 
 These tools are meant to help the user learn how to construct the commands. 
 They are intended for new or occasional users of Pandas. However, 
@@ -54,7 +55,6 @@ understand the code.
 #### Wishlist:
 
   * GUIs for plots beyond scatter/line plots.
-  * Make the GUIs work in Jupyter Lab.
   
 #### Usage:
 If the `jupyter_Pandas_GUI` is installed in your Jupyter/Python environment 
@@ -95,7 +95,7 @@ available in your command shell. More discussion:
 1. Navigate to the directory where this package will be installed.
 1. Start a shell in the environment `$ pipenv shell`.
 1. Install using pip.
-    1. `$ pip install jupyter-Pandas-GUI`. This will install 
+    1. `pip install jupyter-Pandas-GUI`. This will install 
        Jupyter into the same virtual
     environment if you do not already have it on your machine. If Jupyter is already
     installed the virtual environment will use the existing installation. This takes
@@ -103,7 +103,8 @@ available in your command shell. More discussion:
     swap. See: [Build Jupyter on a Pi
    ](https://www.uwosh.edu/facstaff/gutow/computer-and-programming-how-tos/installing-jupyter-on-raspberrian).
     2. Still within the environment shell test this by starting jupyter
-`$ jupyter notebook`. Jupyter should launch in your browser.
+`jupyter notebook` or `Jupyter lab`. The version of Jupyter requested should 
+       launch in your browser.
         1. Open a new notebook using the default (Python 3) kernel.
         1. In the first cell import the pandas_GUI module:
             `from pandas_GUI import *`
@@ -129,6 +130,13 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
+* 0.7.0rc0
+  * GUIs now also work in Google Colab and Jupyter Lab, although less 
+    elegently than in classic Jupyter.
+  * Some minor bug fixes and clarification of instructions.
+  * More and better comments in generated code.
+  * Replacement of notebook cell javascript tools with those from JPSLUtils 
+    is complete.
 * 0.6.2.1 Fix for python move of `Iterable` to `collections.abc`
 * 0.6.2
   * Can now pass dataframes to the GUIs and they will search for additional 
