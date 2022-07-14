@@ -670,12 +670,19 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     extend_fit = Checkbox(value=False,
                            description='Extend fitted function plot',
                            style=longdesc)
-    range_plot =  go.FigureWidget(layout_template='simple_white')
-    range_plot_line_color = 'blue'
-    range_plot_hilight = 'cyan'
-    range_plot_marker_size = 6
-    range_plot_hilight_size = 20
-    ranges=[]
+    range_plot = None
+    if JPSLUtils.notebookenv == 'colab':
+        range_plot = richLabel(value = '<span style="color:blue;">' \
+                               'Unfortunately, defining a range by clicking ' \
+                               'on the graph is not yet supported in Google' \
+                               'Colab.</span>')
+    else:
+        range_plot =  go.FigureWidget(layout_template='simple_white')
+        range_plot_line_color = 'blue'
+        range_plot_hilight = 'cyan'
+        range_plot_marker_size = 6
+        range_plot_hilight_size = 20
+        ranges=[]
     def update_range_point(trace, points, selector):
         # size and color must be done separately as they may not be updated
         # in sync.

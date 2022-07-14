@@ -130,9 +130,10 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
-* 0.7.0rc0
+* 0.7.0rc1
   * GUIs now also work in Google Colab and Jupyter Lab, although less 
-    elegently than in classic Jupyter.
+    elegently than in classic Jupyter. Range selection for fitting not yet 
+    supported in Colab.
   * Some minor bug fixes and clarification of instructions.
   * More and better comments in generated code.
   * Replacement of notebook cell javascript tools with those from JPSLUtils 
