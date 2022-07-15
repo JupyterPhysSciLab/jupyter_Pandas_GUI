@@ -56,20 +56,21 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         RadioButtons, BoundedIntText
     from ipywidgets import HTML as richLabel
     from ipywidgets import HTMLMath as texLabel
-    import plotly.graph_objects as go
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
     from IPython import get_ipython
-    from .utils import new_cell_immediately_below,\
+    from JPSLUtils.utils import new_cell_immediately_below,\
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell, iconselector, notice_group, \
-        replace_text_of_current_cell
+        replace_text_of_current_cell, pseudoLatexToLatex
     import JPSLUtils
     from lmfit import models
+    if JPSLUtils.notebookenv != 'colab':
+        import plotly.graph_objects as go
 
-    from .utils import find_pandas_dataframe_names
+    from .utils import find_pandas_dataframe_names, build_run_snip_widget
     from IPython import get_ipython
     global_dict = get_ipython().user_ns
     dfs_info = []
@@ -125,144 +126,144 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     }
 
     def polymodelresultstr(resultname):
-        template = r'' \
-          'fitstr = r\'$fit = \'\\n' \
-          'termcount = 0\\n' \
-          'for k in %result.params.keys():\\n' \
-          '    pwr = int(str(k)[-1:])\\n' \
-          '    if %result.params[k].vary:\\n' \
-          '        if termcount > 0:\\n' \
-          '            fitstr += \' + \'\\n' \
-          '        fitstr += r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
-                                         '%result.params[k].value,\\n' \
+        template = '' \
+          'fitstr = \'$fit = \'\n' \
+          'termcount = 0\n' \
+          'for k in %result.params.keys():\n' \
+          '    pwr = int(str(k)[-1:])\n' \
+          '    if %result.params[k].vary:\n' \
+          '        if termcount > 0:\n' \
+          '            fitstr += \' + \'\n' \
+          '        fitstr += \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                                         '%result.params[k].value,\n' \
           '                               %result.params[k].stderr, ' \
-                                         'errdig=1, lowmag=-3)+\'})\'\\n' \
-          '        if pwr == 1:\\n' \
-          '            fitstr += \'x\'\\n' \
-          '        if pwr > 1:\\n' \
-          '            fitstr += \'x^\'+str(pwr)\\n' \
-          '        termcount+=1\\n' \
-          '    else:\\n' \
-          '        if %result.params[k].value!=0:\\n' \
-          '            if termcount > 0:\\n' \
-          '                fitstr += \'+\'\\n' \
-          '            fitstr += r\'(\\\color{blue}{\'+str(' \
-                                         '%result.params[k].value)+\'})\'\\n' \
-          '            termcount +=1\\n' \
-          '            if pwr == 1:\\n' \
-          '                fitstr += \'x\'\\n' \
-          '            if pwr > 1:\\n' \
-          '                fitstr += \'x^\'+str(pwr)\\n' \
-          'fitstr+=\'$\'\\n' \
-          'captionstr=\'<p>Use the command <code>%result</code> as the' \
-          'last line of a code cell for more details.</p>\'\\n' \
+                                         'errdig=1, lowmag=-3)+\'})\'\n' \
+          '        if pwr == 1:\n' \
+          '            fitstr += \'x\'\n' \
+          '        if pwr > 1:\n' \
+          '            fitstr += \'x^\'+str(pwr)\n' \
+          '        termcount+=1\n' \
+          '    else:\n' \
+          '        if %result.params[k].value!=0:\n' \
+          '            if termcount > 0:\n' \
+          '                fitstr += \'+\'\n' \
+          '            fitstr += \'(\\\color{blue}{\'+str(' \
+                                         '%result.params[k].value)+\'})\'\n' \
+          '            termcount +=1\n' \
+          '            if pwr == 1:\n' \
+          '                fitstr += \'x\'\n' \
+          '            if pwr > 1:\n' \
+          '                fitstr += \'x^\'+str(pwr)\n' \
+          'fitstr+=\'$\'\n' \
+          'captionstr=\'<p>Use the command <code>%result</code> as the ' \
+          'last line of a code cell for more details.</p>\'\n' \
           'display(HTML(fitstr+captionstr))'
         return template.replace('%result', str(resultname))
 
     def linmodelresultstr(resultname):
-        template = r'' \
-       'slopestr = ''\'\'\\n' \
-       'interceptstr = ''\'\'\\n' \
-       'for k in %results.params.keys():\\n' \
-       '    if %results.params[k].vary:\\n' \
-       '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
-                   '%results.params[k].value,\\n' \
-       '                                       %results.params[k].stderr,\\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\\n' \
-       '    else:\\n' \
-       '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
+        template = '' \
+       'slopestr = ''\'\'\n' \
+       'interceptstr = ''\'\'\n' \
+       'for k in %results.params.keys():\n' \
+       '    if %results.params[k].vary:\n' \
+       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                   '%results.params[k].value,\n' \
+       '                                       %results.params[k].stderr,\n' \
+       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '    else:\n' \
+       '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
                    'k].value,' \
-                   '\\n' \
-       '                                       )+\'}\'\\n' \
-       '    if k == \'slope\':\\n' \
-       '        slopestr = paramstr\\n' \
-       '    if k == \'intercept\' and %results.params[k].value != 0:\\n' \
-       '        interceptstr = \' + \' + paramstr\\n' \
-       'fitstr = r\'$fit = \'+slopestr + \'x\' + interceptstr + \'$\'\\n' \
+                   '\n' \
+       '                                       )+\'}\'\n' \
+       '    if k == \'slope\':\n' \
+       '        slopestr = paramstr\n' \
+       '    if k == \'intercept\' and %results.params[k].value != 0:\n' \
+       '        interceptstr = \' + \' + paramstr\n' \
+       'fitstr = \'$fit = \'+slopestr + \'x\' + interceptstr + \'$\'\n' \
        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
-       'last line of a code cell for more details.</p>\'\\n' \
+       'last line of a code cell for more details.</p>\'\n' \
        'display(HTML(fitstr+captionstr))'
         return template.replace('%results', resultname)
 
     def expmodelresultstr(resultname):
-        template = r'' \
-        'ampstr = ''\'\'\\n' \
-        'decaystr = ''\'\'\\n' \
-        'for k in %results.params.keys():\\n' \
-        '    if %results.params[k].vary:\\n' \
-        '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
-        '%results.params[k].value,\\n' \
-        '                                 %results.params[k].stderr,\\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\\n' \
-        '    else:\\n' \
-        '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
-                                               'k].value, \\n' \
-        '                                       )+\'}\'\\n' \
-        '    if k == \'amplitude\':\\n' \
-        '        ampstr = paramstr\\n' \
-        '    if k == \'decay\':\\n' \
-        '        decaystr = paramstr\\n' \
-        'fitstr = r\'$$fit = \'+ampstr+r\'\\\exp \\\left( %FRAC{-x}' \
-                        r'{\'+decaystr+r\'}\\right)$$\'\n' \
+        template = '' \
+        'ampstr = ''\'\'\n' \
+        'decaystr = ''\'\'\n' \
+        'for k in %results.params.keys():\n' \
+        '    if %results.params[k].vary:\n' \
+        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '%results.params[k].value,\n' \
+        '                                 %results.params[k].stderr,\n' \
+        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '    else:\n' \
+        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+                                               'k].value, \n' \
+        '                                       )+\'}\'\n' \
+        '    if k == \'amplitude\':\n' \
+        '        ampstr = paramstr\n' \
+        '    if k == \'decay\':\n' \
+        '        decaystr = paramstr\n' \
+        'fitstr = r\'$$fit = \'+ampstr+r\'%EXP %LEFT( %FRAC{-x}' \
+                        '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
         'captionstr = \'<p>Use the command <code>%results</code> as the ' \
-        'last line of a code cell for more details.</p>\'\\n' \
+        'last line of a code cell for more details.</p>\'\n' \
         'display(HTML(fitstr+captionstr))'
-        return template.replace('%results',resultname).replace('%FRAC',r'\\frac')
+        return template.replace('%results',resultname)
 
     def gausmodelresultstr(resultname):
         # TODO
-        template = r'' \
-        'ampstr = ''\'\'\\n' \
-        'centstr = ''\'\'\\n' \
-        'sigmastr = ''\'\'\\n' \
-        'for k in %results.params.keys():\\n' \
-        '    if %results.params[k].vary:\\n' \
-        '        paramstr = r\'(\\\color{red}{\'+rue.latex_rndwitherr(' \
-                                          '%results.params[k].value,\\n' \
-        '                                 %results.params[k].stderr,\\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\\n' \
-        '    else:\\n' \
-        '        paramstr = r\'\\\color{blue}{\'+str(%results.params[' \
-                                               'k].value, \\n' \
-        '                                       )+\'}\'\\n' \
-        '    if k == \'amplitude\':\\n' \
-        '        ampstr = paramstr\\n' \
-        '    if k == \'center\':\\n' \
-        '        centstr = paramstr\\n' \
-        '    if k == \'sigma\':\\n' \
-        '        sigmastr = paramstr\\n' \
+        template = '' \
+        'ampstr = ''\'\'\n' \
+        'centstr = ''\'\'\n' \
+        'sigmastr = ''\'\'\n' \
+        'for k in %results.params.keys():\n' \
+        '    if %results.params[k].vary:\n' \
+        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+                                          '%results.params[k].value,\n' \
+        '                                 %results.params[k].stderr,\n' \
+        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '    else:\n' \
+        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+                                               'k].value, \n' \
+        '                                       )+\'}\'\n' \
+        '    if k == \'amplitude\':\n' \
+        '        ampstr = paramstr\n' \
+        '    if k == \'center\':\n' \
+        '        centstr = paramstr\n' \
+        '    if k == \'sigma\':\n' \
+        '        sigmastr = paramstr\n' \
         'fitstr = r\'$$fit = %FRAC{\'+ampstr+\'}{' \
-                   r'\'+sigmastr+r\'\\\sqrt{2\\\pi}}\\\exp \\\left( %FRAC{' \
-                   r'-\\left[x-\'+centstr+r\'\\right]^2}' \
-                   r'{2\'+sigmastr+r\'^2}\\right)$$\'\n' \
+                   '\'+sigmastr+r\'%SQRT{2%PI}}%EXP %LEFT( %FRAC{' \
+                   '-%LEFT[x-\'+centstr+r\'%RIGHT]^2}' \
+                   '{2\'+sigmastr+r\'^2}%RIGHT)$$\'\n' \
         'captionstr = \'<p>Use the command <code>%results</code> as the ' \
-        'last line of a code cell for more details.</p>\'\\n' \
+        'last line of a code cell for more details.</p>\'\n' \
         'display(HTML(fitstr+captionstr))'
-        return template.replace('%results',resultname).replace('%FRAC',r'\\frac')
+        return template.replace('%results',resultname)
 
     def sinmodelresultstr(resultname):
-        template = r'' \
-       'ampstr = \'\'\\n' \
-       'freqstr = \'\'\\n' \
-       'shiftstr = \'\'\\n' \
-       'for k in %results.params.keys():\\n' \
-       '    if %results.params[k].vary:\\n' \
+        template = '' \
+       'ampstr = \'\'\n' \
+       'freqstr = \'\'\n' \
+       'shiftstr = \'\'\n' \
+       'for k in %results.params.keys():\n' \
+       '    if %results.params[k].vary:\n' \
        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
-                   '%results.params[k].value,\\n' \
-       '                                       %results.params[k].stderr,\\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\\n' \
-       '    else:\\n' \
+                   '%results.params[k].value,\n' \
+       '                                       %results.params[k].stderr,\n' \
+       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '    else:\n' \
        '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value' \
-                   ')+\'}\'\\n' \
-       '    if k == \'amplitude\':\\n' \
-       '        ampstr = paramstr\\n' \
-       '    if k == \'frequency\':\\n' \
-       '        freqstr = paramstr\\n' \
-       '    if k == \'shift\' and %results.params[k].value != 0:\\n' \
-       '        shiftstr = \' + \' + paramstr\\n' \
-       'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\\n' \
+                   ')+\'}\'\n' \
+       '    if k == \'amplitude\':\n' \
+       '        ampstr = paramstr\n' \
+       '    if k == \'frequency\':\n' \
+       '        freqstr = paramstr\n' \
+       '    if k == \'shift\' and %results.params[k].value != 0:\n' \
+       '        shiftstr = \' + \' + paramstr\n' \
+       'fitstr = \'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
-       'last line of a code cell for more details.</p>\'\\n' \
+       'last line of a code cell for more details.</p>\'\n' \
        'display(HTML(fitstr+captionstr))'
         return template.replace('%results', resultname)
 
@@ -274,15 +275,15 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     'SineModel': sinmodelresultstr
     }
 
-    importstr = r'# CODE BLOCK generated using fit_pandas_GUI(). See '\
-                r'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\n' \
-                r'# Imports (no effect if already imported)\n' \
-                r'import numpy as np\n' \
-                r'import lmfit as lmfit\n' \
-                r'import round_using_error as rue\n' \
-                r'import copy as copy\n' \
-                r'from plotly import graph_objects as go\n' \
-                r'from IPython.display import HTML\n\n'
+    importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
+                'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
+                '# Imports (no effect if already imported)\n' \
+                'import numpy as np\n' \
+                'import lmfit as lmfit\n' \
+                'import round_using_error as rue\n' \
+                'import copy as copy\n' \
+                'from plotly import graph_objects as go\n' \
+                'from IPython.display import HTML\n\n'
     step1str = ''
     step2str = ''
     step3str = ''
@@ -406,10 +407,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     trace_notices.set_active([0,1])
     add_trace_notices = richLabel(value = trace_notices.notice_html())
-    step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
-    step1actionbox = VBox([add_trace_notices])
-    step1hbox = HBox([step1tracebox,step1actionbox])
-    step1 = VBox([step1instracc, step1hbox])
+    step1tracebox =  VBox(children=[whichframe,Xcoord,Ycoord,trace_name])
+    step1actionbox =  VBox(children=[add_trace_notices])
+    step1hbox =  HBox(children=[step1tracebox,step1actionbox])
+    step1 =  VBox(children=[step1instracc, step1hbox])
 
     # 2. Set data uncertainty
     step2instr = richLabel(value = 'If you know the uncertainty in your data '
@@ -477,11 +478,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
-    yerrrow1 = HBox([yerrtype,yerrvalue])
-    yerror = VBox([yerrrow1,yerrdata])
+    yerrrow1 =  HBox(children=[yerrtype,yerrvalue])
+    yerror =  VBox(children=[yerrrow1,yerrdata])
     step2instracc = Accordion(children=[step2instr])
     step2instracc.selected_index = None
-    step2 = VBox([step2instr,yerror])
+    step2 =  VBox(children=[step2instr,yerror])
 
     # 3. Set fit parameters
     step3instr = richLabel(value = '<ol><li>Choose the fit type ('
@@ -586,7 +587,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                  disabled=False,
                                  style=longdesc)
             paramlabel = Label(value = str(i)+':',style=longdesc)
-            parambox = VBox([paramlabel,HBox([fixcheck,valuefield,minfield,
+            parambox =  VBox(children=[paramlabel, HBox(children=[fixcheck,valuefield,minfield,
                                     maxfield])])
             parambox.layout.display = 'none'
             currmodel_param.append(parambox)
@@ -600,7 +601,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     modeldrop.observe(modeldrop_change, names = 'value')
     params_set = make_param_set()
     getcurrmodel_param(modeldrop.value, params_set)
-    step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
+    step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
 
     # 5.Title, Axes, Format ...
     step5instr = richLabel(value = 'You must set the axes labels to something '
@@ -644,9 +645,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step5hbox1 = HBox([X_label, Y_label])
-    step5hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step5 = VBox([step5instr, plot_title, step5hbox1, step5hbox2])
+    step5hbox1 =  HBox(children=[X_label, Y_label])
+    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step5 =  VBox(children=[step5instr, plot_title, step5hbox1, step5hbox2])
 
     # 4. Pick Fit Range(s)
     step4instr = richLabel(value ='This step is optional. '
@@ -670,12 +671,20 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     extend_fit = Checkbox(value=False,
                            description='Extend fitted function plot',
                            style=longdesc)
-    range_plot =  go.FigureWidget(layout_template='simple_white')
-    range_plot_line_color = 'blue'
-    range_plot_hilight = 'cyan'
-    range_plot_marker_size = 6
-    range_plot_hilight_size = 20
-    ranges=[]
+    range_plot = None
+    if JPSLUtils.notebookenv == 'colab':
+        range_plot = richLabel(value = '<span style="color:blue;">' \
+                               'Unfortunately, defining a range by clicking ' \
+                               'on the graph is not yet supported in Google' \
+                               'Colab.</span>')
+    else:
+        range_plot =  go.FigureWidget(layout_template='simple_white')
+        range_plot_line_color = 'blue'
+        range_plot_hilight = 'cyan'
+        range_plot_marker_size = 6
+        range_plot_hilight_size = 20
+        ranges=[]
+        
     def update_range_point(trace, points, selector):
         # size and color must be done separately as they may not be updated
         # in sync.
@@ -706,85 +715,100 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step4instacc = Accordion(children =[step4instr])
     step4instacc.set_title(0,'Instructions (optional step)')
     step4instacc.selected_index = None
-    step4 = VBox([step4instacc,extend_fit,range_plot])
+    step4 =  VBox(children=[step4instacc,extend_fit,range_plot])
 
     # 6. Final Check*
-    step6instr = richLabel(value = 'Things to check before clicking "Do '
-                                   'Fit": <ul>'
-                                   '<li>Fix any problems listed in '
-                                   '"Notices".</li>'
-                                   '<li>Check for any unpaired parentheses, '
-                                   'brackets or braces (usually highlighted '
-                                   'in red).</li>'
-                                   '<li>Check that all single and double '
-                                   'quotes are paired.</li>'
-                                   '<li>If you did any manual editing '
+    step6instr = richLabel(value = 'Things to check before running the fit:' \
+                                   '<ul><li>Fix any problems listed in ' \
+                                   '"Notices".</li>' \
+                                   '<li>Check for any unpaired parentheses, ' \
+                                   'brackets or braces.</li>' \
+                                   '<li>Check that all single and double ' \
+                                   'quotes are paired.</li>' \
+                                   '<li>If you did any manual editing ' \
                                    'double-check for typos.</li>')
     step6noticebox = richLabel(value = makeplot_notices.notice_html())
+
     def dofit_click(change):
-        select_cell_immediately_below()
-        # run the cell to build the plot
-        JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
-        # remove the GUI cell
-        select_containing_cell('pandasfitGUI')
-        delete_selected_cell()
+        if JPSLUtils.notebookenv == 'NBClassic':
+            text = '\n# Force save widget states so that graph will still be\n'
+            text += '# available when notebook next opened in trusted state.\n'
+            text += 'import time\ntime.sleep(5)'
+            select_containing_cell('pandasfitGUI')
+            select_cell_immediately_below()
+            insert_newline_at_end_of_current_cell(text)
+            jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
+            text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+            insert_newline_at_end_of_current_cell(text)
+            # run the cell to build the plot
+            JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
+            # remove the GUI cell
+            select_containing_cell('pandasfitGUI')
+            delete_selected_cell()
         pass
-    dofitbut = Button(description = 'Do Fit', disabled = True)
+
+    dofitbut_lay = Layout(visibility = "hidden")
+    if JPSLUtils.notebookenv == 'NBClassic':
+        dofitbut_lay = Layout(visibility="visible")
+    dofitbut = Button(description = 'Do Fit',
+                      disabled = True,
+                      layout = dofitbut_lay)
     dofitbut.on_click(dofit_click)
-    step6vbox = VBox([dofitbut,step6noticebox])
-    step6 = HBox([step6instr,step6vbox])
+    step6vbox =  VBox(children=[dofitbut,step6noticebox])
+    step6 =  HBox(children=[step6instr,step6vbox])
 
 
-    steps = Tab([step1, step2, step3, step4, step5, step6])
+    steps =  Tab(children=[step1, step2, step3, step4, step5, step6])
     steps.set_title(0,'1. Pick Data*')
     steps.set_title(1,'2. Data Uncertainty*')
     steps.set_title(2,'3. Set up Model*')
     steps.set_title(3,'4. Pick Fit Range(s)')
     steps.set_title(4, '5. Axes & Format*')
     steps.set_title(5, '6. Final Check*')
+
     def tab_changed(change):
         nonlocal importstr, step1str, step2str, step3str, step4str, step5str, \
             range_chosen
         dfname = friendly_to_globalname[whichframe.value]
         if change['old'] == 0:
             # Update step 1 string
-            step1str = '# Define data and trace name\\n'
-            step1str += 'Xvals = '+dfname+'[\\"'
-            step1str += str(Xcoord.value)+'\\"]\\n'
-            step1str += 'Yvals = ' + dfname +'[\\"'
-            step1str += str(Ycoord.value)+'\\"]\\n'
-            step1str += 'tracename = \\"'+str(trace_name.value)+'\\"\\n\\n'
+            step1str = '# Define data and trace name\n'
+            step1str += 'Xvals = '+dfname+'[\"'
+            step1str += str(Xcoord.value)+'\"]\n'
+            step1str += 'Yvals = ' + dfname +'[\"'
+            step1str += str(Ycoord.value)+'\"]\n'
+            step1str += 'tracename = \"'+str(trace_name.value)+'\"\n\n'
             pass
         if change['old'] == 1:
             # TODO need do something in case  tab is changed before a click
             # occurs outside a box that was just change. blur things will
             # require ipywidgets v8+
             # update step 2 string
-            step2str = '# Define error (uncertainty)\\n'
+            step2str = '# Define error (uncertainty)\n'
             if yerrtype.value == 'none':
-                step2str += 'Yerr = ' + dfname + '[\\"'
-                step2str += str(Ycoord.value) + '\\"]*0 + 1\\n\\n'
+                step2str += 'Yerr = ' + dfname + '[\"'
+                step2str += str(Ycoord.value) + '\"]*0 + 1\n\n'
             if yerrtype.value=='constant':
-                step2str += 'Yerr = ' + dfname +'[\\"'
-                step2str += str(Ycoord.value)+'\\"]*0 + ' + str(
-                    yerrvalue.value) + '\\n\\n'
+                step2str += 'Yerr = ' + dfname +'[\"'
+                step2str += str(Ycoord.value)+'\"]*0 + ' + str(
+                    yerrvalue.value) + '\n\n'
             if yerrtype.value == 'percent':
-                step2str += 'Yerr = np.fabs('+ dfname +'[\\"'
-                step2str += str(Ycoord.value)+'\\"])*0.01*' + str(
-                    yerrvalue.value) + '\\n\\n'
+                step2str += 'Yerr = np.fabs('+ dfname +'[\"'
+                step2str += str(Ycoord.value)+'\"])*0.01*' + str(
+                    yerrvalue.value) + '\n\n'
             if yerrtype.value == 'data':
-                step2str += 'Yerr = ' + dfname +'[\\"'
-                step2str += str(yerrdata.value)+'\\"]\\n\\n'
+                step2str += 'Yerr = ' + dfname +'[\"'
+                step2str += str(yerrdata.value)+'\"]\n\n'
             pass
         if change['old']== 2:
             # update step 3 string
-            step3str = '# Define the fit model, initial guesses, and contraints\\n'
-            step3str += 'fitmod = lmfit.models.'+str(modeldrop.value)+'()\\n'
+            step3str = '# Define the fit model, initial guesses, and contraints\n'
+            step3str += 'fitmod = lmfit.models.'+str(modeldrop.value)+'()\n'
             currmodel = getattr(models, str(modeldrop.value))()
             for k in params_set.children:
                 param_name = str(k.children[0].value.split(':')[0])
                 if param_name in currmodel.param_names:
-                    step3str += 'fitmod.set_param_hint(\\"'+param_name+'\\",'
+                    step3str += 'fitmod.set_param_hint(\"'+param_name+'\",'
                     step3str += ' vary = '+str(not(k.children[1].children[
                         0].value))
                     temp_val = k.children[1].children[1].value
@@ -803,69 +827,70 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     temp_val = k.children[1].children[3].value
                     if tst_temp_val(temp_val):
                         step3str += ', max = ' + str(temp_val)
-                    step3str += ')\\n'
-            step3str +='\\n'
+                    step3str += ')\n'
+            step3str +='\n'
             pass
         if change['new']>=4:
-            # update ranges
-            range_start = True
             ranges = []
-            new_range = []
-            if len(range_plot.data)>0:
-                for i in range(len(range_plot.data[0].marker.color)):
-                    if range_plot.data[0].marker.color[i] == range_plot_hilight:
-                        new_range.append(i)
-                        if not range_start:
-                            ranges.append(new_range)
-                            new_range = []
-                        range_start = not range_start
+            if JPSLUtils.notebookenv != 'colab':
+                # update ranges
+                range_start = True
+                new_range = []
+                if len(range_plot.data)>0:
+                    for i in range(len(range_plot.data[0].marker.color)):
+                        if range_plot.data[0].marker.color[i] == range_plot_hilight:
+                            new_range.append(i)
+                            if not range_start:
+                                ranges.append(new_range)
+                                new_range = []
+                            range_start = not range_start
             # update step 4 string
             covscalestr = 'False'
             if yerrtype.value == 'none':
                 covscalestr = 'True'
             if len(ranges) > 0:
                 range_chosen = True
-                step4str = '# Define fit ranges\\n'
+                step4str = '# Define fit ranges\n'
                 step4str += 'Yfiterr = copy.deepcopy(Yerr) # ranges not to ' \
-                            'fit = np.inf\\n'
+                            'fit = np.inf\n'
                 step4str += 'Xfitdata = copy.deepcopy(Xvals) # ranges where ' \
-                            'fit not displayed = np.nan\\n'
+                            'fit not displayed = np.nan\n'
                 for i in range(len(ranges)):
                     if i == 0 and ranges[0][0]>0:
                         step4str += 'Yfiterr[0:'+str(ranges[0][0])+'] = ' \
-                                                                   'np.inf\\n'
+                                                                   'np.inf\n'
                         step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
-                                    '] = np.nan\\n'
+                                    '] = np.nan\n'
                     if (i + 1) < len(ranges):
                         step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
-                                    ':'+str(ranges[i+1][0])+'] = np.inf\\n'
+                                    ':'+str(ranges[i+1][0])+'] = np.inf\n'
                         step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
-                                    ':'+str(ranges[i+1][0])+'] = np.nan\\n'
+                                    ':'+str(ranges[i+1][0])+'] = np.nan\n'
                     if i+1 == len(ranges):
                         step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
                                     ':'+str(len(range_plot.data[0].marker.
-                                                color))+'] = np.inf\\n'
+                                                color))+'] = np.inf\n'
                         step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
                                 ':'+str(len(range_plot.data[0].marker.
-                                            color))+'] = np.nan\\n'
-                step4str += '\\n'
-                step4str += '# Do fit\\n'
+                                            color))+'] = np.nan\n'
+                step4str += '\n'
+                step4str += '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
                     'weights = 1/Yfiterr, scale_covar = '+covscalestr+', ' \
-                    'nan_policy = \\"omit\\")\\n\\n'
+                    'nan_policy = \"omit\")\n\n'
             else:
                 range_chosen = False
-                step4str = '# Do fit\\n'
+                step4str = '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
                     'weights = 1/Yerr, scale_covar = '+covscalestr+', ' \
-                    'nan_policy = \\"omit\\")\\n\\n'
-            step4str += '# Calculate residuals (data - fit) because lmfit\\n'
+                    'nan_policy = \"omit\")\n\n'
+            step4str += '# Calculate residuals (data - fit) because lmfit\n'
             step4str += '#  does not calculate for all points under all ' \
-                        'conditions\\n'
-            step4str += 'resid = []\\n'
-            step4str += 'for i in range(0,len('+str(fitname)+'.data)):\\n'
+                        'conditions\n'
+            step4str += 'resid = []\n'
+            step4str += 'for i in range(0,len('+str(fitname)+'.data)):\n'
             step4str += '    resid.append('+str(fitname)+'.data[' \
-                                        'i]-'+str(fitname)+'.best_fit[i])\\n\\n'
+                                        'i]-'+str(fitname)+'.best_fit[i])\n\n'
             pass
         if change['old'] == 4:
                 # update step 5 string
@@ -873,19 +898,19 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 if range_chosen:
                     xstr = 'Xfitdata'
                     if not(extend_fit.value):
-                        step5str += '# Delete residuals in ranges not fit\\n'
+                        step5str += '# Delete residuals in ranges not fit\n'
                         step5str += '# and fit values that are not ' \
-                                    'displayed.\\n'
-                        step5str += 'for i in range(len(resid)):\\n'
-                        step5str += '    if np.isnan(Xfitdata[i]):\\n'
-                        step5str += '        resid[i] = np.nan\\n'
+                                    'displayed.\n'
+                        step5str += 'for i in range(len(resid)):\n'
+                        step5str += '    if np.isnan(Xfitdata[i]):\n'
+                        step5str += '        resid[i] = np.nan\n'
                         step5str += '        '+str(fitname)+'.best_fit[i] = ' \
-                                                   'np.nan\\n\\n'
+                                                   'np.nan\n\n'
                 else:
                     xstr = 'Xvals'
                 errbarstr = ''
                 if yerrtype.value!='none':
-                    errbarstr = ', error_y_type=\\"data\\", error_y_array=Yerr'
+                    errbarstr = ', error_y_type=\"data\", error_y_array=Yerr'
                 xresidstr = xstr
                 if extend_fit.value:
                     xresidstr = 'Xvals'
@@ -893,54 +918,54 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 if mirror_axes.value:
                     mirrorstr = ', mirror = True'
                     if mirror_ticks.value:
-                        mirrorstr = ', mirror = \\"ticks\\"'
+                        mirrorstr = ', mirror = \"ticks\"'
                 # the plot
-                step5str += '# Plot Results\\n'
+                step5str += '# Plot Results\n'
                 step5str += str(figname) + ' = go.FigureWidget(' \
-                                    'layout_template=\\"'+str(
-                                    plot_template.value)+'\\")\\n'
-                step5str += str(figname)+ '.update_layout(title = \\"'+ \
-                                    str(plot_title.value)+'\\")\\n'
+                                    'layout_template=\"'+str(
+                                    plot_template.value)+'\")\n'
+                step5str += str(figname)+ '.update_layout(title = \"'+ \
+                                    str(plot_title.value)+'\")\n'
                 step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
                                            'row_heights=[0.2,0.8], ' \
-                                           'shared_xaxes=True)\\n'
+                                           'shared_xaxes=True)\n'
                 step5str += 'scat = go.Scatter(y=resid,x='+xresidstr+', ' \
-                                    'mode=\\"markers\\",' \
-                                    'name = \\"residuals\\"'+errbarstr+')\\n'
+                                    'mode=\"markers\",' \
+                                    'name = \"residuals\"'+errbarstr+')\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
-                                        '\\"Residuals\\", ' \
+                                        '\"Residuals\", ' \
                             'row=1, col=1, zeroline=True, zerolinecolor = ' \
-                            '\\"lightgrey\\"'+str(mirrorstr)+')\\n'
+                            '\"lightgrey\"'+str(mirrorstr)+')\n'
                 if mirror_axes.value:
                     step5str += str(figname) + '.update_xaxes(' \
-                                           'row=1, col=1'+str(mirrorstr)+')\\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=1)\\n'
+                                           'row=1, col=1'+str(mirrorstr)+')\n'
+                step5str += str(figname) + '.add_trace(scat,col=1,row=1)\n'
                 step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
-                            'mode=\\"markers\\", name=tracename'+errbarstr+')\\n'
+                            'mode=\"markers\", name=tracename'+errbarstr+')\n'
                 step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                           'row = 2)\\n'
+                                           'row = 2)\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
-                                           '\\"'+Y_label.value+'\\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\\n'
+                                           '\"'+Y_label.value+'\", ' \
+                                           'row=2, col=1'+str(mirrorstr)+')\n'
                 step5str += str(figname) + '.update_xaxes(title = ' \
-                                           '\\"'+X_label.value+'\\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\\n'
+                                           '\"'+X_label.value+'\", ' \
+                                           'row=2, col=1'+str(mirrorstr)+')\n'
                 if extend_fit.value:
                     step5str += 'scat = go.Scatter(y='+str(
-                        fitname)+'.best_fit, x=Xvals, mode=\\"lines\\", '\
-                                'line_color = \\"black\\", ' \
-                                'name=\\"extrapolated\\",' \
-                                 'line_dash=\\"dash\\")\\n'
+                        fitname)+'.best_fit, x=Xvals, mode=\"lines\", '\
+                                'line_color = \"black\", ' \
+                                'name=\"extrapolated\",' \
+                                 'line_dash=\"dash\")\n'
                     step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                               'row=2)\\n'
+                                               'row=2)\n'
                 step5str += 'scat = go.Scatter(y='+str(fitname)+'.best_fit,' \
-                                    'x='+xstr+', mode=\\"lines\\", ' \
-                                    'name=\\"fit\\", line_color = ' \
-                                    '\\"black\\", line_dash=\\"solid\\")\\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=2)\\n'
-                step5str += str(figname) + '.show()\\n\\n'
+                                    'x='+xstr+', mode=\"lines\", ' \
+                                    'name=\"fit\", line_color = ' \
+                                    '\"black\", line_dash=\"solid\")\n'
+                step5str += str(figname) + '.add_trace(scat,col=1,row=2)\n'
+                step5str += str(figname) + '.show()\n\n'
                 pass
-        if change['new'] == 3:
+        if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
             df = friendly_to_object[whichframe.value]
             rangex = df[Xcoord.value]
             rangey = df[Ycoord.value]
@@ -984,15 +1009,25 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             dofitbut.disabled = False
             dofitbut.button_style = 'success'
         # the best fit equation
-        step6str = '# Display best fit equation\\n'
+        step6str = '# Display best fit equation\n'
         step6str += fitresultstrs[modeldrop.value](fitname)
-        JPSLUtils.select_containing_cell('pandasfitGUI')
-        JPSLUtils.replace_text_of_next_cell(importstr + step1str + step2str +
-                                     step3str + step4str + step5str + step6str)
+        if JPSLUtils.notebookenv == 'NBClassic':
+            JPSLUtils.select_containing_cell('pandasfitGUI')
+            JPSLUtils.replace_text_of_next_cell(importstr + step1str + \
+                                                step2str + step3str + \
+                                                step4str + step5str + step6str)
+        else:
+            codearea.sniptext.value = importstr + step1str + step2str + \
+                                      step3str + step4str + step5str + \
+                                      pseudoLatexToLatex(step6str)
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
     display(steps)
-    select_containing_cell('pandasfitGUI')
-    new_cell_immediately_below()
+    if JPSLUtils.notebookenv == 'NBClassic':
+        select_containing_cell('pandasfitGUI')
+        new_cell_immediately_below()
+    else:
+        codearea = build_run_snip_widget('')
+        display(codearea)
     pass

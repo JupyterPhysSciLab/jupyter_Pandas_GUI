@@ -37,7 +37,7 @@
     </ul>
 
 
-            <footer>jupyter_Pandas_GUI v0.6.2</footer>
+            <footer>jupyter_Pandas_GUI v0.7.0</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev">
             built with <span class="visually-hidden">pdoc</span><img
@@ -91,14 +91,15 @@
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span> <span class="k">as</span> <span class="n">JS</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
+    <span class="kn">from</span> <span class="nn">JPSLUtils.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
         <span class="n">select_cell_immediately_below</span><span class="p">,</span> <span class="n">move_cursor_in_current_cell</span><span class="p">,</span> \
         <span class="n">insert_text_into_next_cell</span><span class="p">,</span> <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">,</span> \
         <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">,</span> <span class="n">select_containing_cell</span><span class="p">,</span> \
-        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">iconselector</span><span class="p">,</span> <span class="n">notice_group</span>
+        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">iconselector</span><span class="p">,</span> <span class="n">notice_group</span><span class="p">,</span> <span class="n">notebookenv</span><span class="p">,</span> \
+        <span class="n">replace_text_of_next_cell</span>
     <span class="kn">import</span> <span class="nn">JPSLUtils</span>
 
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span>
+    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span><span class="p">,</span> <span class="n">build_run_snip_widget</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
     <span class="n">global_dict</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">user_ns</span>
     <span class="n">dfs_info</span> <span class="o">=</span> <span class="p">[]</span>
@@ -141,6 +142,17 @@
                                     <span class="s1">&#39;Notices:&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
     <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">set_active</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
+    <span class="c1"># Strings for each tab, that are combined to make the code.</span>
+    <span class="n">importstr</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using plot_pandas_GUI().</span><span class="se">\n</span><span class="s1"># See &#39;</span> \
+        <span class="s1">&#39;https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.</span><span class="se">\n</span><span class="s1">&#39;</span> \
+        <span class="s1">&#39;from plotly import graph_objects as go</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="s1">&#39; = go.FigureWidget(layout_template=</span><span class="se">\&quot;</span><span class="s1">simple_white</span><span class="se">\&quot;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step1strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Trace declaration(s) and trace formating</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step1str</span> <span class="o">=</span> <span class="n">step1strdefault</span>
+    <span class="n">step2strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Axes labels</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step2str</span> <span class="o">=</span> <span class="n">step2strdefault</span>
+    <span class="n">step3strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Plot formatting</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step3str</span> <span class="o">=</span> <span class="n">step3strdefault</span>
     <span class="c1"># 1. Pick Traces*</span>
     <span class="c1">#   a. Select Y vs. X pairs* (DataFrame, X and Y, which must be from single</span>
     <span class="c1">#       frame.</span>
@@ -150,7 +162,7 @@
         <span class="s1">&#39;X- and Y-coordinates required.&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Incomplete or inconsistent error specification(s).&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Non-default trace formatting left from previous trace.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;X-Error settings left from previous trace.&lt;/li&gt;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;X-Error settings left from previous trace.&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Y-Error settings left from previous trace.&#39;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">trace_notices</span> <span class="o">=</span> <span class="n">notice_group</span><span class="p">(</span><span class="n">notice_list</span><span class="p">,</span> <span class="s1">&#39;Notices:&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
@@ -284,8 +296,8 @@
                                 <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Marker Size (px): &#39;</span><span class="p">,</span>
                                 <span class="n">style</span><span class="o">=</span><span class="n">longdesc</span><span class="p">)</span>
     <span class="n">markersize</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
-    <span class="n">markerhbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">markerlabel</span><span class="p">,</span><span class="n">filled_open</span><span class="p">,</span><span class="n">markersize</span><span class="p">])</span>
-    <span class="n">markervbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">markerhbox</span><span class="p">,</span> <span class="n">marker_selector</span><span class="o">.</span><span class="n">box</span><span class="p">])</span>
+    <span class="n">markerhbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">markerlabel</span><span class="p">,</span><span class="n">filled_open</span><span class="p">,</span><span class="n">markersize</span><span class="p">])</span>
+    <span class="n">markervbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">markerhbox</span><span class="p">,</span> <span class="n">marker_selector</span><span class="o">.</span><span class="n">box</span><span class="p">])</span>
     <span class="n">line_style</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span><span class="s1">&#39;dashdot&#39;</span><span class="p">],</span>
                           <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Line style: &#39;</span><span class="p">)</span>
     <span class="n">line_style</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
@@ -293,11 +305,11 @@
                                 <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Linewidth (px): &#39;</span><span class="p">,</span>
                                 <span class="n">style</span><span class="o">=</span><span class="n">longdesc</span><span class="p">)</span>
     <span class="n">line_width</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
-    <span class="n">linehbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">line_style</span><span class="p">,</span><span class="n">line_width</span><span class="p">])</span>
+    <span class="n">linehbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">line_style</span><span class="p">,</span><span class="n">line_width</span><span class="p">])</span>
 
-    <span class="n">formatHbox1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">modedrop</span><span class="p">,</span><span class="n">colordrop</span><span class="p">])</span>
-    <span class="n">formatVbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">formatHbox1</span><span class="p">,</span><span class="n">linehbox</span><span class="p">,</span><span class="n">markervbox</span><span class="p">])</span>
-    <span class="n">step1formatacc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">([</span><span class="n">formatVbox</span><span class="p">])</span>
+    <span class="n">formatHbox1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">modedrop</span><span class="p">,</span><span class="n">colordrop</span><span class="p">])</span>
+    <span class="n">formatVbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">formatHbox1</span><span class="p">,</span><span class="n">linehbox</span><span class="p">,</span><span class="n">markervbox</span><span class="p">])</span>
+    <span class="n">step1formatacc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">formatVbox</span><span class="p">])</span>
     <span class="n">step1formatacc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;Trace Formatting&#39;</span><span class="p">)</span>
     <span class="n">step1formatacc</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">yerrtype</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
@@ -372,8 +384,8 @@
         <span class="k">pass</span>
 
     <span class="n">yerrdata</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">errdata_change</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">yerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">yerrtype</span><span class="p">,</span><span class="n">yerrvalue</span><span class="p">])</span>
-    <span class="n">yerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">yerrrow1</span><span class="p">,</span><span class="n">yerrdata</span><span class="p">])</span>
+    <span class="n">yerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">yerrtype</span><span class="p">,</span><span class="n">yerrvalue</span><span class="p">])</span>
+    <span class="n">yerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">yerrrow1</span><span class="p">,</span><span class="n">yerrdata</span><span class="p">])</span>
     <span class="n">xerrtype</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
                         <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Error Type: &#39;</span><span class="p">,</span>
                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -417,8 +429,8 @@
                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="n">xerrdata</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">errdata_change</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">xerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">xerrtype</span><span class="p">,</span><span class="n">xerrvalue</span><span class="p">])</span>
-    <span class="n">xerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">xerrrow1</span><span class="p">,</span><span class="n">xerrdata</span><span class="p">])</span>
+    <span class="n">xerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">xerrtype</span><span class="p">,</span><span class="n">xerrvalue</span><span class="p">])</span>
+    <span class="n">xerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">xerrrow1</span><span class="p">,</span><span class="n">xerrdata</span><span class="p">])</span>
     <span class="n">step1erracc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">yerror</span><span class="p">,</span><span class="n">xerror</span><span class="p">])</span>
     <span class="n">step1erracc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Y error bars&#39;</span><span class="p">)</span>
     <span class="n">step1erracc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;X error bars&#39;</span><span class="p">)</span>
@@ -428,42 +440,43 @@
     <span class="n">add_trace_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Add Trace&#39;</span><span class="p">,</span>
                            <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">do_add_trace</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">importstr</span><span class="p">,</span> <span class="n">step1str</span><span class="p">,</span> <span class="n">step2str</span><span class="p">,</span> <span class="n">step3str</span>
         <span class="n">dfname</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;scat = go.Scatter(x = &#39;</span><span class="o">+</span><span class="n">dfname</span><span class="o">+</span><span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> \
                <span class="o">+</span><span class="n">Xcoord</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],&#39;</span>
         <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; y = &#39;</span> <span class="o">+</span><span class="n">dfname</span><span class="o">+</span><span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">Ycoord</span><span class="o">.</span><span class="n">value</span><span class="o">+</span> \
-                                          <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],</span><span class="se">\\</span><span class="s1">n&#39;</span>
+                                          <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;        mode = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, name = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> \
                                                <span class="o">+</span><span class="n">trace_name</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">,&#39;</span>
         <span class="c1"># in here add other formatting items using ifs.</span>
         <span class="k">if</span> <span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;line_color = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">colordrop</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;markers&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_color = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;solid&#39;</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;line_dash=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">if</span> <span class="n">line_width</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;line_width=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">line_width</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;markers&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">markersize</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_size=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">markersize</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
             <span class="n">tmpmkr</span> <span class="o">=</span> <span class="n">icontoplotly</span><span class="p">[</span><span class="n">marker_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">filled_open</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">tmpmkr</span> <span class="o">+=</span><span class="s1">&#39;-open&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_symbol=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">tmpmkr</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">tmpmkr</span> <span class="o">!=</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
-                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                     <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_symbol=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">tmpmkr</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
         <span class="k">if</span> <span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_y_type=</span><span class="se">\&#39;</span><span class="s1">data</span><span class="se">\&#39;</span><span class="s1">, &#39;</span> \
                         <span class="s1">&#39;error_y_array=&#39;</span><span class="o">+</span><span class="n">dfname</span>
@@ -472,7 +485,7 @@
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_y_type=</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, error_y_value=&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">yerrvalue</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
         <span class="k">if</span> <span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_x_type=</span><span class="se">\&#39;</span><span class="s1">data</span><span class="se">\&#39;</span><span class="s1">, &#39;</span> \
                         <span class="s1">&#39;error_x_array=&#39;</span><span class="o">+</span><span class="n">dfname</span>
@@ -480,10 +493,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_x_type=</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, error_x_value=&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">xerrvalue</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;)</span><span class="se">\\</span><span class="s1">n&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.add_trace(scat)&#39;</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.add_trace(scat)</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">step1str</span> <span class="o">+=</span> <span class="n">text</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">replace_text_of_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span> <span class="ow">or</span> \
             <span class="p">(</span><span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;solid&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">line_width</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> \
             <span class="p">(</span><span class="n">icontoplotly</span><span class="p">[</span><span class="n">marker_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;circle&#39;</span><span class="p">)</span> <span class="ow">or</span> \
@@ -501,14 +517,14 @@
 
     <span class="n">trace_notices</span><span class="o">.</span><span class="n">set_active</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">add_trace_notices</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">trace_notices</span><span class="o">.</span><span class="n">notice_html</span><span class="p">())</span>
-    <span class="n">step1tracebox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">whichframe</span><span class="p">,</span><span class="n">Xcoord</span><span class="p">,</span><span class="n">Ycoord</span><span class="p">,</span><span class="n">trace_name</span><span class="p">])</span>
-    <span class="n">step1actionbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">add_trace_but</span><span class="p">,</span> <span class="n">add_trace_notices</span><span class="p">])</span>
-    <span class="n">step1hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step1tracebox</span><span class="p">,</span><span class="n">step1actionbox</span><span class="p">])</span>
-    <span class="n">step1optbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1formatacc</span><span class="p">,</span> <span class="n">step1erracc</span><span class="p">])</span>
+    <span class="n">step1tracebox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">whichframe</span><span class="p">,</span><span class="n">Xcoord</span><span class="p">,</span><span class="n">Ycoord</span><span class="p">,</span><span class="n">trace_name</span><span class="p">])</span>
+    <span class="n">step1actionbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">add_trace_but</span><span class="p">,</span> <span class="n">add_trace_notices</span><span class="p">])</span>
+    <span class="n">step1hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1tracebox</span><span class="p">,</span><span class="n">step1actionbox</span><span class="p">])</span>
+    <span class="n">step1optbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1formatacc</span><span class="p">,</span> <span class="n">step1erracc</span><span class="p">])</span>
     <span class="n">step1opt</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">step1optbox</span><span class="p">])</span>
     <span class="n">step1opt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Optional (Trace formatting, error bars...)&#39;</span><span class="p">)</span>
     <span class="n">step1opt</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1instracc</span><span class="p">,</span> <span class="n">step1hbox</span><span class="p">,</span> <span class="n">step1opt</span><span class="p">])</span>
+    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1instracc</span><span class="p">,</span> <span class="n">step1hbox</span><span class="p">,</span> <span class="n">step1opt</span><span class="p">])</span>
 
     <span class="c1"># 2. Set Axes Labels (will use column names by default).</span>
     <span class="n">step2instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;You must set the axes labels to something &#39;</span>
@@ -532,8 +548,8 @@
                    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Y-axis label: &#39;</span><span class="p">,</span>
                    <span class="n">style</span> <span class="o">=</span> <span class="n">longdesc</span><span class="p">,</span>
                    <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;45%&#39;</span><span class="p">))</span>
-    <span class="n">step2hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">X_label</span><span class="p">,</span><span class="n">Y_label</span><span class="p">])</span>
-    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step2instracc</span><span class="p">,</span><span class="n">step2hbox</span><span class="p">])</span>
+    <span class="n">step2hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">X_label</span><span class="p">,</span><span class="n">Y_label</span><span class="p">])</span>
+    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step2instracc</span><span class="p">,</span><span class="n">step2hbox</span><span class="p">])</span>
     <span class="c1"># 3.Title, Format ...</span>
     <span class="n">plot_title</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">figname</span><span class="p">,</span>
                        <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Plot title: &#39;</span><span class="p">,</span>
@@ -563,73 +579,62 @@
                         <span class="n">value</span><span class="o">=</span><span class="s1">&#39;simple_white&#39;</span><span class="p">,</span>
                         <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Plot Styling: &#39;</span><span class="p">,</span>
                         <span class="n">style</span> <span class="o">=</span> <span class="n">longdesc</span><span class="p">)</span>
-    <span class="n">step3hbox2</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">mirror_axes</span><span class="p">,</span><span class="n">mirror_ticks</span><span class="p">,</span> <span class="n">plot_template</span><span class="p">])</span>
-    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_title</span><span class="p">,</span><span class="n">step3hbox2</span><span class="p">])</span>
+    <span class="n">step3hbox2</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">mirror_axes</span><span class="p">,</span><span class="n">mirror_ticks</span><span class="p">,</span> <span class="n">plot_template</span><span class="p">])</span>
+    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">plot_title</span><span class="p">,</span><span class="n">step3hbox2</span><span class="p">])</span>
 
     <span class="c1"># 4. Final Check*</span>
-    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Things to check before clicking &quot;Make &#39;</span>
-                                   <span class="s1">&#39;Plot&quot;: &lt;ul&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Fix any problems listed in &#39;</span>
-                                   <span class="s1">&#39;&quot;Notices&quot;.&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Look at the code below to make sure &#39;</span>
-                                   <span class="s1">&#39;you have included all the traces you &#39;</span>
-                                   <span class="s1">&#39;intended to (look for &quot;name&quot;).&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Check for any unpaired parentheses, &#39;</span>
-                                   <span class="s1">&#39;brackets or braces (usually highlighted &#39;</span>
-                                   <span class="s1">&#39;in red).&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Check that all single and double &#39;</span>
-                                   <span class="s1">&#39;quotes are paired.&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;If you did any manual editing &#39;</span>
+    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Things to check before clicking making &#39;</span> \
+                                   <span class="s1">&#39;the plot: &lt;ul&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Fix any problems listed in &#39;</span> \
+                                   <span class="s1">&#39;&quot;Notices&quot;.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Look at the code below to make sure &#39;</span> \
+                                   <span class="s1">&#39;you have included all the traces you &#39;</span> \
+                                   <span class="s1">&#39;intended to (look for &quot;name&quot;).&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Check for any unpaired parentheses, &#39;</span> \
+                                   <span class="s1">&#39;brackets or braces.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Check that all single and double &#39;</span> \
+                                   <span class="s1">&#39;quotes are paired.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;If you did any manual editing &#39;</span> \
                                    <span class="s1">&#39;double-check for typos.&lt;/li&gt;&#39;</span><span class="p">)</span>
     <span class="n">step4noticebox</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">notice_html</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">makeplt_click</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_xaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">X_label</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
-        <span class="k">def</span> <span class="nf">get_mirror_text</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">mirror_axes</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror = True)&#39;</span>
-                <span class="k">if</span> <span class="n">mirror_ticks</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror= </span><span class="se">\&#39;</span><span class="s1">ticks</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;)&#39;</span>
-            <span class="k">return</span> <span class="n">mirror_text</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_yaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">Y_label</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span><span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;simple_white&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span><span class="o">+</span><span class="s1">&#39;.update_layout(title = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">plot_title</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
-            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;template = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Force save widget states so that graph will still be</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;# available when notebook next opened in trusted state.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;import time</span><span class="se">\n</span><span class="s1">time.sleep(5)&#39;</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
             <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span><span class="s1">&#39;.show()&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# Force save widget states so that graph will still be&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# available when notebook next opened in trusted state.&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">jscode</span> <span class="o">=</span> <span class="s1">&#39;Jupyter.actions.call(</span><span class="se">\\</span><span class="s1">&quot;widgets:save-with-widgets</span><span class="se">\\</span><span class="s1">&quot;);&#39;</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;JPSLUtils.OTJS(</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">jscode</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">jscode</span> <span class="o">=</span> <span class="s1">&#39;Jupyter.actions.call(&quot;widgets:save-with-widgets&quot;);&#39;</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;JPSLUtils.OTJS(</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">jscode</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
+            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="c1"># run the cell to build the plot</span>
-        <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">OTJS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">)</span>
+            <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">OTJS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute();&#39;</span><span class="p">)</span>
         <span class="c1"># remove the GUI cell</span>
-        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
-        <span class="n">delete_selected_cell</span><span class="p">()</span>
-        <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+            <span class="n">delete_selected_cell</span><span class="p">()</span>
         <span class="k">pass</span>
-    <span class="n">makeplotbut</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Make Plot&#39;</span><span class="p">,</span> <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">makeplotbut_lay</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">visibility</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">makeplotbut_lay</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">visibility</span><span class="o">=</span><span class="s2">&quot;visible&quot;</span><span class="p">)</span>
+
+    <span class="n">makeplotbut</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Make Plot&#39;</span><span class="p">,</span>
+                         <span class="n">layout</span> <span class="o">=</span> <span class="n">makeplotbut_lay</span><span class="p">,</span>
+                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
     <span class="n">makeplotbut</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">makeplt_click</span><span class="p">)</span>
-    <span class="n">step4vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">makeplotbut</span><span class="p">,</span><span class="n">step4noticebox</span><span class="p">])</span>
-    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step4instr</span><span class="p">,</span><span class="n">step4vbox</span><span class="p">])</span>
+    <span class="n">step4vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">makeplotbut</span><span class="p">,</span><span class="n">step4noticebox</span><span class="p">])</span>
+    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step4instr</span><span class="p">,</span><span class="n">step4vbox</span><span class="p">])</span>
 
 
-    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">([</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;1. Pick Trace(s)*&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;2. Label Axes*&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;3. Title, Format ...&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;4. Final Check*&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">tab_changed</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">importstr</span><span class="p">,</span> <span class="n">step1strdefault</span><span class="p">,</span> <span class="n">step1str</span><span class="p">,</span> <span class="n">step2strdefault</span><span class="p">,</span> \
+            <span class="n">step2str</span><span class="p">,</span> <span class="n">step3strdefault</span><span class="p">,</span> <span class="n">step3str</span>
         <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span><span class="mi">3</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">X_label</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">Y_label</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                 <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">activate_notice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -641,18 +646,49 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">makeplot_notices</span><span class="o">.</span><span class="n">get_active</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">makeplotbut</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">makeplotbut</span><span class="o">.</span><span class="n">button_style</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
+        <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># update step2str</span>
+            <span class="n">step2str</span> <span class="o">=</span> <span class="n">step2strdefault</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_xaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">X_label</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+
+            <span class="k">def</span> <span class="nf">get_mirror_text</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">mirror_axes</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror = True)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="n">mirror_ticks</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                        <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror= </span><span class="se">\&#39;</span><span class="s1">ticks</span><span class="se">\&#39;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">return</span> <span class="n">mirror_text</span>
+
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
+            <span class="n">step2str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_yaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">Y_label</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
+            <span class="n">step2str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="c1"># update step3str</span>
+            <span class="n">step3str</span> <span class="o">=</span> <span class="n">step3strdefault</span>
+            <span class="k">if</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;simple_white&#39;</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_layout(title = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;template = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">step3str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.show()&#39;</span>
+            <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+                <span class="n">replace_text_of_next_cell</span><span class="p">(</span>
+                    <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="o">+</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="o">+</span><span class="n">text</span>
+
         <span class="k">pass</span>
 
     <span class="n">steps</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">tab_changed</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;selected_index&#39;</span><span class="p">)</span>
     <span class="n">display</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-    <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
-    <span class="n">new_cell_immediately_below</span><span class="p">()</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using plot_pandas_GUI(). See &#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.</span><span class="se">\\</span><span class="s1">n&#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;from plotly import graph_objects as go</span><span class="se">\\</span><span class="s1">n&#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; = go.FigureWidget(&#39;</span> \
-                          <span class="s1">&#39;layout_template=</span><span class="se">\\</span><span class="s1">&quot;simple_white</span><span class="se">\\</span><span class="s1">&quot;)&#39;</span>
-    <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+        <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">codearea</span> <span class="o">=</span> <span class="n">build_run_snip_widget</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">codearea</span><span class="p">)</span>
     <span class="k">pass</span>
 </pre></div>
 
@@ -706,14 +742,15 @@
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span> <span class="k">as</span> <span class="n">JS</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
+    <span class="kn">from</span> <span class="nn">JPSLUtils.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
         <span class="n">select_cell_immediately_below</span><span class="p">,</span> <span class="n">move_cursor_in_current_cell</span><span class="p">,</span> \
         <span class="n">insert_text_into_next_cell</span><span class="p">,</span> <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">,</span> \
         <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">,</span> <span class="n">select_containing_cell</span><span class="p">,</span> \
-        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">iconselector</span><span class="p">,</span> <span class="n">notice_group</span>
+        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">iconselector</span><span class="p">,</span> <span class="n">notice_group</span><span class="p">,</span> <span class="n">notebookenv</span><span class="p">,</span> \
+        <span class="n">replace_text_of_next_cell</span>
     <span class="kn">import</span> <span class="nn">JPSLUtils</span>
 
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span>
+    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span><span class="p">,</span> <span class="n">build_run_snip_widget</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
     <span class="n">global_dict</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">user_ns</span>
     <span class="n">dfs_info</span> <span class="o">=</span> <span class="p">[]</span>
@@ -756,6 +793,17 @@
                                     <span class="s1">&#39;Notices:&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
     <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">set_active</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
+    <span class="c1"># Strings for each tab, that are combined to make the code.</span>
+    <span class="n">importstr</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using plot_pandas_GUI().</span><span class="se">\n</span><span class="s1"># See &#39;</span> \
+        <span class="s1">&#39;https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.</span><span class="se">\n</span><span class="s1">&#39;</span> \
+        <span class="s1">&#39;from plotly import graph_objects as go</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="s1">&#39; = go.FigureWidget(layout_template=</span><span class="se">\&quot;</span><span class="s1">simple_white</span><span class="se">\&quot;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step1strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Trace declaration(s) and trace formating</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step1str</span> <span class="o">=</span> <span class="n">step1strdefault</span>
+    <span class="n">step2strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Axes labels</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step2str</span> <span class="o">=</span> <span class="n">step2strdefault</span>
+    <span class="n">step3strdefault</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Plot formatting</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">step3str</span> <span class="o">=</span> <span class="n">step3strdefault</span>
     <span class="c1"># 1. Pick Traces*</span>
     <span class="c1">#   a. Select Y vs. X pairs* (DataFrame, X and Y, which must be from single</span>
     <span class="c1">#       frame.</span>
@@ -765,7 +813,7 @@
         <span class="s1">&#39;X- and Y-coordinates required.&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Incomplete or inconsistent error specification(s).&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Non-default trace formatting left from previous trace.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;X-Error settings left from previous trace.&lt;/li&gt;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;X-Error settings left from previous trace.&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Y-Error settings left from previous trace.&#39;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">trace_notices</span> <span class="o">=</span> <span class="n">notice_group</span><span class="p">(</span><span class="n">notice_list</span><span class="p">,</span> <span class="s1">&#39;Notices:&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
@@ -899,8 +947,8 @@
                                 <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Marker Size (px): &#39;</span><span class="p">,</span>
                                 <span class="n">style</span><span class="o">=</span><span class="n">longdesc</span><span class="p">)</span>
     <span class="n">markersize</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
-    <span class="n">markerhbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">markerlabel</span><span class="p">,</span><span class="n">filled_open</span><span class="p">,</span><span class="n">markersize</span><span class="p">])</span>
-    <span class="n">markervbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">markerhbox</span><span class="p">,</span> <span class="n">marker_selector</span><span class="o">.</span><span class="n">box</span><span class="p">])</span>
+    <span class="n">markerhbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">markerlabel</span><span class="p">,</span><span class="n">filled_open</span><span class="p">,</span><span class="n">markersize</span><span class="p">])</span>
+    <span class="n">markervbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">markerhbox</span><span class="p">,</span> <span class="n">marker_selector</span><span class="o">.</span><span class="n">box</span><span class="p">])</span>
     <span class="n">line_style</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span><span class="s1">&#39;dashdot&#39;</span><span class="p">],</span>
                           <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Line style: &#39;</span><span class="p">)</span>
     <span class="n">line_style</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
@@ -908,11 +956,11 @@
                                 <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Linewidth (px): &#39;</span><span class="p">,</span>
                                 <span class="n">style</span><span class="o">=</span><span class="n">longdesc</span><span class="p">)</span>
     <span class="n">line_width</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">trace_format_update</span><span class="p">)</span>
-    <span class="n">linehbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">line_style</span><span class="p">,</span><span class="n">line_width</span><span class="p">])</span>
+    <span class="n">linehbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">line_style</span><span class="p">,</span><span class="n">line_width</span><span class="p">])</span>
 
-    <span class="n">formatHbox1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">modedrop</span><span class="p">,</span><span class="n">colordrop</span><span class="p">])</span>
-    <span class="n">formatVbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">formatHbox1</span><span class="p">,</span><span class="n">linehbox</span><span class="p">,</span><span class="n">markervbox</span><span class="p">])</span>
-    <span class="n">step1formatacc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">([</span><span class="n">formatVbox</span><span class="p">])</span>
+    <span class="n">formatHbox1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">modedrop</span><span class="p">,</span><span class="n">colordrop</span><span class="p">])</span>
+    <span class="n">formatVbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">formatHbox1</span><span class="p">,</span><span class="n">linehbox</span><span class="p">,</span><span class="n">markervbox</span><span class="p">])</span>
+    <span class="n">step1formatacc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">formatVbox</span><span class="p">])</span>
     <span class="n">step1formatacc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;Trace Formatting&#39;</span><span class="p">)</span>
     <span class="n">step1formatacc</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">yerrtype</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
@@ -987,8 +1035,8 @@
         <span class="k">pass</span>
 
     <span class="n">yerrdata</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">errdata_change</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">yerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">yerrtype</span><span class="p">,</span><span class="n">yerrvalue</span><span class="p">])</span>
-    <span class="n">yerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">yerrrow1</span><span class="p">,</span><span class="n">yerrdata</span><span class="p">])</span>
+    <span class="n">yerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">yerrtype</span><span class="p">,</span><span class="n">yerrvalue</span><span class="p">])</span>
+    <span class="n">yerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">yerrrow1</span><span class="p">,</span><span class="n">yerrdata</span><span class="p">])</span>
     <span class="n">xerrtype</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
                         <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Error Type: &#39;</span><span class="p">,</span>
                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -1032,8 +1080,8 @@
                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="n">xerrdata</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">errdata_change</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">xerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">xerrtype</span><span class="p">,</span><span class="n">xerrvalue</span><span class="p">])</span>
-    <span class="n">xerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">xerrrow1</span><span class="p">,</span><span class="n">xerrdata</span><span class="p">])</span>
+    <span class="n">xerrrow1</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">xerrtype</span><span class="p">,</span><span class="n">xerrvalue</span><span class="p">])</span>
+    <span class="n">xerror</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">xerrrow1</span><span class="p">,</span><span class="n">xerrdata</span><span class="p">])</span>
     <span class="n">step1erracc</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">yerror</span><span class="p">,</span><span class="n">xerror</span><span class="p">])</span>
     <span class="n">step1erracc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Y error bars&#39;</span><span class="p">)</span>
     <span class="n">step1erracc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;X error bars&#39;</span><span class="p">)</span>
@@ -1043,42 +1091,43 @@
     <span class="n">add_trace_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Add Trace&#39;</span><span class="p">,</span>
                            <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">do_add_trace</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">importstr</span><span class="p">,</span> <span class="n">step1str</span><span class="p">,</span> <span class="n">step2str</span><span class="p">,</span> <span class="n">step3str</span>
         <span class="n">dfname</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;scat = go.Scatter(x = &#39;</span><span class="o">+</span><span class="n">dfname</span><span class="o">+</span><span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> \
                <span class="o">+</span><span class="n">Xcoord</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],&#39;</span>
         <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; y = &#39;</span> <span class="o">+</span><span class="n">dfname</span><span class="o">+</span><span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">Ycoord</span><span class="o">.</span><span class="n">value</span><span class="o">+</span> \
-                                          <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],</span><span class="se">\\</span><span class="s1">n&#39;</span>
+                                          <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">],</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;        mode = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, name = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> \
                                                <span class="o">+</span><span class="n">trace_name</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">,&#39;</span>
         <span class="c1"># in here add other formatting items using ifs.</span>
         <span class="k">if</span> <span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;line_color = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">colordrop</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;markers&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_color = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;solid&#39;</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;line_dash=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">if</span> <span class="n">line_width</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;line_width=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">line_width</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;markers&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">markersize</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_size=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">markersize</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
             <span class="n">tmpmkr</span> <span class="o">=</span> <span class="n">icontoplotly</span><span class="p">[</span><span class="n">marker_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">filled_open</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                 <span class="n">tmpmkr</span> <span class="o">+=</span><span class="s1">&#39;-open&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_symbol=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">tmpmkr</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">tmpmkr</span> <span class="o">!=</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
-                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
                     <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;marker_symbol=</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">tmpmkr</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
         <span class="k">if</span> <span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_y_type=</span><span class="se">\&#39;</span><span class="s1">data</span><span class="se">\&#39;</span><span class="s1">, &#39;</span> \
                         <span class="s1">&#39;error_y_array=&#39;</span><span class="o">+</span><span class="n">dfname</span>
@@ -1087,7 +1136,7 @@
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_y_type=</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">yerrtype</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, error_y_value=&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">yerrvalue</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
         <span class="k">if</span> <span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n        &#39;</span>
+            <span class="n">text</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">        &#39;</span>
             <span class="k">if</span> <span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_x_type=</span><span class="se">\&#39;</span><span class="s1">data</span><span class="se">\&#39;</span><span class="s1">, &#39;</span> \
                         <span class="s1">&#39;error_x_array=&#39;</span><span class="o">+</span><span class="n">dfname</span>
@@ -1095,10 +1144,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;error_x_type=</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">xerrtype</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, error_x_value=&#39;</span>
                 <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">xerrvalue</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;)</span><span class="se">\\</span><span class="s1">n&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.add_trace(scat)&#39;</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.add_trace(scat)</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">step1str</span> <span class="o">+=</span> <span class="n">text</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">replace_text_of_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">modedrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;lines&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">colordrop</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span> <span class="ow">or</span> \
             <span class="p">(</span><span class="n">line_style</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;solid&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">line_width</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> \
             <span class="p">(</span><span class="n">icontoplotly</span><span class="p">[</span><span class="n">marker_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;circle&#39;</span><span class="p">)</span> <span class="ow">or</span> \
@@ -1116,14 +1168,14 @@
 
     <span class="n">trace_notices</span><span class="o">.</span><span class="n">set_active</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">add_trace_notices</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">trace_notices</span><span class="o">.</span><span class="n">notice_html</span><span class="p">())</span>
-    <span class="n">step1tracebox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">whichframe</span><span class="p">,</span><span class="n">Xcoord</span><span class="p">,</span><span class="n">Ycoord</span><span class="p">,</span><span class="n">trace_name</span><span class="p">])</span>
-    <span class="n">step1actionbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">add_trace_but</span><span class="p">,</span> <span class="n">add_trace_notices</span><span class="p">])</span>
-    <span class="n">step1hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step1tracebox</span><span class="p">,</span><span class="n">step1actionbox</span><span class="p">])</span>
-    <span class="n">step1optbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1formatacc</span><span class="p">,</span> <span class="n">step1erracc</span><span class="p">])</span>
+    <span class="n">step1tracebox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">whichframe</span><span class="p">,</span><span class="n">Xcoord</span><span class="p">,</span><span class="n">Ycoord</span><span class="p">,</span><span class="n">trace_name</span><span class="p">])</span>
+    <span class="n">step1actionbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">add_trace_but</span><span class="p">,</span> <span class="n">add_trace_notices</span><span class="p">])</span>
+    <span class="n">step1hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1tracebox</span><span class="p">,</span><span class="n">step1actionbox</span><span class="p">])</span>
+    <span class="n">step1optbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1formatacc</span><span class="p">,</span> <span class="n">step1erracc</span><span class="p">])</span>
     <span class="n">step1opt</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">step1optbox</span><span class="p">])</span>
     <span class="n">step1opt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Optional (Trace formatting, error bars...)&#39;</span><span class="p">)</span>
     <span class="n">step1opt</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1instracc</span><span class="p">,</span> <span class="n">step1hbox</span><span class="p">,</span> <span class="n">step1opt</span><span class="p">])</span>
+    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1instracc</span><span class="p">,</span> <span class="n">step1hbox</span><span class="p">,</span> <span class="n">step1opt</span><span class="p">])</span>
 
     <span class="c1"># 2. Set Axes Labels (will use column names by default).</span>
     <span class="n">step2instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;You must set the axes labels to something &#39;</span>
@@ -1147,8 +1199,8 @@
                    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Y-axis label: &#39;</span><span class="p">,</span>
                    <span class="n">style</span> <span class="o">=</span> <span class="n">longdesc</span><span class="p">,</span>
                    <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;45%&#39;</span><span class="p">))</span>
-    <span class="n">step2hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">X_label</span><span class="p">,</span><span class="n">Y_label</span><span class="p">])</span>
-    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step2instracc</span><span class="p">,</span><span class="n">step2hbox</span><span class="p">])</span>
+    <span class="n">step2hbox</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">X_label</span><span class="p">,</span><span class="n">Y_label</span><span class="p">])</span>
+    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step2instracc</span><span class="p">,</span><span class="n">step2hbox</span><span class="p">])</span>
     <span class="c1"># 3.Title, Format ...</span>
     <span class="n">plot_title</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">figname</span><span class="p">,</span>
                        <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Plot title: &#39;</span><span class="p">,</span>
@@ -1178,73 +1230,62 @@
                         <span class="n">value</span><span class="o">=</span><span class="s1">&#39;simple_white&#39;</span><span class="p">,</span>
                         <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Plot Styling: &#39;</span><span class="p">,</span>
                         <span class="n">style</span> <span class="o">=</span> <span class="n">longdesc</span><span class="p">)</span>
-    <span class="n">step3hbox2</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">mirror_axes</span><span class="p">,</span><span class="n">mirror_ticks</span><span class="p">,</span> <span class="n">plot_template</span><span class="p">])</span>
-    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_title</span><span class="p">,</span><span class="n">step3hbox2</span><span class="p">])</span>
+    <span class="n">step3hbox2</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">mirror_axes</span><span class="p">,</span><span class="n">mirror_ticks</span><span class="p">,</span> <span class="n">plot_template</span><span class="p">])</span>
+    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">plot_title</span><span class="p">,</span><span class="n">step3hbox2</span><span class="p">])</span>
 
     <span class="c1"># 4. Final Check*</span>
-    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Things to check before clicking &quot;Make &#39;</span>
-                                   <span class="s1">&#39;Plot&quot;: &lt;ul&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Fix any problems listed in &#39;</span>
-                                   <span class="s1">&#39;&quot;Notices&quot;.&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Look at the code below to make sure &#39;</span>
-                                   <span class="s1">&#39;you have included all the traces you &#39;</span>
-                                   <span class="s1">&#39;intended to (look for &quot;name&quot;).&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Check for any unpaired parentheses, &#39;</span>
-                                   <span class="s1">&#39;brackets or braces (usually highlighted &#39;</span>
-                                   <span class="s1">&#39;in red).&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;Check that all single and double &#39;</span>
-                                   <span class="s1">&#39;quotes are paired.&lt;/li&gt;&#39;</span>
-                                   <span class="s1">&#39;&lt;li&gt;If you did any manual editing &#39;</span>
+    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Things to check before clicking making &#39;</span> \
+                                   <span class="s1">&#39;the plot: &lt;ul&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Fix any problems listed in &#39;</span> \
+                                   <span class="s1">&#39;&quot;Notices&quot;.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Look at the code below to make sure &#39;</span> \
+                                   <span class="s1">&#39;you have included all the traces you &#39;</span> \
+                                   <span class="s1">&#39;intended to (look for &quot;name&quot;).&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Check for any unpaired parentheses, &#39;</span> \
+                                   <span class="s1">&#39;brackets or braces.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;Check that all single and double &#39;</span> \
+                                   <span class="s1">&#39;quotes are paired.&lt;/li&gt;&#39;</span> \
+                                   <span class="s1">&#39;&lt;li&gt;If you did any manual editing &#39;</span> \
                                    <span class="s1">&#39;double-check for typos.&lt;/li&gt;&#39;</span><span class="p">)</span>
     <span class="n">step4noticebox</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">notice_html</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">makeplt_click</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_xaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">X_label</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
-        <span class="k">def</span> <span class="nf">get_mirror_text</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">mirror_axes</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror = True)&#39;</span>
-                <span class="k">if</span> <span class="n">mirror_ticks</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror= </span><span class="se">\&#39;</span><span class="s1">ticks</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;)&#39;</span>
-            <span class="k">return</span> <span class="n">mirror_text</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_yaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">Y_label</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
-        <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span><span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;simple_white&#39;</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span><span class="o">+</span><span class="s1">&#39;.update_layout(title = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">plot_title</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
-            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;template = </span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"># Force save widget states so that graph will still be</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;# available when notebook next opened in trusted state.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;import time</span><span class="se">\n</span><span class="s1">time.sleep(5)&#39;</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
             <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span><span class="s1">&#39;.show()&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# Force save widget states so that graph will still be&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# available when notebook next opened in trusted state.&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">jscode</span> <span class="o">=</span> <span class="s1">&#39;Jupyter.actions.call(</span><span class="se">\\</span><span class="s1">&quot;widgets:save-with-widgets</span><span class="se">\\</span><span class="s1">&quot;);&#39;</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;JPSLUtils.OTJS(</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">jscode</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
-        <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">jscode</span> <span class="o">=</span> <span class="s1">&#39;Jupyter.actions.call(&quot;widgets:save-with-widgets&quot;);&#39;</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;JPSLUtils.OTJS(</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">jscode</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
+            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="c1"># run the cell to build the plot</span>
-        <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">OTJS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">)</span>
+            <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">OTJS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute();&#39;</span><span class="p">)</span>
         <span class="c1"># remove the GUI cell</span>
-        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
-        <span class="n">delete_selected_cell</span><span class="p">()</span>
-        <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+            <span class="n">delete_selected_cell</span><span class="p">()</span>
         <span class="k">pass</span>
-    <span class="n">makeplotbut</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Make Plot&#39;</span><span class="p">,</span> <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">makeplotbut_lay</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">visibility</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">makeplotbut_lay</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">visibility</span><span class="o">=</span><span class="s2">&quot;visible&quot;</span><span class="p">)</span>
+
+    <span class="n">makeplotbut</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Make Plot&#39;</span><span class="p">,</span>
+                         <span class="n">layout</span> <span class="o">=</span> <span class="n">makeplotbut_lay</span><span class="p">,</span>
+                         <span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
     <span class="n">makeplotbut</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">makeplt_click</span><span class="p">)</span>
-    <span class="n">step4vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">makeplotbut</span><span class="p">,</span><span class="n">step4noticebox</span><span class="p">])</span>
-    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step4instr</span><span class="p">,</span><span class="n">step4vbox</span><span class="p">])</span>
+    <span class="n">step4vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">makeplotbut</span><span class="p">,</span><span class="n">step4noticebox</span><span class="p">])</span>
+    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step4instr</span><span class="p">,</span><span class="n">step4vbox</span><span class="p">])</span>
 
 
-    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">([</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;1. Pick Trace(s)*&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;2. Label Axes*&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;3. Title, Format ...&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;4. Final Check*&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">tab_changed</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">importstr</span><span class="p">,</span> <span class="n">step1strdefault</span><span class="p">,</span> <span class="n">step1str</span><span class="p">,</span> <span class="n">step2strdefault</span><span class="p">,</span> \
+            <span class="n">step2str</span><span class="p">,</span> <span class="n">step3strdefault</span><span class="p">,</span> <span class="n">step3str</span>
         <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span><span class="mi">3</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">X_label</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">Y_label</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                 <span class="n">makeplot_notices</span><span class="o">.</span><span class="n">activate_notice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1256,18 +1297,49 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">makeplot_notices</span><span class="o">.</span><span class="n">get_active</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">makeplotbut</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">makeplotbut</span><span class="o">.</span><span class="n">button_style</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
+        <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># update step2str</span>
+            <span class="n">step2str</span> <span class="o">=</span> <span class="n">step2strdefault</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_xaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">X_label</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+
+            <span class="k">def</span> <span class="nf">get_mirror_text</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">mirror_axes</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror = True)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="n">mirror_ticks</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                        <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;, mirror= </span><span class="se">\&#39;</span><span class="s1">ticks</span><span class="se">\&#39;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mirror_text</span> <span class="o">=</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">return</span> <span class="n">mirror_text</span>
+
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
+            <span class="n">step2str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_yaxes(title= </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">Y_label</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">get_mirror_text</span><span class="p">()</span>
+            <span class="n">step2str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="c1"># update step3str</span>
+            <span class="n">step3str</span> <span class="o">=</span> <span class="n">step3strdefault</span>
+            <span class="k">if</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;simple_white&#39;</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.update_layout(title = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">plot_title</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;template = </span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">plot_template</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">step3str</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">figname</span> <span class="o">+</span> <span class="s1">&#39;.show()&#39;</span>
+            <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+                <span class="n">replace_text_of_next_cell</span><span class="p">(</span>
+                    <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="o">+</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="o">+</span><span class="n">text</span>
+
         <span class="k">pass</span>
 
     <span class="n">steps</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">tab_changed</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;selected_index&#39;</span><span class="p">)</span>
     <span class="n">display</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-    <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
-    <span class="n">new_cell_immediately_below</span><span class="p">()</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using plot_pandas_GUI(). See &#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.</span><span class="se">\\</span><span class="s1">n&#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;from plotly import graph_objects as go</span><span class="se">\\</span><span class="s1">n&#39;</span>
-    <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; = go.FigureWidget(&#39;</span> \
-                          <span class="s1">&#39;layout_template=</span><span class="se">\\</span><span class="s1">&quot;simple_white</span><span class="se">\\</span><span class="s1">&quot;)&#39;</span>
-    <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;pandasplotGUI&#39;</span><span class="p">)</span>
+        <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">codearea</span> <span class="o">=</span> <span class="n">build_run_snip_widget</span><span class="p">(</span><span class="n">importstr</span><span class="o">+</span><span class="n">step1str</span><span class="o">+</span><span class="n">step2str</span><span class="o">+</span><span class="n">step3str</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">codearea</span><span class="p">)</span>
     <span class="k">pass</span>
 </pre></div>
 

@@ -35,14 +35,15 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
     from IPython import get_ipython
-    from .utils import new_cell_immediately_below,\
+    from JPSLUtils.utils import new_cell_immediately_below,\
         select_cell_immediately_below, move_cursor_in_current_cell, \
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
-        delete_selected_cell, iconselector, notice_group
+        delete_selected_cell, iconselector, notice_group, notebookenv, \
+        replace_text_of_next_cell
     import JPSLUtils
 
-    from .utils import find_pandas_dataframe_names
+    from .utils import find_pandas_dataframe_names, build_run_snip_widget
     from IPython import get_ipython
     global_dict = get_ipython().user_ns
     dfs_info = []
@@ -85,6 +86,17 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'Notices:','','red')
     makeplot_notices.set_active([0,1])
 
+    # Strings for each tab, that are combined to make the code.
+    importstr = '# CODE BLOCK generated using plot_pandas_GUI().\n# See ' \
+        'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
+        'from plotly import graph_objects as go\n' + str(figname) + \
+        ' = go.FigureWidget(layout_template=\"simple_white\")\n'
+    step1strdefault = '\n# Trace declaration(s) and trace formating\n'
+    step1str = step1strdefault
+    step2strdefault = '\n# Axes labels\n'
+    step2str = step2strdefault
+    step3strdefault = '\n# Plot formatting\n'
+    step3str = step3strdefault
     # 1. Pick Traces*
     #   a. Select Y vs. X pairs* (DataFrame, X and Y, which must be from single
     #       frame.
@@ -94,7 +106,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'X- and Y-coordinates required.',
         'Incomplete or inconsistent error specification(s).',
         'Non-default trace formatting left from previous trace.',
-        'X-Error settings left from previous trace.</li>',
+        'X-Error settings left from previous trace.',
         'Y-Error settings left from previous trace.',
     ]
     trace_notices = notice_group(notice_list, 'Notices:','','red')
@@ -228,8 +240,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                 description = 'Marker Size (px): ',
                                 style=longdesc)
     markersize.observe(trace_format_update)
-    markerhbox = HBox([markerlabel,filled_open,markersize])
-    markervbox = VBox([markerhbox, marker_selector.box])
+    markerhbox = HBox(children=[markerlabel,filled_open,markersize])
+    markervbox = VBox(children=[markerhbox, marker_selector.box])
     line_style = Dropdown(options = ['solid','dot','dash','dashdot'],
                           description = 'Line style: ')
     line_style.observe(trace_format_update)
@@ -237,11 +249,11 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                 description = 'Linewidth (px): ',
                                 style=longdesc)
     line_width.observe(trace_format_update)
-    linehbox = HBox([line_style,line_width])
+    linehbox = HBox(children=[line_style,line_width])
 
-    formatHbox1 = HBox([modedrop,colordrop])
-    formatVbox = VBox([formatHbox1,linehbox,markervbox])
-    step1formatacc = Accordion([formatVbox])
+    formatHbox1 = HBox(children=[modedrop,colordrop])
+    formatVbox = VBox(children=[formatHbox1,linehbox,markervbox])
+    step1formatacc = Accordion(children=[formatVbox])
     step1formatacc.set_title(0,'Trace Formatting')
     step1formatacc.selected_index = 0
     yerrtype = Dropdown(options = ['none','percent','constant','data'],
@@ -316,8 +328,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
-    yerrrow1 = HBox([yerrtype,yerrvalue])
-    yerror = VBox([yerrrow1,yerrdata])
+    yerrrow1 = HBox(children=[yerrtype,yerrvalue])
+    yerror = VBox(children=[yerrrow1,yerrdata])
     xerrtype = Dropdown(options = ['none','percent','constant','data'],
                         description = 'Error Type: ',
                         disabled = True)
@@ -361,8 +373,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         disabled = True)
 
     xerrdata.observe(errdata_change, names = 'value')
-    xerrrow1 = HBox([xerrtype,xerrvalue])
-    xerror = VBox([xerrrow1,xerrdata])
+    xerrrow1 = HBox(children=[xerrtype,xerrvalue])
+    xerror = VBox(children=[xerrrow1,xerrdata])
     step1erracc = Accordion(children = [yerror,xerror])
     step1erracc.set_title(0, 'Y error bars')
     step1erracc.set_title(1, 'X error bars')
@@ -372,42 +384,43 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     add_trace_but = Button(description = 'Add Trace',
                            disabled = True)
     def do_add_trace(change):
+        nonlocal importstr, step1str, step2str, step3str
         dfname = friendly_to_globalname[whichframe.value]
         text = 'scat = go.Scatter(x = '+dfname+'[\'' \
                +Xcoord.value+'\'],'
         text += ' y = ' +dfname+'[\''+Ycoord.value+ \
-                                          '\'],\\n'
+                                          '\'],\n'
         text += '        mode = \''+modedrop.value+'\', name = \'' \
                                                +trace_name.value+'\','
         # in here add other formatting items using ifs.
         if colordrop.value != 'default':
-            text +='\\n        '
+            text +='\n        '
             if str(modedrop.value).find('lines') > -1:
                 text += 'line_color = \''+colordrop.value+'\', '
             if str(modedrop.value).find('markers') > -1:
                 text += 'marker_color = \'' + colordrop.value + '\', '
         if str(modedrop.value).find('lines') > -1:
             if line_style.value != 'solid':
-                text +='\\n        '
+                text +='\n        '
                 text +='line_dash=\'' + line_style.value + '\', '
             if line_width.value != 2:
-                text +='\\n        '
+                text +='\n        '
                 text +='line_width=' + str(line_width.value) + ', '
         if str(modedrop.value).find('markers') > -1:
             if markersize.value != 6:
-                text += '\\n        '
+                text += '\n        '
                 text += 'marker_size=' + str(markersize.value) + ', '
             tmpmkr = icontoplotly[marker_selector.value]
             if not filled_open.value:
-                text += '\\n        '
+                text += '\n        '
                 tmpmkr +='-open'
                 text += 'marker_symbol=\'' + tmpmkr + '\', '
             else:
                 if tmpmkr != 'circle':
-                    text += '\\n        '
+                    text += '\n        '
                     text += 'marker_symbol=\'' + tmpmkr + '\', '
         if yerrtype.value != 'none':
-            text +='\\n        '
+            text +='\n        '
             if yerrtype.value == 'data':
                 text += 'error_y_type=\'data\', ' \
                         'error_y_array='+dfname
@@ -416,7 +429,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 text += 'error_y_type=\''+yerrtype.value+'\', error_y_value='
                 text += str(yerrvalue.value)+','
         if xerrtype.value != 'none':
-            text +='\\n        '
+            text +='\n        '
             if xerrtype.value == 'data':
                 text += 'error_x_type=\'data\', ' \
                         'error_x_array='+dfname
@@ -424,10 +437,13 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             else:
                 text += 'error_x_type=\''+xerrtype.value+'\', error_x_value='
                 text += str(xerrvalue.value)+','
-        text += ')\\n'
-        text += figname + '.add_trace(scat)'
-        select_cell_immediately_below()
-        insert_newline_at_end_of_current_cell(text)
+        text += ')\n'
+        text += figname + '.add_trace(scat)\n'
+        step1str += text
+        if JPSLUtils.notebookenv == 'NBClassic':
+            replace_text_of_next_cell(importstr+step1str+step2str+step3str)
+        else:
+            codearea.sniptext.value = importstr+step1str+step2str+step3str
         if (modedrop.value != 'lines') or (colordrop.value != 'default') or \
             (line_style.value != 'solid') or (line_width.value != 2) or \
             (icontoplotly[marker_selector.value] != 'circle') or \
@@ -445,14 +461,14 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     trace_notices.set_active([0,1])
     add_trace_notices = richLabel(value = trace_notices.notice_html())
-    step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
-    step1actionbox = VBox([add_trace_but, add_trace_notices])
-    step1hbox = HBox([step1tracebox,step1actionbox])
-    step1optbox = VBox([step1formatacc, step1erracc])
+    step1tracebox = VBox(children=[whichframe,Xcoord,Ycoord,trace_name])
+    step1actionbox = VBox(children=[add_trace_but, add_trace_notices])
+    step1hbox = HBox(children=[step1tracebox,step1actionbox])
+    step1optbox = VBox(children=[step1formatacc, step1erracc])
     step1opt = Accordion(children = [step1optbox])
     step1opt.set_title(0, 'Optional (Trace formatting, error bars...)')
     step1opt.selected_index = None
-    step1 = VBox([step1instracc, step1hbox, step1opt])
+    step1 = VBox(children=[step1instracc, step1hbox, step1opt])
 
     # 2. Set Axes Labels (will use column names by default).
     step2instr = richLabel(value = 'You must set the axes labels to something '
@@ -476,8 +492,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                    description = 'Y-axis label: ',
                    style = longdesc,
                    layout=Layout(width='45%'))
-    step2hbox = HBox([X_label,Y_label])
-    step2 = VBox([step2instracc,step2hbox])
+    step2hbox = HBox(children=[X_label,Y_label])
+    step2 = VBox(children=[step2instracc,step2hbox])
     # 3.Title, Format ...
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
@@ -507,73 +523,62 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step3hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step3 = VBox([plot_title,step3hbox2])
+    step3hbox2 = HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step3 = VBox(children=[plot_title,step3hbox2])
 
     # 4. Final Check*
-    step4instr = richLabel(value = 'Things to check before clicking "Make '
-                                   'Plot": <ul>'
-                                   '<li>Fix any problems listed in '
-                                   '"Notices".</li>'
-                                   '<li>Look at the code below to make sure '
-                                   'you have included all the traces you '
-                                   'intended to (look for "name").</li>'
-                                   '<li>Check for any unpaired parentheses, '
-                                   'brackets or braces (usually highlighted '
-                                   'in red).</li>'
-                                   '<li>Check that all single and double '
-                                   'quotes are paired.</li>'
-                                   '<li>If you did any manual editing '
+    step4instr = richLabel(value = 'Things to check before clicking making ' \
+                                   'the plot: <ul>' \
+                                   '<li>Fix any problems listed in ' \
+                                   '"Notices".</li>' \
+                                   '<li>Look at the code below to make sure ' \
+                                   'you have included all the traces you ' \
+                                   'intended to (look for "name").</li>' \
+                                   '<li>Check for any unpaired parentheses, ' \
+                                   'brackets or braces.</li>' \
+                                   '<li>Check that all single and double ' \
+                                   'quotes are paired.</li>' \
+                                   '<li>If you did any manual editing ' \
                                    'double-check for typos.</li>')
     step4noticebox = richLabel(value = makeplot_notices.notice_html())
     def makeplt_click(change):
-        select_cell_immediately_below()
-        text = figname + '.update_xaxes(title= \''+X_label.value+'\''
-        def get_mirror_text():
-            if mirror_axes.value:
-                mirror_text = ', mirror = True)'
-                if mirror_ticks.value:
-                    mirror_text = ', mirror= \'ticks\')'
-            else:
-                mirror_text = ')'
-            return mirror_text
-        text += get_mirror_text()
-        insert_newline_at_end_of_current_cell(text)
-        text = figname + '.update_yaxes(title= \''+Y_label.value+'\''
-        text += get_mirror_text()
-        insert_newline_at_end_of_current_cell(text)
-        if plot_title.value !='' or plot_template.value != 'simple_white':
-            text = figname+'.update_layout(title = \''+plot_title.value+'\', '
-            text += 'template = \''+ plot_template.value +'\')'
+        if JPSLUtils.notebookenv == 'NBClassic':
+            text = '\n# Force save widget states so that graph will still be\n'
+            text += '# available when notebook next opened in trusted state.\n'
+            text += 'import time\ntime.sleep(5)'
+            select_containing_cell('pandasplotGUI')
+            select_cell_immediately_below()
             insert_newline_at_end_of_current_cell(text)
-        text = figname +'.show()'
-        insert_newline_at_end_of_current_cell(text)
-        text = '# Force save widget states so that graph will still be'
-        insert_newline_at_end_of_current_cell(text)
-        text = '# available when notebook next opened in trusted state.'
-        insert_newline_at_end_of_current_cell(text)
-        jscode = 'Jupyter.actions.call(\\"widgets:save-with-widgets\\");'
-        text = 'JPSLUtils.OTJS(\''+jscode+'\')'
-        insert_newline_at_end_of_current_cell(text)
+            jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
+            text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+            insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
-        JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
+            JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute();')
         # remove the GUI cell
-        select_containing_cell('pandasplotGUI')
-        delete_selected_cell()
-        from time import sleep
+            select_containing_cell('pandasplotGUI')
+            delete_selected_cell()
         pass
-    makeplotbut = Button(description = 'Make Plot', disabled = True)
+
+    makeplotbut_lay = Layout(visibility="hidden")
+    if JPSLUtils.notebookenv == 'NBClassic':
+        makeplotbut_lay = Layout(visibility="visible")
+
+    makeplotbut = Button(description = 'Make Plot',
+                         layout = makeplotbut_lay,
+                         disabled = True)
     makeplotbut.on_click(makeplt_click)
-    step4vbox = VBox([makeplotbut,step4noticebox])
-    step4 = HBox([step4instr,step4vbox])
+    step4vbox = VBox(children=[makeplotbut,step4noticebox])
+    step4 = HBox(children=[step4instr,step4vbox])
 
 
-    steps = Tab([step1, step2, step3, step4])
+    steps = Tab(children=[step1, step2, step3, step4])
     steps.set_title(0,'1. Pick Trace(s)*')
     steps.set_title(1,'2. Label Axes*')
     steps.set_title(2,'3. Title, Format ...')
     steps.set_title(3,'4. Final Check*')
     def tab_changed(change):
+        nonlocal importstr, step1strdefault, step1str, step2strdefault, \
+            step2str, step3strdefault, step3str
         if change['new'] ==3:
             if X_label.value == '' or Y_label.value == '':
                 makeplot_notices.activate_notice(1)
@@ -585,16 +590,47 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         if len(makeplot_notices.get_active()) == 0:
             makeplotbut.disabled = False
             makeplotbut.button_style = 'success'
+        if change['new'] > 1:
+            # update step2str
+            step2str = step2strdefault
+            text = figname + '.update_xaxes(title= \'' + X_label.value + '\''
+
+            def get_mirror_text():
+                if mirror_axes.value:
+                    mirror_text = ', mirror = True)\n'
+                    if mirror_ticks.value:
+                        mirror_text = ', mirror= \'ticks\')\n'
+                else:
+                    mirror_text = ')\n'
+                return mirror_text
+
+            text += get_mirror_text()
+            step2str += text
+            text = figname + '.update_yaxes(title= \'' + Y_label.value + '\''
+            text += get_mirror_text()
+            step2str += text
+            # update step3str
+            step3str = step3strdefault
+            if plot_title.value != '' or plot_template.value != 'simple_white':
+                text = figname + '.update_layout(title = \'' + plot_title.value + '\', '
+                text += 'template = \'' + plot_template.value + '\')\n'
+                step3str += text
+            text = figname + '.show()'
+            if JPSLUtils.notebookenv == 'NBClassic':
+                replace_text_of_next_cell(
+                    importstr+step1str+step2str+step3str+text)
+            else:
+                codearea.sniptext.value = importstr+step1str+step2str+step3str+text
+
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
     display(steps)
-    select_containing_cell('pandasplotGUI')
-    new_cell_immediately_below()
-    text = '# CODE BLOCK generated using plot_pandas_GUI(). See '
-    text += 'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\\n'
-    text += 'from plotly import graph_objects as go\\n'
-    text += str(figname) + ' = go.FigureWidget(' \
-                          'layout_template=\\"simple_white\\")'
-    insert_text_into_next_cell(text)
+    if JPSLUtils.notebookenv == 'NBClassic':
+        select_containing_cell('pandasplotGUI')
+        new_cell_immediately_below()
+        insert_text_into_next_cell(importstr+step1str+step2str+step3str)
+    else:
+        codearea = build_run_snip_widget(importstr+step1str+step2str+step3str)
+        display(codearea)
     pass
