@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pandas GUI behavior in Lab and Colab versus Classic Jupyter</title>
+</head>
+<body>
+<h1>Pandas GUI behavior in Lab and Colab versus Classic Jupyter</h1>
+<a href="https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/">
+    Return to Documentation Home Page</a>
+<h2>Introduction</h2>
+<p>The examples in the documentation are all based on how the GUI tools work
+    in the classic
+    Jupyter notebook environment. If you are using these tools in
+    <a href = "https://jupyter.org/">Jupyter Lab</a> or
+    <a href = "https://colab.research.google.com">Google Colab</a> keep in
+    mind the differences in behavior described below.</p>
+<h2>Differences common to Lab and Colab</h2>
+<ul>
+    <li>Rather then generate the code directly in a notebook cell
+        immediately below the tabbed GUI, the code is generated in an
+        editable textarea below the tabbed GUI. See the image below for
+        the <code>new_pandas_column_GUI()</code>.</li>
+    <image src = "DataSets/new_col_in_Colab.png"></image>
+    <li>If you wish the generated code to persist after cell outputs are
+        cleared, the generated code needs to be manually copied to a code
+        cell.</li>
+</ul>
+<h2>Running the code in Lab and Colab</h2>
+<uL>
+    <li><span style="color:blue;">In Colab</span> the code can be run by
+        clicking on the "run code" button and the results will appear in
+        the output of the cell.</li>
+    <li><span style="color:red;">In Lab</span> clicking on the "run code"
+        button will output the results to the log console,
+        which defaults to appearing at the bottom of the window. To make
+        the results appear in the output of a notebook cell the code must
+        be copied to a cell and the cell run.</li>
+</uL>
+<a href="https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/">
+    Return to Documentation Home Page</a>
+</body>
+</html>

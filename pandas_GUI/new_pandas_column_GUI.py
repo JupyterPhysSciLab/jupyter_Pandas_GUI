@@ -96,7 +96,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         whichcolumn.options = tempopt
         pass
     whichframe.observe(update_columns, names='value')
-    step1 = VBox([step1instr, whichframe])
+    step1 = VBox(children=[step1instr, whichframe])
 
     # Step 2
     newname = Text(placeholder='Type name for new column.')
@@ -128,7 +128,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
 
     insertname.on_click(do_insertname)
 
-    step2 = VBox([step2instr, HBox([newname,
+    step2 = VBox(children=[step2instr, HBox(children=[newname,
                                            insertname])])
 
     # Step 3
@@ -207,8 +207,8 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
 
     whichop.observe(op_insert, names='value')
 
-    step3drops = HBox([whichcolumn, whichop])
-    step3 = VBox([step3instr, step3drops])
+    step3drops = HBox(children=[whichcolumn, whichop])
+    step3 = VBox(children=[step3instr, step3drops])
 
     # Step 4
     step4instr = richLabel(
@@ -260,10 +260,10 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     gen_col_but.on_click(run_new_col_decl)
-    step4act = VBox([show_updated_df_box, gen_col_but])
-    step4 = HBox([step4instr, step4act])
+    step4act = VBox(children=[show_updated_df_box, gen_col_but])
+    step4 = HBox(children=[step4instr, step4act])
 
-    steps = Tab([step1, step2, step3, step4])
+    steps = Tab(children=[step1, step2, step3, step4])
     steps.set_title(0, 'Step 1')
     steps.set_title(1, 'Step 2')
     steps.set_title(2, 'Step 3')

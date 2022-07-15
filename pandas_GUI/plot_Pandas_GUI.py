@@ -240,8 +240,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                 description = 'Marker Size (px): ',
                                 style=longdesc)
     markersize.observe(trace_format_update)
-    markerhbox = HBox([markerlabel,filled_open,markersize])
-    markervbox = VBox([markerhbox, marker_selector.box])
+    markerhbox = HBox(children=[markerlabel,filled_open,markersize])
+    markervbox = VBox(children=[markerhbox, marker_selector.box])
     line_style = Dropdown(options = ['solid','dot','dash','dashdot'],
                           description = 'Line style: ')
     line_style.observe(trace_format_update)
@@ -249,11 +249,11 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                 description = 'Linewidth (px): ',
                                 style=longdesc)
     line_width.observe(trace_format_update)
-    linehbox = HBox([line_style,line_width])
+    linehbox = HBox(children=[line_style,line_width])
 
-    formatHbox1 = HBox([modedrop,colordrop])
-    formatVbox = VBox([formatHbox1,linehbox,markervbox])
-    step1formatacc = Accordion([formatVbox])
+    formatHbox1 = HBox(children=[modedrop,colordrop])
+    formatVbox = VBox(children=[formatHbox1,linehbox,markervbox])
+    step1formatacc = Accordion(children=[formatVbox])
     step1formatacc.set_title(0,'Trace Formatting')
     step1formatacc.selected_index = 0
     yerrtype = Dropdown(options = ['none','percent','constant','data'],
@@ -328,8 +328,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
-    yerrrow1 = HBox([yerrtype,yerrvalue])
-    yerror = VBox([yerrrow1,yerrdata])
+    yerrrow1 = HBox(children=[yerrtype,yerrvalue])
+    yerror = VBox(children=[yerrrow1,yerrdata])
     xerrtype = Dropdown(options = ['none','percent','constant','data'],
                         description = 'Error Type: ',
                         disabled = True)
@@ -373,8 +373,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         disabled = True)
 
     xerrdata.observe(errdata_change, names = 'value')
-    xerrrow1 = HBox([xerrtype,xerrvalue])
-    xerror = VBox([xerrrow1,xerrdata])
+    xerrrow1 = HBox(children=[xerrtype,xerrvalue])
+    xerror = VBox(children=[xerrrow1,xerrdata])
     step1erracc = Accordion(children = [yerror,xerror])
     step1erracc.set_title(0, 'Y error bars')
     step1erracc.set_title(1, 'X error bars')
@@ -461,14 +461,14 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     trace_notices.set_active([0,1])
     add_trace_notices = richLabel(value = trace_notices.notice_html())
-    step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
-    step1actionbox = VBox([add_trace_but, add_trace_notices])
-    step1hbox = HBox([step1tracebox,step1actionbox])
-    step1optbox = VBox([step1formatacc, step1erracc])
+    step1tracebox = VBox(children=[whichframe,Xcoord,Ycoord,trace_name])
+    step1actionbox = VBox(children=[add_trace_but, add_trace_notices])
+    step1hbox = HBox(children=[step1tracebox,step1actionbox])
+    step1optbox = VBox(children=[step1formatacc, step1erracc])
     step1opt = Accordion(children = [step1optbox])
     step1opt.set_title(0, 'Optional (Trace formatting, error bars...)')
     step1opt.selected_index = None
-    step1 = VBox([step1instracc, step1hbox, step1opt])
+    step1 = VBox(children=[step1instracc, step1hbox, step1opt])
 
     # 2. Set Axes Labels (will use column names by default).
     step2instr = richLabel(value = 'You must set the axes labels to something '
@@ -492,8 +492,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                    description = 'Y-axis label: ',
                    style = longdesc,
                    layout=Layout(width='45%'))
-    step2hbox = HBox([X_label,Y_label])
-    step2 = VBox([step2instracc,step2hbox])
+    step2hbox = HBox(children=[X_label,Y_label])
+    step2 = VBox(children=[step2instracc,step2hbox])
     # 3.Title, Format ...
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
@@ -523,8 +523,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step3hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step3 = VBox([plot_title,step3hbox2])
+    step3hbox2 = HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step3 = VBox(children=[plot_title,step3hbox2])
 
     # 4. Final Check*
     step4instr = richLabel(value = 'Things to check before clicking making ' \
@@ -567,11 +567,11 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                          layout = makeplotbut_lay,
                          disabled = True)
     makeplotbut.on_click(makeplt_click)
-    step4vbox = VBox([makeplotbut,step4noticebox])
-    step4 = HBox([step4instr,step4vbox])
+    step4vbox = VBox(children=[makeplotbut,step4noticebox])
+    step4 = HBox(children=[step4instr,step4vbox])
 
 
-    steps = Tab([step1, step2, step3, step4])
+    steps = Tab(children=[step1, step2, step3, step4])
     steps.set_title(0,'1. Pick Trace(s)*')
     steps.set_title(1,'2. Label Axes*')
     steps.set_title(2,'3. Title, Format ...')

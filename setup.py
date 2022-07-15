@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="jupyter_Pandas_GUI",
-    version="0.7.0rc1",
+    version="0.7.0",
     description="Pandas expression composers using Jupyter widgets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -23,8 +23,8 @@ setuptools.setup(
         'pandas>=1.2.5',
         'numpy>=1.19.0',
         'plotly>=5.5.0',
-        'ipywidgets>=7.6.2',
-        'JPSLUtils>=0.7.0rc0',
+        'ipywidgets>=7.6.2, <8.0',
+        'JPSLUtils>=0.7.0',
         'lmfit>=1.0.3',
         'round-using-error>=1.1.1',
     ],

@@ -56,7 +56,6 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         RadioButtons, BoundedIntText
     from ipywidgets import HTML as richLabel
     from ipywidgets import HTMLMath as texLabel
-    import plotly.graph_objects as go
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
     from IPython import get_ipython
@@ -68,6 +67,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         replace_text_of_current_cell, pseudoLatexToLatex
     import JPSLUtils
     from lmfit import models
+    if JPSLUtils.notebookenv != 'colab':
+        import plotly.graph_objects as go
 
     from .utils import find_pandas_dataframe_names, build_run_snip_widget
     from IPython import get_ipython
@@ -274,8 +275,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     'SineModel': sinmodelresultstr
     }
 
-    importstr = '# CODE BLOCK generated using fit_pandas_GUI(). See '\
-                'https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI.\n' \
+    importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
+                'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
                 '# Imports (no effect if already imported)\n' \
                 'import numpy as np\n' \
                 'import lmfit as lmfit\n' \
@@ -406,10 +407,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     trace_notices.set_active([0,1])
     add_trace_notices = richLabel(value = trace_notices.notice_html())
-    step1tracebox = VBox([whichframe,Xcoord,Ycoord,trace_name])
-    step1actionbox = VBox([add_trace_notices])
-    step1hbox = HBox([step1tracebox,step1actionbox])
-    step1 = VBox([step1instracc, step1hbox])
+    step1tracebox =  VBox(children=[whichframe,Xcoord,Ycoord,trace_name])
+    step1actionbox =  VBox(children=[add_trace_notices])
+    step1hbox =  HBox(children=[step1tracebox,step1actionbox])
+    step1 =  VBox(children=[step1instracc, step1hbox])
 
     # 2. Set data uncertainty
     step2instr = richLabel(value = 'If you know the uncertainty in your data '
@@ -477,11 +478,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     yerrdata.observe(errdata_change, names = 'value')
-    yerrrow1 = HBox([yerrtype,yerrvalue])
-    yerror = VBox([yerrrow1,yerrdata])
+    yerrrow1 =  HBox(children=[yerrtype,yerrvalue])
+    yerror =  VBox(children=[yerrrow1,yerrdata])
     step2instracc = Accordion(children=[step2instr])
     step2instracc.selected_index = None
-    step2 = VBox([step2instr,yerror])
+    step2 =  VBox(children=[step2instr,yerror])
 
     # 3. Set fit parameters
     step3instr = richLabel(value = '<ol><li>Choose the fit type ('
@@ -586,7 +587,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                  disabled=False,
                                  style=longdesc)
             paramlabel = Label(value = str(i)+':',style=longdesc)
-            parambox = VBox([paramlabel,HBox([fixcheck,valuefield,minfield,
+            parambox =  VBox(children=[paramlabel, HBox(children=[fixcheck,valuefield,minfield,
                                     maxfield])])
             parambox.layout.display = 'none'
             currmodel_param.append(parambox)
@@ -600,7 +601,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     modeldrop.observe(modeldrop_change, names = 'value')
     params_set = make_param_set()
     getcurrmodel_param(modeldrop.value, params_set)
-    step3 = VBox([step3instracc,HBox([modeldrop,modeleqn]),params_set])
+    step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
 
     # 5.Title, Axes, Format ...
     step5instr = richLabel(value = 'You must set the axes labels to something '
@@ -644,9 +645,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step5hbox1 = HBox([X_label, Y_label])
-    step5hbox2 = HBox([mirror_axes,mirror_ticks, plot_template])
-    step5 = VBox([step5instr, plot_title, step5hbox1, step5hbox2])
+    step5hbox1 =  HBox(children=[X_label, Y_label])
+    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step5 =  VBox(children=[step5instr, plot_title, step5hbox1, step5hbox2])
 
     # 4. Pick Fit Range(s)
     step4instr = richLabel(value ='This step is optional. '
@@ -683,6 +684,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         range_plot_marker_size = 6
         range_plot_hilight_size = 20
         ranges=[]
+        
     def update_range_point(trace, points, selector):
         # size and color must be done separately as they may not be updated
         # in sync.
@@ -713,7 +715,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step4instacc = Accordion(children =[step4instr])
     step4instacc.set_title(0,'Instructions (optional step)')
     step4instacc.selected_index = None
-    step4 = VBox([step4instacc,extend_fit,range_plot])
+    step4 =  VBox(children=[step4instacc,extend_fit,range_plot])
 
     # 6. Final Check*
     step6instr = richLabel(value = 'Things to check before running the fit:' \
@@ -752,11 +754,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                       disabled = True,
                       layout = dofitbut_lay)
     dofitbut.on_click(dofit_click)
-    step6vbox = VBox([dofitbut,step6noticebox])
-    step6 = HBox([step6instr,step6vbox])
+    step6vbox =  VBox(children=[dofitbut,step6noticebox])
+    step6 =  HBox(children=[step6instr,step6vbox])
 
 
-    steps = Tab([step1, step2, step3, step4, step5, step6])
+    steps =  Tab(children=[step1, step2, step3, step4, step5, step6])
     steps.set_title(0,'1. Pick Data*')
     steps.set_title(1,'2. Data Uncertainty*')
     steps.set_title(2,'3. Set up Model*')
@@ -829,18 +831,19 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step3str +='\n'
             pass
         if change['new']>=4:
-            # update ranges
-            range_start = True
             ranges = []
-            new_range = []
-            if len(range_plot.data)>0:
-                for i in range(len(range_plot.data[0].marker.color)):
-                    if range_plot.data[0].marker.color[i] == range_plot_hilight:
-                        new_range.append(i)
-                        if not range_start:
-                            ranges.append(new_range)
-                            new_range = []
-                        range_start = not range_start
+            if JPSLUtils.notebookenv != 'colab':
+                # update ranges
+                range_start = True
+                new_range = []
+                if len(range_plot.data)>0:
+                    for i in range(len(range_plot.data[0].marker.color)):
+                        if range_plot.data[0].marker.color[i] == range_plot_hilight:
+                            new_range.append(i)
+                            if not range_start:
+                                ranges.append(new_range)
+                                new_range = []
+                            range_start = not range_start
             # update step 4 string
             covscalestr = 'False'
             if yerrtype.value == 'none':
@@ -962,7 +965,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 step5str += str(figname) + '.add_trace(scat,col=1,row=2)\n'
                 step5str += str(figname) + '.show()\n\n'
                 pass
-        if change['new'] == 3:
+        if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
             df = friendly_to_object[whichframe.value]
             rangex = df[Xcoord.value]
             rangey = df[Ycoord.value]
