@@ -37,7 +37,7 @@
     </ul>
 
 
-            <footer>jupyter_Pandas_GUI v0.6.2</footer>
+            <footer>jupyter_Pandas_GUI v0.7.0</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev">
             built with <span class="visually-hidden">pdoc</span><img
@@ -54,7 +54,9 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">new_pandas_column_GUI</span><span class="p">(</span><span class="n">df_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_text_col</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">JPSLUtils</span>
+
+<span class="k">def</span> <span class="nf">new_pandas_column_GUI</span><span class="p">(</span><span class="n">df_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_text_col</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If passed no parameters this will look for all the dataframes in the user</span>
 <span class="sd">    namespace and make them available for adding a new column to. Once a</span>
@@ -82,17 +84,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">GridBox</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> \
-        <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Checkbox</span>
+        <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Textarea</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Checkbox</span>
     <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">richLabel</span>
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
+    <span class="kn">from</span> <span class="nn">JPSLUtils.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
         <span class="n">select_cell_immediately_below</span><span class="p">,</span> <span class="n">move_cursor_in_current_cell</span><span class="p">,</span> \
         <span class="n">insert_text_into_next_cell</span><span class="p">,</span> <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">,</span> \
         <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">,</span> <span class="n">select_containing_cell</span><span class="p">,</span> \
-        <span class="n">delete_selected_cell</span>
+        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">replace_text_of_next_cell</span>
+    <span class="kn">from</span> <span class="nn">JPSLUtils</span> <span class="kn">import</span> <span class="n">notebookenv</span>
 
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span>
+    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span><span class="p">,</span> <span class="n">build_run_snip_widget</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
     <span class="n">global_dict</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">user_ns</span>
     <span class="n">dfs_info</span> <span class="o">=</span> <span class="p">[]</span>
@@ -108,6 +111,25 @@
 
     <span class="c1">#### Define GUI Elements ####</span>
 
+    <span class="n">importstr</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using new_pandas_column_GUI().</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;# See https://jupyterphysscilab.github.io/&#39;</span> \
+                <span class="s1">&#39;jupyter_Pandas_GUI.</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;# Imports (no effect if already imported)</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;import numpy as np</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">allbutlastline</span> <span class="o">=</span> <span class="n">importstr</span>
+    <span class="n">lastline</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">split_to_all_but_last_and_last</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">all_but_last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">all_but_last</span> <span class="o">+=</span> <span class="n">lines</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">last</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">all_but_last</span><span class="p">,</span> <span class="n">last</span>
+            
     <span class="c1"># DataFrame Choice (Step 1)</span>
     <span class="n">step1instr</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Select the DataFrame to work with.&#39;</span><span class="p">)</span>
     <span class="n">tempopts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -130,26 +152,41 @@
         <span class="n">whichcolumn</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">tempopt</span>
         <span class="k">pass</span>
     <span class="n">whichframe</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_columns</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1instr</span><span class="p">,</span> <span class="n">whichframe</span><span class="p">])</span>
+    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1instr</span><span class="p">,</span> <span class="n">whichframe</span><span class="p">])</span>
 
     <span class="c1"># Step 2</span>
     <span class="n">newname</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Type name for new column.&#39;</span><span class="p">)</span>
     <span class="n">step2instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Pick a name for the new column. The expression will be &#39;</span> \
-              <span class="s1">&#39;built in the cell below. Click the &quot;Insert&quot; button when &#39;</span> \
-              <span class="s1">&#39;you are satisfied with the name.&#39;</span><span class="p">)</span>
+              <span class="s1">&#39;built in the cell (textbox) below. Click the &quot;Insert&quot; button &#39;</span> \
+              <span class="s1">&#39;when you are satisfied with the name.&#39;</span><span class="p">)</span>
     <span class="n">insertname</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Insert&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">do_insertname</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="n">framename</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">newname</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">] = &#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">codestr</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">newname</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">] = &#39;</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">codestr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">codestr</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> <span class="n">codestr</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                   <span class="n">codestr</span>
         <span class="k">pass</span>
 
     <span class="n">insertname</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">do_insertname</span><span class="p">)</span>
 
-    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step2instr</span><span class="p">,</span> <span class="n">HBox</span><span class="p">([</span><span class="n">newname</span><span class="p">,</span>
+    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step2instr</span><span class="p">,</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">newname</span><span class="p">,</span>
                                            <span class="n">insertname</span><span class="p">])])</span>
+
     <span class="c1"># Step 3</span>
     <span class="n">whichcolumn</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Choose column to insert.&#39;</span><span class="p">],</span>
                            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Column: &#39;</span><span class="p">,</span>
@@ -161,21 +198,35 @@
             <span class="k">return</span>
         <span class="n">framename</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">]&#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;+)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;-)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; )&#39;</span><span class="p">):</span>
+                <span class="n">lastline</span> <span class="o">=</span> <span class="n">lastline</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">text</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lastline</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span><span class="o">+</span><span class="n">lastline</span>
         <span class="n">whichcolumn</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Choose column to insert.&#39;</span>
         <span class="k">pass</span>
 
     <span class="n">whichcolumn</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">column_insert</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
     <span class="n">step3instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Add the calculation to the right hand side using the menus &#39;</span> \
-              <span class="s1">&#39;to insert columns, math operations or functions. &#39;</span> \
-              <span class="s1">&#39;Your choices will replace selected &#39;</span> \
-              <span class="s1">&#39;text or insert at the current cursor position.&#39;</span><span class="p">)</span>
+        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Add the calculation to the right hand side of the = using the &#39;</span>
+              <span class="s1">&#39;menus to insert columns, math operations or functions. &#39;</span> \
+              <span class="s1">&#39;Your choices will be appended to the end of the last line &#39;</span> \
+              <span class="s1">&#39;or inserted within the last set of parentheses. You can also&#39;</span> \
+              <span class="s1">&#39; manually edit the expression.&#39;</span><span class="p">)</span>
     <span class="n">oplst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Choose an operation to insert.&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span>
              <span class="s1">&#39;exp()&#39;</span><span class="p">,</span> <span class="s1">&#39;log10()&#39;</span><span class="p">,</span> <span class="s1">&#39;ln()&#39;</span><span class="p">,</span> <span class="s1">&#39;sqrt()&#39;</span><span class="p">,</span> <span class="s1">&#39;sin()&#39;</span><span class="p">,</span> <span class="s1">&#39;cos()&#39;</span><span class="p">,</span>
              <span class="s1">&#39;tan()&#39;</span><span class="p">,</span> <span class="s1">&#39;cot()&#39;</span><span class="p">,</span> <span class="s1">&#39;asin()&#39;</span><span class="p">,</span> <span class="s1">&#39;acos()&#39;</span><span class="p">,</span> <span class="s1">&#39;atan()&#39;</span><span class="p">,</span> <span class="s1">&#39;acot()&#39;</span><span class="p">]</span>
     <span class="n">whichop</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">oplst</span><span class="p">,</span>
                        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Operation: &#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">op_insert</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="n">need_numpy</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">np_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;exp()&#39;</span><span class="p">,</span> <span class="s1">&#39;log10()&#39;</span><span class="p">,</span> <span class="s1">&#39;ln()&#39;</span><span class="p">,</span> <span class="s1">&#39;sqrt()&#39;</span><span class="p">,</span> <span class="s1">&#39;sin()&#39;</span><span class="p">,</span> <span class="s1">&#39;cos()&#39;</span><span class="p">,</span>
@@ -187,76 +238,107 @@
         <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">np_list</span><span class="p">:</span>
             <span class="n">need_numpy</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;ln()&#39;</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;log()&#39;</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39;log()&#39;</span>
             <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39;np.&#39;</span> <span class="o">+</span> <span class="n">op</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">op</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">need_numpy</span><span class="p">:</span>
-            <span class="n">move_cursor_in_current_cell</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_numpy</span><span class="p">:</span>
+                <span class="n">move_cursor_in_current_cell</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;+)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;-)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; )&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;])&#39;</span><span class="p">):</span>
+                <span class="n">lastline</span> <span class="o">=</span> <span class="n">lastline</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">op</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lastline</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span><span class="o">+</span><span class="n">lastline</span>
         <span class="n">whichop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Choose an operation to insert.&#39;</span>
         <span class="k">pass</span>
 
     <span class="n">whichop</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">op_insert</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
-    <span class="n">step3drops</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">whichcolumn</span><span class="p">,</span> <span class="n">whichop</span><span class="p">])</span>
-    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step3instr</span><span class="p">,</span> <span class="n">step3drops</span><span class="p">])</span>
+    <span class="n">step3drops</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">whichcolumn</span><span class="p">,</span> <span class="n">whichop</span><span class="p">])</span>
+    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step3instr</span><span class="p">,</span> <span class="n">step3drops</span><span class="p">])</span>
+
     <span class="c1"># Step 4</span>
-    <span class="n">step4instr1</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Carefully check the expression for typos before selecting&#39;</span> \
-              <span class="s1">&#39; &quot;Do it!&quot;.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr2</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Parentheses, brackets or braces highlighted in red &#39;</span> \
-              <span class="s1">&#39;are missing their partner.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr3</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Check that all double and single quotes are also &#39;</span> \
-              <span class="s1">&#39;properly paired.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr4</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Check that all function calls are prefaced by &#39;</span> \
-              <span class="s1">&#39;an </span><span class="se">\&#39;</span><span class="s1">np.</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
-    <span class="n">show_updated_df_box</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Display updated &#39;</span>
-                                                 <span class="s1">&#39;dataset.&#39;</span><span class="p">,</span>
-                                   <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">gen_col_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Do it!&#39;</span><span class="p">)</span>
+    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Carefully check the expression for typos:&#39;</span> \
+            <span class="s1">&#39;&lt;ul&gt;&lt;li&gt;Check that parentheses, brackets or braces are properly &#39;</span> \
+              <span class="s1">&#39;paired.&lt;/li&gt;&#39;</span> \
+            <span class="s1">&#39;&lt;li&gt;Check that all double and single quotes are also &#39;</span> \
+              <span class="s1">&#39;properly paired.&lt;/li&gt;&#39;</span> \
+            <span class="s1">&#39;&lt;li&gt;Check that all function calls are prefaced by &#39;</span> \
+              <span class="s1">&#39;an &lt;code&gt;np.&lt;/code&gt;.&lt;/li&gt;&lt;/ul&gt;&#39;</span> \
+            <span class="s1">&#39;Uncheck &quot;Display updated data set&quot;, if you do not wish to &#39;</span> \
+                <span class="s1">&#39;display a summary of the updated data set. &#39;</span> \
+            <span class="s1">&#39;&lt;span style=&quot;color:red;&quot;&gt;Click </span><span class="se">\&#39;</span><span class="s1">OK</span><span class="se">\&#39;</span><span class="s1"> to do final code updates. &#39;</span> \
+            <span class="s1">&#39;&lt;/span&gt;In the classic Jupyter notebook this button will also &#39;</span> \
+            <span class="s1">&#39;run the code and clear this GUI from the notebook.&#39;</span>
+    <span class="p">)</span>
+    <span class="n">show_updated_df_box</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Show updated data set.&#39;</span><span class="p">,</span>
+                                   <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="s1">&#39;-90px&#39;</span><span class="p">))</span>
+    <span class="n">gen_col_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;      OK      &#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">run_new_col_decl</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
         <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span> <span class="k">as</span> <span class="n">JS</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="c1"># import numpy if numpy functions used (they could have put in by hand -- insert by default?)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;import numpy as np # Necessary for function calls</span><span class="se">\\</span><span class="s1">n&#39;</span>
-        <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="c1"># if show updated dataframe is checked append dataframe name as last line.</span>
         <span class="k">if</span> <span class="n">show_updated_df_box</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; # DataFrame name on last line of cell displays summary.&#39;</span>
-            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# Display summary of updated data set.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;display(&#39;</span><span class="o">+</span><span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+                <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+                <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+                <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> \
+                                              <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">text</span>
+
         <span class="c1"># run composed operation</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">JS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">))</span>
-        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
-        <span class="n">delete_selected_cell</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">JS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">))</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">delete_selected_cell</span><span class="p">()</span>
         <span class="k">pass</span>
 
     <span class="n">gen_col_but</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">run_new_col_decl</span><span class="p">)</span>
-    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step4instr1</span><span class="p">,</span> <span class="n">step4instr2</span><span class="p">,</span> <span class="n">step4instr3</span><span class="p">,</span>
-                        <span class="n">step4instr4</span><span class="p">])</span>
-    <span class="n">step4act</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">show_updated_df_box</span><span class="p">,</span> <span class="n">gen_col_but</span><span class="p">])</span>
-    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step4instr</span><span class="p">,</span> <span class="n">step4act</span><span class="p">])</span>
+    <span class="n">step4act</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">show_updated_df_box</span><span class="p">,</span> <span class="n">gen_col_but</span><span class="p">])</span>
+    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step4instr</span><span class="p">,</span> <span class="n">step4act</span><span class="p">])</span>
 
-    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">([</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Step 1&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Step 2&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Step 3&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Step 4&#39;</span><span class="p">)</span>
 
+    <span class="n">codearea</span> <span class="o">=</span> <span class="n">build_run_snip_widget</span><span class="p">(</span><span class="n">importstr</span><span class="p">)</span>
+
     <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
         <span class="s2">&quot;&lt;h3 id =&#39;newcolGUI&#39; style=&#39;text-align:center;&#39;&gt;Pandas New Calculated &quot;</span>
         <span class="s2">&quot;Column &quot;</span>
         <span class="s2">&quot;Composer&lt;/h3&gt;&quot;</span><span class="p">))</span>
-    <span class="c1">#pdComposer = VBox([whichframe, steps])</span>
     <span class="n">display</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-    <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
-    <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+        <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+        <span class="n">replace_text_of_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">codearea</span><span class="p">)</span>
     <span class="k">pass</span>
 </pre></div>
 
@@ -301,17 +383,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">GridBox</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> \
-        <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Checkbox</span>
+        <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Textarea</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Checkbox</span>
     <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">richLabel</span>
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
+    <span class="kn">from</span> <span class="nn">JPSLUtils.utils</span> <span class="kn">import</span> <span class="n">new_cell_immediately_below</span><span class="p">,</span>\
         <span class="n">select_cell_immediately_below</span><span class="p">,</span> <span class="n">move_cursor_in_current_cell</span><span class="p">,</span> \
         <span class="n">insert_text_into_next_cell</span><span class="p">,</span> <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">,</span> \
         <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">,</span> <span class="n">select_containing_cell</span><span class="p">,</span> \
-        <span class="n">delete_selected_cell</span>
+        <span class="n">delete_selected_cell</span><span class="p">,</span> <span class="n">replace_text_of_next_cell</span>
+    <span class="kn">from</span> <span class="nn">JPSLUtils</span> <span class="kn">import</span> <span class="n">notebookenv</span>
 
-    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span>
+    <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_pandas_dataframe_names</span><span class="p">,</span> <span class="n">build_run_snip_widget</span>
     <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
     <span class="n">global_dict</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">user_ns</span>
     <span class="n">dfs_info</span> <span class="o">=</span> <span class="p">[]</span>
@@ -327,6 +410,25 @@
 
     <span class="c1">#### Define GUI Elements ####</span>
 
+    <span class="n">importstr</span> <span class="o">=</span> <span class="s1">&#39;# CODE BLOCK generated using new_pandas_column_GUI().</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;# See https://jupyterphysscilab.github.io/&#39;</span> \
+                <span class="s1">&#39;jupyter_Pandas_GUI.</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;# Imports (no effect if already imported)</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                <span class="s1">&#39;import numpy as np</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">allbutlastline</span> <span class="o">=</span> <span class="n">importstr</span>
+    <span class="n">lastline</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">split_to_all_but_last_and_last</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">all_but_last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">all_but_last</span> <span class="o">+=</span> <span class="n">lines</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">last</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">all_but_last</span><span class="p">,</span> <span class="n">last</span>
+            
     <span class="c1"># DataFrame Choice (Step 1)</span>
     <span class="n">step1instr</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Select the DataFrame to work with.&#39;</span><span class="p">)</span>
     <span class="n">tempopts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -349,26 +451,41 @@
         <span class="n">whichcolumn</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">tempopt</span>
         <span class="k">pass</span>
     <span class="n">whichframe</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_columns</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step1instr</span><span class="p">,</span> <span class="n">whichframe</span><span class="p">])</span>
+    <span class="n">step1</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1instr</span><span class="p">,</span> <span class="n">whichframe</span><span class="p">])</span>
 
     <span class="c1"># Step 2</span>
     <span class="n">newname</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Type name for new column.&#39;</span><span class="p">)</span>
     <span class="n">step2instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Pick a name for the new column. The expression will be &#39;</span> \
-              <span class="s1">&#39;built in the cell below. Click the &quot;Insert&quot; button when &#39;</span> \
-              <span class="s1">&#39;you are satisfied with the name.&#39;</span><span class="p">)</span>
+              <span class="s1">&#39;built in the cell (textbox) below. Click the &quot;Insert&quot; button &#39;</span> \
+              <span class="s1">&#39;when you are satisfied with the name.&#39;</span><span class="p">)</span>
     <span class="n">insertname</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Insert&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">do_insertname</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="n">framename</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">newname</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">] = &#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">codestr</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">newname</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">] = &#39;</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">codestr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">codestr</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> <span class="n">codestr</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                   <span class="n">codestr</span>
         <span class="k">pass</span>
 
     <span class="n">insertname</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">do_insertname</span><span class="p">)</span>
 
-    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step2instr</span><span class="p">,</span> <span class="n">HBox</span><span class="p">([</span><span class="n">newname</span><span class="p">,</span>
+    <span class="n">step2</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step2instr</span><span class="p">,</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">newname</span><span class="p">,</span>
                                            <span class="n">insertname</span><span class="p">])])</span>
+
     <span class="c1"># Step 3</span>
     <span class="n">whichcolumn</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Choose column to insert.&#39;</span><span class="p">],</span>
                            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Column: &#39;</span><span class="p">,</span>
@@ -380,21 +497,35 @@
             <span class="k">return</span>
         <span class="n">framename</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">framename</span> <span class="o">+</span> <span class="s1">&#39;[</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">]&#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;+)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;-)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; )&#39;</span><span class="p">):</span>
+                <span class="n">lastline</span> <span class="o">=</span> <span class="n">lastline</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">text</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lastline</span> <span class="o">+=</span> <span class="n">text</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span><span class="o">+</span><span class="n">lastline</span>
         <span class="n">whichcolumn</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Choose column to insert.&#39;</span>
         <span class="k">pass</span>
 
     <span class="n">whichcolumn</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">column_insert</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
     <span class="n">step3instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Add the calculation to the right hand side using the menus &#39;</span> \
-              <span class="s1">&#39;to insert columns, math operations or functions. &#39;</span> \
-              <span class="s1">&#39;Your choices will replace selected &#39;</span> \
-              <span class="s1">&#39;text or insert at the current cursor position.&#39;</span><span class="p">)</span>
+        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Add the calculation to the right hand side of the = using the &#39;</span>
+              <span class="s1">&#39;menus to insert columns, math operations or functions. &#39;</span> \
+              <span class="s1">&#39;Your choices will be appended to the end of the last line &#39;</span> \
+              <span class="s1">&#39;or inserted within the last set of parentheses. You can also&#39;</span> \
+              <span class="s1">&#39; manually edit the expression.&#39;</span><span class="p">)</span>
     <span class="n">oplst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Choose an operation to insert.&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span>
              <span class="s1">&#39;exp()&#39;</span><span class="p">,</span> <span class="s1">&#39;log10()&#39;</span><span class="p">,</span> <span class="s1">&#39;ln()&#39;</span><span class="p">,</span> <span class="s1">&#39;sqrt()&#39;</span><span class="p">,</span> <span class="s1">&#39;sin()&#39;</span><span class="p">,</span> <span class="s1">&#39;cos()&#39;</span><span class="p">,</span>
              <span class="s1">&#39;tan()&#39;</span><span class="p">,</span> <span class="s1">&#39;cot()&#39;</span><span class="p">,</span> <span class="s1">&#39;asin()&#39;</span><span class="p">,</span> <span class="s1">&#39;acos()&#39;</span><span class="p">,</span> <span class="s1">&#39;atan()&#39;</span><span class="p">,</span> <span class="s1">&#39;acot()&#39;</span><span class="p">]</span>
     <span class="n">whichop</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">oplst</span><span class="p">,</span>
                        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Operation: &#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">op_insert</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="n">need_numpy</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">np_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;exp()&#39;</span><span class="p">,</span> <span class="s1">&#39;log10()&#39;</span><span class="p">,</span> <span class="s1">&#39;ln()&#39;</span><span class="p">,</span> <span class="s1">&#39;sqrt()&#39;</span><span class="p">,</span> <span class="s1">&#39;sin()&#39;</span><span class="p">,</span> <span class="s1">&#39;cos()&#39;</span><span class="p">,</span>
@@ -406,76 +537,107 @@
         <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">np_list</span><span class="p">:</span>
             <span class="n">need_numpy</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;ln()&#39;</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;log()&#39;</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39;log()&#39;</span>
             <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39;np.&#39;</span> <span class="o">+</span> <span class="n">op</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">op</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
-        <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">need_numpy</span><span class="p">:</span>
-            <span class="n">move_cursor_in_current_cell</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">insert_text_into_next_cell</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_numpy</span><span class="p">:</span>
+                <span class="n">move_cursor_in_current_cell</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;+)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;-)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*)&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/)&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; )&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">lastline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;])&#39;</span><span class="p">):</span>
+                <span class="n">lastline</span> <span class="o">=</span> <span class="n">lastline</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">op</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lastline</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span><span class="o">+</span><span class="n">lastline</span>
         <span class="n">whichop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Choose an operation to insert.&#39;</span>
         <span class="k">pass</span>
 
     <span class="n">whichop</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">op_insert</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
-    <span class="n">step3drops</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">whichcolumn</span><span class="p">,</span> <span class="n">whichop</span><span class="p">])</span>
-    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step3instr</span><span class="p">,</span> <span class="n">step3drops</span><span class="p">])</span>
+    <span class="n">step3drops</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">whichcolumn</span><span class="p">,</span> <span class="n">whichop</span><span class="p">])</span>
+    <span class="n">step3</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step3instr</span><span class="p">,</span> <span class="n">step3drops</span><span class="p">])</span>
+
     <span class="c1"># Step 4</span>
-    <span class="n">step4instr1</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Carefully check the expression for typos before selecting&#39;</span> \
-              <span class="s1">&#39; &quot;Do it!&quot;.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr2</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Parentheses, brackets or braces highlighted in red &#39;</span> \
-              <span class="s1">&#39;are missing their partner.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr3</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Check that all double and single quotes are also &#39;</span> \
-              <span class="s1">&#39;properly paired.&#39;</span><span class="p">)</span>
-    <span class="n">step4instr4</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
-        <span class="n">value</span><span class="o">=</span><span class="s1">&#39; * Check that all function calls are prefaced by &#39;</span> \
-              <span class="s1">&#39;an </span><span class="se">\&#39;</span><span class="s1">np.</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
-    <span class="n">show_updated_df_box</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Display updated &#39;</span>
-                                                 <span class="s1">&#39;dataset.&#39;</span><span class="p">,</span>
-                                   <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">gen_col_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Do it!&#39;</span><span class="p">)</span>
+    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Carefully check the expression for typos:&#39;</span> \
+            <span class="s1">&#39;&lt;ul&gt;&lt;li&gt;Check that parentheses, brackets or braces are properly &#39;</span> \
+              <span class="s1">&#39;paired.&lt;/li&gt;&#39;</span> \
+            <span class="s1">&#39;&lt;li&gt;Check that all double and single quotes are also &#39;</span> \
+              <span class="s1">&#39;properly paired.&lt;/li&gt;&#39;</span> \
+            <span class="s1">&#39;&lt;li&gt;Check that all function calls are prefaced by &#39;</span> \
+              <span class="s1">&#39;an &lt;code&gt;np.&lt;/code&gt;.&lt;/li&gt;&lt;/ul&gt;&#39;</span> \
+            <span class="s1">&#39;Uncheck &quot;Display updated data set&quot;, if you do not wish to &#39;</span> \
+                <span class="s1">&#39;display a summary of the updated data set. &#39;</span> \
+            <span class="s1">&#39;&lt;span style=&quot;color:red;&quot;&gt;Click </span><span class="se">\&#39;</span><span class="s1">OK</span><span class="se">\&#39;</span><span class="s1"> to do final code updates. &#39;</span> \
+            <span class="s1">&#39;&lt;/span&gt;In the classic Jupyter notebook this button will also &#39;</span> \
+            <span class="s1">&#39;run the code and clear this GUI from the notebook.&#39;</span>
+    <span class="p">)</span>
+    <span class="n">show_updated_df_box</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Show updated data set.&#39;</span><span class="p">,</span>
+                                   <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="s1">&#39;-90px&#39;</span><span class="p">))</span>
+    <span class="n">gen_col_but</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;      OK      &#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">run_new_col_decl</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
         <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span> <span class="k">as</span> <span class="n">JS</span>
-        <span class="n">select_cell_immediately_below</span><span class="p">()</span>
-        <span class="c1"># import numpy if numpy functions used (they could have put in by hand -- insert by default?)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;import numpy as np # Necessary for function calls</span><span class="se">\\</span><span class="s1">n&#39;</span>
-        <span class="n">insert_text_at_beginning_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="c1"># if show updated dataframe is checked append dataframe name as last line.</span>
         <span class="k">if</span> <span class="n">show_updated_df_box</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; # DataFrame name on last line of cell displays summary.&#39;</span>
-            <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;# Display summary of updated data set.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;display(&#39;</span><span class="o">+</span><span class="n">friendly_to_globalname</span><span class="p">[</span><span class="n">whichframe</span><span class="o">.</span><span class="n">value</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+            <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+                <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+                <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+                <span class="n">insert_newline_at_end_of_current_cell</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">allbutlastline</span><span class="p">,</span> <span class="n">lastline</span> <span class="o">=</span> <span class="n">split_to_all_but_last_and_last</span><span class="p">(</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">lastline</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">codearea</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">allbutlastline</span> <span class="o">+</span> <span class="n">lastline</span> <span class="o">+</span> \
+                                              <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">text</span>
+
         <span class="c1"># run composed operation</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">JS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">))</span>
-        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
-        <span class="n">delete_selected_cell</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">select_cell_immediately_below</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">JS</span><span class="p">(</span><span class="s1">&#39;Jupyter.notebook.get_selected_cell().execute()&#39;</span><span class="p">))</span>
+            <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+            <span class="n">delete_selected_cell</span><span class="p">()</span>
         <span class="k">pass</span>
 
     <span class="n">gen_col_but</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">run_new_col_decl</span><span class="p">)</span>
-    <span class="n">step4instr</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">step4instr1</span><span class="p">,</span> <span class="n">step4instr2</span><span class="p">,</span> <span class="n">step4instr3</span><span class="p">,</span>
-                        <span class="n">step4instr4</span><span class="p">])</span>
-    <span class="n">step4act</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">show_updated_df_box</span><span class="p">,</span> <span class="n">gen_col_but</span><span class="p">])</span>
-    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="n">step4instr</span><span class="p">,</span> <span class="n">step4act</span><span class="p">])</span>
+    <span class="n">step4act</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">show_updated_df_box</span><span class="p">,</span> <span class="n">gen_col_but</span><span class="p">])</span>
+    <span class="n">step4</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step4instr</span><span class="p">,</span> <span class="n">step4act</span><span class="p">])</span>
 
-    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">([</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">step1</span><span class="p">,</span> <span class="n">step2</span><span class="p">,</span> <span class="n">step3</span><span class="p">,</span> <span class="n">step4</span><span class="p">])</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Step 1&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Step 2&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Step 3&#39;</span><span class="p">)</span>
     <span class="n">steps</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Step 4&#39;</span><span class="p">)</span>
 
+    <span class="n">codearea</span> <span class="o">=</span> <span class="n">build_run_snip_widget</span><span class="p">(</span><span class="n">importstr</span><span class="p">)</span>
+
     <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
         <span class="s2">&quot;&lt;h3 id =&#39;newcolGUI&#39; style=&#39;text-align:center;&#39;&gt;Pandas New Calculated &quot;</span>
         <span class="s2">&quot;Column &quot;</span>
         <span class="s2">&quot;Composer&lt;/h3&gt;&quot;</span><span class="p">))</span>
-    <span class="c1">#pdComposer = VBox([whichframe, steps])</span>
     <span class="n">display</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-    <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
-    <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">JPSLUtils</span><span class="o">.</span><span class="n">notebookenv</span> <span class="o">==</span> <span class="s1">&#39;NBClassic&#39;</span><span class="p">:</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+        <span class="n">new_cell_immediately_below</span><span class="p">()</span>
+        <span class="n">select_containing_cell</span><span class="p">(</span><span class="s1">&#39;newcolGUI&#39;</span><span class="p">)</span>
+        <span class="n">replace_text_of_next_cell</span><span class="p">(</span><span class="n">importstr</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">codearea</span><span class="p">)</span>
     <span class="k">pass</span>
 </pre></div>
 

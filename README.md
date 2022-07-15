@@ -135,7 +135,7 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 #### Change Log
-* 0.7.0rc8
+* 0.7.0
   * GUIs now also work in Jupyter Lab and Google Colab, although less 
     elegently than in classic Jupyter. Only the fit range selection tab 
     does not yet work in Google Colab.

@@ -103,10 +103,19 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#build_run_snip_widget">build_run_snip_widget</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#build_run_snip_widget.__init__">build_run_snip_widget</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
-            <footer>jupyter_Pandas_GUI v0.6.2</footer>
+            <footer>jupyter_Pandas_GUI v0.7.0</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev">
             built with <span class="visually-hidden">pdoc</span><img
@@ -131,6 +140,8 @@ package JPSLUtils (https://github.com/JupyterPhysSciLab/JPSLUtils).</p>
 <span class="sd">The Jupyter JS call utils below are being deprecated by utilites in the</span>
 <span class="sd">package JPSLUtils (https://github.com/JupyterPhysSciLab/JPSLUtils).</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span>
+
 <span class="c1">######</span>
 <span class="c1"># Jupyter JS call utilities</span>
 <span class="c1">######</span>
@@ -431,6 +442,61 @@ package JPSLUtils (https://github.com/JupyterPhysSciLab/JPSLUtils).</p>
             <span class="n">notice_txt</span> <span class="o">+=</span> <span class="n">itemstart</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">noticelist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;&lt;/li&gt;&#39;</span>
         <span class="n">notice_txt</span> <span class="o">+=</span> <span class="n">notice_footer</span>
         <span class="k">return</span> <span class="n">notice_txt</span>
+
+<span class="k">class</span> <span class="nc">build_run_snip_widget</span><span class="p">(</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">GridBox</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaulttxt</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Textarea</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">GridBox</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">richLabel</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span> <span class="o">=</span> <span class="n">Textarea</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;98%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;200px&#39;</span><span class="p">),</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">defaulttxt</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run Code&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;div style=&quot;line-height:1;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style=&quot;color:red;&quot;&gt;If you &#39;</span> \
+                                      <span class="s1">&#39;are running in Jupyter Lab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;the results of running &#39;</span> \
+                                      <span class="s1">&#39;the code will be output to the &#39;</span> \
+                                      <span class="s1">&#39;log console instead of the output of &#39;</span> \
+                                      <span class="s1">&#39;this cell. To show the results in &#39;</span> \
+                                      <span class="s1">&#39;the output of a code cell, copy the &#39;</span> \
+                                      <span class="s1">&#39;code at left into a code cell &#39;</span> \
+                                      <span class="s1">&#39;and run it.&lt;/p&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style = &quot;color:blue;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;If you are running in Colab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;clicking on the &quot;Run Code&quot; button &#39;</span> \
+                                      <span class="s1">&#39;will replace this GUI with the &#39;</span> \
+                                      <span class="s1">&#39;results of running the code. Copying &#39;</span> \
+                                      <span class="s1">&#39;the code in the collapsed &quot;Code &#39;</span> \
+                                      <span class="s1">&#39;that was run&quot; summary to a code cell &#39;</span> \
+                                      <span class="s1">&#39;will prevent the code &#39;</span> \
+                                      <span class="s1">&#39;from being lost if outputs are &#39;</span> \
+                                      <span class="s1">&#39;cleared.&lt;/p&gt;&lt;/div&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">])</span>
+        <span class="k">def</span> <span class="nf">onRunCode</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
+            <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span>
+            <span class="n">clear_output</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
+                <span class="s1">&#39;&lt;details&gt;&lt;summary style=&quot;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-weight:bold;&quot;&gt;&lt;a&gt;&#39;</span> \
+                <span class="s1">&#39;Code that was run&lt;/a&gt;&lt;/span&gt;(click to toggle visibility)&lt;/summary&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;div style=&quot;background:#eff0f1;white-space:pre-line;white-space:pre-wrap;&quot;&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&#39;</span><span class="p">))</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;h3&gt;Result&lt;h3&gt;&#39;</span><span class="p">))</span>
+            <span class="n">exec</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">onRunCode</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">build_run_snip_widget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span><span class="p">],</span>
+                                            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">grid_template_rows</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_columns</span><span class="o">=</span><span class="s1">&#39;75</span><span class="si">% 25%</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_areas</span><span class="o">=</span><span class="s2">&quot;self.sniptext self.dobox&quot;</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -1280,6 +1346,233 @@ active notices that are not in the provided list.</p>
 </div>
 
 
+                            </div>
+                </section>
+                <section id="build_run_snip_widget">
+                                <div class="attr class">
+        <a class="headerlink" href="#build_run_snip_widget">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">build_run_snip_widget</span><wbr>(<span class="base">ipywidgets.widgets.widget_box.GridBox</span>):
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">build_run_snip_widget</span><span class="p">(</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">GridBox</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaulttxt</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Textarea</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">GridBox</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">richLabel</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span> <span class="o">=</span> <span class="n">Textarea</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;98%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;200px&#39;</span><span class="p">),</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">defaulttxt</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run Code&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;div style=&quot;line-height:1;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style=&quot;color:red;&quot;&gt;If you &#39;</span> \
+                                      <span class="s1">&#39;are running in Jupyter Lab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;the results of running &#39;</span> \
+                                      <span class="s1">&#39;the code will be output to the &#39;</span> \
+                                      <span class="s1">&#39;log console instead of the output of &#39;</span> \
+                                      <span class="s1">&#39;this cell. To show the results in &#39;</span> \
+                                      <span class="s1">&#39;the output of a code cell, copy the &#39;</span> \
+                                      <span class="s1">&#39;code at left into a code cell &#39;</span> \
+                                      <span class="s1">&#39;and run it.&lt;/p&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style = &quot;color:blue;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;If you are running in Colab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;clicking on the &quot;Run Code&quot; button &#39;</span> \
+                                      <span class="s1">&#39;will replace this GUI with the &#39;</span> \
+                                      <span class="s1">&#39;results of running the code. Copying &#39;</span> \
+                                      <span class="s1">&#39;the code in the collapsed &quot;Code &#39;</span> \
+                                      <span class="s1">&#39;that was run&quot; summary to a code cell &#39;</span> \
+                                      <span class="s1">&#39;will prevent the code &#39;</span> \
+                                      <span class="s1">&#39;from being lost if outputs are &#39;</span> \
+                                      <span class="s1">&#39;cleared.&lt;/p&gt;&lt;/div&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">])</span>
+        <span class="k">def</span> <span class="nf">onRunCode</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
+            <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span>
+            <span class="n">clear_output</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
+                <span class="s1">&#39;&lt;details&gt;&lt;summary style=&quot;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-weight:bold;&quot;&gt;&lt;a&gt;&#39;</span> \
+                <span class="s1">&#39;Code that was run&lt;/a&gt;&lt;/span&gt;(click to toggle visibility)&lt;/summary&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;div style=&quot;background:#eff0f1;white-space:pre-line;white-space:pre-wrap;&quot;&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&#39;</span><span class="p">))</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;h3&gt;Result&lt;h3&gt;&#39;</span><span class="p">))</span>
+            <span class="n">exec</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">onRunCode</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">build_run_snip_widget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span><span class="p">],</span>
+                                            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">grid_template_rows</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_columns</span><span class="o">=</span><span class="s1">&#39;75</span><span class="si">% 25%</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_areas</span><span class="o">=</span><span class="s2">&quot;self.sniptext self.dobox&quot;</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Displays multiple widgets in rows and columns using the grid box model.</p>
+
+<h2 id="parameters">Parameters</h2>
+
+<p>{box_params}</p>
+
+<h2 id="examples">Examples</h2>
+
+<div class="pdoc-code codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">title_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;em&gt;Grid Box Example&lt;/em&gt;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">button1</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">button2</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a grid with two columns, splitting space equally</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">grid_template_columns</span><span class="o">=</span><span class="s1">&#39;1fr 1fr&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">widgets</span><span class="o">.</span><span class="n">GridBox</span><span class="p">([</span><span class="n">title_widget</span><span class="p">,</span> <span class="n">slider</span><span class="p">,</span> <span class="n">button1</span><span class="p">,</span> <span class="n">button2</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">)</span>
+</code></pre></div>
+</div>
+
+
+                            <div id="build_run_snip_widget.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#build_run_snip_widget.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">build_run_snip_widget</span><span class="signature">(defaulttxt)</span>
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaulttxt</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Textarea</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">GridBox</span>
+        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">richLabel</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span> <span class="o">=</span> <span class="n">Textarea</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;98%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;200px&#39;</span><span class="p">),</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">defaulttxt</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run Code&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="o">=</span> <span class="n">richLabel</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;div style=&quot;line-height:1;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style=&quot;color:red;&quot;&gt;If you &#39;</span> \
+                                      <span class="s1">&#39;are running in Jupyter Lab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;the results of running &#39;</span> \
+                                      <span class="s1">&#39;the code will be output to the &#39;</span> \
+                                      <span class="s1">&#39;log console instead of the output of &#39;</span> \
+                                      <span class="s1">&#39;this cell. To show the results in &#39;</span> \
+                                      <span class="s1">&#39;the output of a code cell, copy the &#39;</span> \
+                                      <span class="s1">&#39;code at left into a code cell &#39;</span> \
+                                      <span class="s1">&#39;and run it.&lt;/p&gt;&#39;</span> \
+                                      <span class="s1">&#39;&lt;p&gt;&lt;span style = &quot;color:blue;&quot;&gt;&#39;</span> \
+                                      <span class="s1">&#39;If you are running in Colab&lt;/span&gt;, &#39;</span> \
+                                      <span class="s1">&#39;clicking on the &quot;Run Code&quot; button &#39;</span> \
+                                      <span class="s1">&#39;will replace this GUI with the &#39;</span> \
+                                      <span class="s1">&#39;results of running the code. Copying &#39;</span> \
+                                      <span class="s1">&#39;the code in the collapsed &quot;Code &#39;</span> \
+                                      <span class="s1">&#39;that was run&quot; summary to a code cell &#39;</span> \
+                                      <span class="s1">&#39;will prevent the code &#39;</span> \
+                                      <span class="s1">&#39;from being lost if outputs are &#39;</span> \
+                                      <span class="s1">&#39;cleared.&lt;/p&gt;&lt;/div&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">])</span>
+        <span class="k">def</span> <span class="nf">onRunCode</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
+            <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span>
+            <span class="n">clear_output</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
+                <span class="s1">&#39;&lt;details&gt;&lt;summary style=&quot;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-weight:bold;&quot;&gt;&lt;a&gt;&#39;</span> \
+                <span class="s1">&#39;Code that was run&lt;/a&gt;&lt;/span&gt;(click to toggle visibility)&lt;/summary&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;div style=&quot;background:#eff0f1;white-space:pre-line;white-space:pre-wrap;&quot;&gt;&#39;</span> \
+                <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&#39;</span><span class="p">))</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;h3&gt;Result&lt;h3&gt;&#39;</span><span class="p">))</span>
+            <span class="n">exec</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dobutton</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">onRunCode</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">build_run_snip_widget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">sniptext</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">dobox</span><span class="p">],</span>
+                                            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">grid_template_rows</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_columns</span><span class="o">=</span><span class="s1">&#39;75</span><span class="si">% 25%</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">grid_template_areas</span><span class="o">=</span><span class="s2">&quot;self.sniptext self.dobox&quot;</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Public constructor</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>ipywidgets.widgets.widget_box.Box</dt>
+                                <dd id="build_run_snip_widget.children" class="variable">children</dd>
+                <dd id="build_run_snip_widget.box_style" class="variable">box_style</dd>
+
+            </div>
+            <div><dt>ipywidgets.widgets.domwidget.DOMWidget</dt>
+                                <dd id="build_run_snip_widget.layout" class="variable">layout</dd>
+                <dd id="build_run_snip_widget.add_class" class="function">add_class</dd>
+                <dd id="build_run_snip_widget.remove_class" class="function">remove_class</dd>
+
+            </div>
+            <div><dt>ipywidgets.widgets.widget.Widget</dt>
+                                <dd id="build_run_snip_widget.widgets" class="variable">widgets</dd>
+                <dd id="build_run_snip_widget.widget_types" class="variable">widget_types</dd>
+                <dd id="build_run_snip_widget.close_all" class="function">close_all</dd>
+                <dd id="build_run_snip_widget.on_widget_constructed" class="function">on_widget_constructed</dd>
+                <dd id="build_run_snip_widget.handle_comm_opened" class="function">handle_comm_opened</dd>
+                <dd id="build_run_snip_widget.get_manager_state" class="function">get_manager_state</dd>
+                <dd id="build_run_snip_widget.get_view_spec" class="function">get_view_spec</dd>
+                <dd id="build_run_snip_widget.comm" class="variable">comm</dd>
+                <dd id="build_run_snip_widget.keys" class="variable">keys</dd>
+                <dd id="build_run_snip_widget.open" class="function">open</dd>
+                <dd id="build_run_snip_widget.model_id" class="variable">model_id</dd>
+                <dd id="build_run_snip_widget.close" class="function">close</dd>
+                <dd id="build_run_snip_widget.send_state" class="function">send_state</dd>
+                <dd id="build_run_snip_widget.get_state" class="function">get_state</dd>
+                <dd id="build_run_snip_widget.set_state" class="function">set_state</dd>
+                <dd id="build_run_snip_widget.send" class="function">send</dd>
+                <dd id="build_run_snip_widget.on_msg" class="function">on_msg</dd>
+                <dd id="build_run_snip_widget.on_displayed" class="function">on_displayed</dd>
+                <dd id="build_run_snip_widget.add_traits" class="function">add_traits</dd>
+                <dd id="build_run_snip_widget.notify_change" class="function">notify_change</dd>
+                <dd id="build_run_snip_widget.hold_sync" class="function">hold_sync</dd>
+
+            </div>
+            <div><dt>ipywidgets.widgets.widget.LoggingHasTraits</dt>
+                                <dd id="build_run_snip_widget.log" class="variable">log</dd>
+
+            </div>
+            <div><dt>traitlets.traitlets.HasTraits</dt>
+                                <dd id="build_run_snip_widget.setup_instance" class="function">setup_instance</dd>
+                <dd id="build_run_snip_widget.cross_validation_lock" class="variable">cross_validation_lock</dd>
+                <dd id="build_run_snip_widget.hold_trait_notifications" class="function">hold_trait_notifications</dd>
+                <dd id="build_run_snip_widget.on_trait_change" class="function">on_trait_change</dd>
+                <dd id="build_run_snip_widget.observe" class="function">observe</dd>
+                <dd id="build_run_snip_widget.unobserve" class="function">unobserve</dd>
+                <dd id="build_run_snip_widget.unobserve_all" class="function">unobserve_all</dd>
+                <dd id="build_run_snip_widget.set_trait" class="function">set_trait</dd>
+                <dd id="build_run_snip_widget.class_trait_names" class="function">class_trait_names</dd>
+                <dd id="build_run_snip_widget.class_traits" class="function">class_traits</dd>
+                <dd id="build_run_snip_widget.class_own_traits" class="function">class_own_traits</dd>
+                <dd id="build_run_snip_widget.has_trait" class="function">has_trait</dd>
+                <dd id="build_run_snip_widget.trait_has_value" class="function">trait_has_value</dd>
+                <dd id="build_run_snip_widget.trait_values" class="function">trait_values</dd>
+                <dd id="build_run_snip_widget.trait_defaults" class="function">trait_defaults</dd>
+                <dd id="build_run_snip_widget.trait_names" class="function">trait_names</dd>
+                <dd id="build_run_snip_widget.traits" class="function">traits</dd>
+                <dd id="build_run_snip_widget.trait_metadata" class="function">trait_metadata</dd>
+                <dd id="build_run_snip_widget.class_own_trait_events" class="function">class_own_trait_events</dd>
+                <dd id="build_run_snip_widget.trait_events" class="function">trait_events</dd>
+
+            </div>
+                                </dl>
                             </div>
                 </section>
     </main>
