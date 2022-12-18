@@ -1,8 +1,8 @@
 jupyter>=1.0.0
-pandas>=1.2.5
-numpy>=1.19.0
-plotly>=4.14.3
+pandas>=1.5.2
+numpy>=1.23.0
+plotly>=5.5.0
 ipywidgets>=7.6.2, <8.0
 JPSLUtils>=0.7.0
-lmfit>=1.0.3
-round-using-error>=1.1.1
+lmfit>=1.1.0
+round-using-error>=1.2.0

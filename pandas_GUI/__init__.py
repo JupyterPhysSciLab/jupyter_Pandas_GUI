@@ -1,8 +1,10 @@
-name = "pandas_GUI"
 """
-.. include:: ../docs/intro.md
+.. include:: ../README.md
+.. include:: ../Development Notes.md
 """
 __docformat__ = "numpy"
+
+name = "pandas_GUI"
 
 import os
 

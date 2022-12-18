@@ -1,4 +1,4 @@
-## Pandas_GUI (aka: jupyter_Pandas_GUI)
+# Pandas_GUI (aka: jupyter_Pandas_GUI)
 
 [Introduction](#introduction) | [Current Features](#current-features) | 
 [Wishlist](#wishlist) | [Usage](#usage) | [Installation](#installation) | 
@@ -9,7 +9,7 @@
 **[Documentation / Website
 ](https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/)**
 
-#### Introduction:
+## Introduction:
 
 This package provides GUI tools to help the user construct Pandas and Python 
 expressions 
@@ -24,7 +24,7 @@ They are intended for new or occasional users of Pandas. However,
 sophisticated users may find them useful for doing simple one-off tasks where 
 the ability to choose python objects from menus can reduce errors.
 
-#### Current Features:
+## Current Features:
 
 The user can pass the GUI tools a list of Pandas 
 DataFrames to work with. If nothing is passed, the GUI will look for 
@@ -57,11 +57,11 @@ understand the code.
 
   <img src = "https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets/GUI_fitexp_1.png" style="width:90%;"/>
 
-#### Wishlist:
+## Wishlist:
 
   * GUIs for plots beyond scatter/line plots.
   
-#### Usage:
+## Usage:
 If the `jupyter_Pandas_GUI` is installed in your Jupyter/Python environment 
 start by importing it:
 ```
@@ -87,15 +87,16 @@ for the dataframes. There is also an option to make columns containing text
 available. By default they are ignored.
 
 
-#### Installation:
+## Installation:
 
 Installation using pip into a virtual environment is recommended.
 
 *Production*
 
-1. If not installed, install pipenv:`$ pip3 install --user pipenv`. You may
-need to add `~/.local/bin` to your `PATH` to make `pipenv`
-available in your command shell. More discussion: 
+1. If not installed, install pipenv:`$ pip3 install --user pipenv`, or your 
+   favorite environment management system. You may
+   need to add `~/.local/bin` to your `PATH` to make `pipenv`
+   available in your command shell. More discussion: 
 [The Hitchhiker's Guide to Python](https://docs.python-guide.org/dev/virtualenvs/).
 1. Navigate to the directory where this package will be installed.
 1. Start a shell in the environment `$ pipenv shell`.
@@ -104,9 +105,9 @@ available in your command shell. More discussion:
        Jupyter into the same virtual
     environment if you do not already have it on your machine. If Jupyter is already
     installed the virtual environment will use the existing installation. This takes
-    a long time on a Raspberry Pi. It will not run on a 3B+ without at least 1 GB of
-    swap. See: [Build Jupyter on a Pi
-   ](https://www.uwosh.edu/facstaff/gutow/computer-and-programming-how-tos/installing-jupyter-on-raspberrian).
+    a long time on a Raspberry Pi 3B+ or older. It will not run on a 3B+ 
+       without at least 1 GB of swap. See: [Build Jupyter on a Pi
+   ](https://cms.gutow.uwosh.edu/Gutow/useful-chemistry-links/software-tools-and-coding/computer-and-coding-how-tos/installing-jupyter-on-raspberrian).
     2. Still within the environment shell test this by starting jupyter
 `jupyter notebook` or `Jupyter lab`. The version of Jupyter requested should 
        launch in your browser.
@@ -134,7 +135,10 @@ Simply replace `$ pip install jupyter-Pandas-GUI` with `$ pip
 install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
-#### Change Log
+## Change Log
+* 0.7.1 (2022-12-18)
+  * Documentation fixes and link updates for mybinder.org launches.
+  * Updates to requirements.
 * 0.7.0
   * GUIs now also work in Jupyter Lab and Google Colab, although less 
     elegently than in classic Jupyter. Only the fit range selection tab 
@@ -164,11 +168,11 @@ instructions.
   * Readme updates.
 * 0.5.0 Initial beta release.
 
-#### Issues or comments
+## Issues or comments
 
 [JupyterPhysSciLab/jupyter_Pandas_GUI/issues](https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI/issues)
 
-##### [This software is distributed under the GNU V3 license](https://gnu.org/licenses)
+## [This software is distributed under the GNU V3 license](https://gnu.org/licenses)
 This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
