@@ -307,7 +307,14 @@ class notice_group():
 
 class build_run_snip_widget(ipywidgets.GridBox):
 
-    def __init__(self, defaulttxt):
+    def __init__(self, defaulttxt, output_elem):
+        """
+        Defines a widget that runs code built in it and replaces itself with
+        the results.
+        :param defaulttxt: Initial text in the codebox
+        :param output_elem: Where this element will be located (an ipywidget
+        `Output()` element). Must be created before creating this object.
+        """
         from ipywidgets import Textarea, Layout, Button, VBox, GridBox
         from ipywidgets import HTML as richLabel
         from IPython.display import display, HTML, clear_output
@@ -341,14 +348,15 @@ class build_run_snip_widget(ipywidgets.GridBox):
         def onRunCode(change):
             from IPython import get_ipython
             shell = get_ipython()
-            clear_output()
-            display(HTML(
+            output_elem.clear_output()
+            with output_elem:
+                display(HTML(
                 '<details><summary style="cursor:pointer;"><span style="font-weight:bold;"><a>' \
                 'Code that was run</a></span>(click to toggle visibility)</summary>' \
                 '<div style="background:#eff0f1;white-space:pre-line;white-space:pre-wrap;">' \
                 '<pre>' + self.sniptext.value + '</pre></div></details>'))
-            display(HTML('<h3>Result<h3>'))
-            exec(str(self.sniptext.value), shell.user_ns)
+                display(HTML('<h3>Result<h3>'))
+                exec(str(self.sniptext.value), shell.user_ns)
             pass
 
         self.dobutton.on_click(onRunCode)

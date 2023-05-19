@@ -53,7 +53,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
-        RadioButtons, BoundedIntText
+        RadioButtons, BoundedIntText, Output
     from ipywidgets import HTML as richLabel
     from ipywidgets import HTMLMath as texLabel
     from IPython.display import display, HTML
@@ -293,16 +293,18 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     range_chosen = False
     #### Define GUI Elements ####
     # Those followed by a * are required.
-    display(HTML(
-        "<h3 id ='pandasfitGUI' style='text-align:center;'>Pandas Fit "
-        "Composer</h3> <div style='text-align:center;'>"
-        "<span style='color:green;'>Steps with a * are required.</span> The "
-        "code that will generate the fit is being "
-        "built in the cell immediately below.</div><div "
-        "style='text-align:center;'>This composer uses a subset of "
-        "<a href ='https://lmfit.github.io/lmfit-py/'> the lmfit package</a>"
-        " and <a href ='https://plotly.com/python/line-and-scatter/#'> "
-        "the plotly scatter plot</a> capabilities.</div>"))
+    output = Output()
+    with output:
+        display(HTML(
+            "<h3 id ='pandasfitGUI' style='text-align:center;'>Pandas Fit "
+            "Composer</h3> <div style='text-align:center;'>"
+            "<span style='color:green;'>Steps with a * are required.</span> The "
+            "code that will generate the fit is being "
+            "built in the cell immediately below.</div><div "
+            "style='text-align:center;'>This composer uses a subset of "
+            "<a href ='https://lmfit.github.io/lmfit-py/'> the lmfit package</a>"
+            " and <a href ='https://plotly.com/python/line-and-scatter/#'> "
+            "the plotly scatter plot</a> capabilities.</div>"))
 
     longdesc = {'description_width':'initial'}
 
@@ -560,7 +562,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     def make_param_set():
         '''
-        Creates at VBox with 7 parameters each having fields in an HBox:
+        Creates a VBox with 7 parameters each having fields in an HBox:
         1. fixcheck (checkbox for fixing the value)
         2. valuefield (floatText for setting the value)
         3. minfield (floatText for setting the minimum allowed value)
@@ -1023,11 +1025,14 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
-    display(steps)
+    with output:
+        display(steps)
     if JPSLUtils.notebookenv == 'NBClassic':
         select_containing_cell('pandasfitGUI')
         new_cell_immediately_below()
     else:
-        codearea = build_run_snip_widget('')
-        display(codearea)
+        codearea = build_run_snip_widget('', output)
+        with output:
+            display(codearea)
+    display(output)
     pass
