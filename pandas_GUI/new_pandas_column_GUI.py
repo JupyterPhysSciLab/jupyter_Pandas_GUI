@@ -28,7 +28,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
 
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
-        Dropdown, Label, Text, Textarea, Button, Checkbox
+        Dropdown, Label, Text, Textarea, Button, Checkbox, Output
     from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
     from IPython import get_ipython
@@ -268,19 +268,23 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     steps.set_title(1, 'Step 2')
     steps.set_title(2, 'Step 3')
     steps.set_title(3, 'Step 4')
+    
+    output = Output()
+    codearea = build_run_snip_widget(importstr, output)
 
-    codearea = build_run_snip_widget(importstr)
-
-    display(HTML(
+    with output:
+        display(HTML(
         "<h3 id ='newcolGUI' style='text-align:center;'>Pandas New Calculated "
         "Column "
         "Composer</h3>"))
-    display(steps)
+        display(steps)
     if JPSLUtils.notebookenv == 'NBClassic':
         select_containing_cell('newcolGUI')
         new_cell_immediately_below()
         select_containing_cell('newcolGUI')
         replace_text_of_next_cell(importstr)
     else:
-        display(codearea)
+        with output:
+            display(codearea)
+    display(output)
     pass

@@ -30,7 +30,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     from ipywidgets import Layout, Box, HBox, VBox, GridBox, Tab, \
         Accordion, Dropdown, Label, Text, Button, Checkbox, FloatText, \
-        RadioButtons, BoundedIntText
+        RadioButtons, BoundedIntText, Output
     from ipywidgets import HTML as richLabel
     from IPython.display import display, HTML
     from IPython.display import Javascript as JS
@@ -68,7 +68,9 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     #### Define GUI Elements ####
     # Those followed by a * are required.
-    display(HTML(
+    output = Output()
+    with output:
+        display(HTML(
         "<h3 id ='pandasplotGUI' style='text-align:center;'>Pandas Plot "
         "Composer</h3> <div style='text-align:center;'>"
         "<span style='color:green;'>Steps with a * are required.</span> The "
@@ -625,12 +627,16 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         pass
 
     steps.observe(tab_changed, names = 'selected_index')
-    display(steps)
+    with output:
+        display(steps)
     if JPSLUtils.notebookenv == 'NBClassic':
         select_containing_cell('pandasplotGUI')
         new_cell_immediately_below()
         insert_text_into_next_cell(importstr+step1str+step2str+step3str)
     else:
-        codearea = build_run_snip_widget(importstr+step1str+step2str+step3str)
-        display(codearea)
+        codearea = build_run_snip_widget(
+            importstr+step1str+step2str+step3str, output)
+        with output:
+            display(codearea)
+    display(output)
     pass
