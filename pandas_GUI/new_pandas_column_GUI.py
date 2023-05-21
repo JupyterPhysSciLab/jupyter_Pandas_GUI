@@ -1,5 +1,3 @@
-import JPSLUtils
-
 def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     """
     If passed no parameters this will look for all the dataframes in the user
@@ -37,11 +35,11 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         insert_text_into_next_cell, insert_text_at_beginning_of_current_cell, \
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell, replace_text_of_next_cell
-    from JPSLUtils import notebookenv
 
     from .utils import find_pandas_dataframe_names, build_run_snip_widget
     from IPython import get_ipython
     global_dict = get_ipython().user_ns
+    JPSLUtils = global_dict["JPSLUtils"]
     dfs_info = []
     if isinstance(df_info,list):
         for k in df_info:
@@ -279,6 +277,7 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
         "Composer</h3>"))
         display(steps)
     if JPSLUtils.notebookenv == 'NBClassic':
+        display(output)
         select_containing_cell('newcolGUI')
         new_cell_immediately_below()
         select_containing_cell('newcolGUI')
@@ -286,5 +285,5 @@ def new_pandas_column_GUI(df_info=None, show_text_col = False, **kwargs):
     else:
         with output:
             display(codearea)
-    display(output)
+        display(output)
     pass

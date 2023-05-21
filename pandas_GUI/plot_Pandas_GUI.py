@@ -41,11 +41,11 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         insert_newline_at_end_of_current_cell, select_containing_cell, \
         delete_selected_cell, iconselector, notice_group, notebookenv, \
         replace_text_of_next_cell
-    import JPSLUtils
 
     from .utils import find_pandas_dataframe_names, build_run_snip_widget
     from IPython import get_ipython
     global_dict = get_ipython().user_ns
+    JPSLUtils = global_dict["JPSLUtils"]
     dfs_info = []
     if isinstance(df_info,list):
         for k in df_info:
@@ -630,6 +630,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     with output:
         display(steps)
     if JPSLUtils.notebookenv == 'NBClassic':
+        display(output)
         select_containing_cell('pandasplotGUI')
         new_cell_immediately_below()
         insert_text_into_next_cell(importstr+step1str+step2str+step3str)
@@ -638,5 +639,5 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             importstr+step1str+step2str+step3str, output)
         with output:
             display(codearea)
-    display(output)
+        display(output)
     pass
