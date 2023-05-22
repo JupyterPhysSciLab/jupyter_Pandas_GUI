@@ -328,8 +328,8 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       '<p>If you are running in ' \
                                       '<span style="color:red;">Jupyter ' \
                                       'Lab</span>, ' \
-                                      'or <span style = "color:blue;">' \
-                                      'in Colab</span>, ' \
+                                      'or in <span style = "color:blue;">' \
+                                      'Colab</span>, ' \
                                       'clicking on the "Run Code" button ' \
                                       'will replace this GUI with the ' \
                                       'results of running the code. Copying ' \
@@ -337,13 +337,14 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       'that was run" summary to a code cell ' \
                                       'will prevent the code ' \
                                       'from being lost if outputs are ' \
-                                      'cleared.</p><p>POWER USER HINT: ' \
+                                      'cleared.</p><br/>' \
+                                      '<p>POWER USER HINT: ' \
                                       'You can repeatedly try different ' \
                                       'settings by copying the completed ' \
                                       'code from the text box at left into ' \
                                       'a code cell. Then run it. Then use ' \
                                       'the GUI tools to update the code at ' \
-                                      'left and then try again.' \
+                                      'left and try again.' \
                                       '</p></div>')
         self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):
