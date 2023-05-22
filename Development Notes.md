@@ -1,7 +1,7 @@
 # Development Notes
 
 [General](#general-notes) | [Make Docs](#constructing-the-documentation) | 
-[Build PyPi Package](#building-pypi-package)|
+[Build PyPi Package](#building-pypi-package) |
 ## General Notes
 1. Thoughts on GUI for loading data. Could use ipyfilechooser to select 
    local files. A dropdown for html vs csv to filter and select the reader. 
@@ -19,7 +19,7 @@
      (full url) paths before pushing to the main repository. The root is 
      `https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets` for 
      images.
-   * DONOT change absolute (full url) paths.
+   * DO NOT change absolute (full url) paths.
 3. Make edits to the file `Pandas_GUI_Doc_Home.html`.
 4. At the root level run pdoc `pdoc --logo Pandas_GUI_Icon.svg --logo-link 
 https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/ --footer-text 

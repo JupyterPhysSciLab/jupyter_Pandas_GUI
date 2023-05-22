@@ -136,6 +136,9 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.8.0dev (2023-5-)
+  * In Jupyter Lab results of running code now replace the GUI rather than 
+    appearing in the Console.
 * 0.7.1 (2022-12-18)
   * Documentation fixes and link updates for mybinder.org launches.
   * Updates to requirements.
