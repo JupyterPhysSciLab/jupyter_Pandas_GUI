@@ -325,17 +325,11 @@ class build_run_snip_widget(ipywidgets.GridBox):
         self.value = self.sniptext.value
         self.dobutton = Button(description='Run Code')
         self.instructions = richLabel(value = '<div style="line-height:1;">' \
-                                      '<p><span style="color:red;">If you ' \
-                                      'are running in Jupyter Lab</span>, ' \
-                                      'the results of running ' \
-                                      'the code will be output to the ' \
-                                      'log console instead of the output of ' \
-                                      'this cell. To show the results in ' \
-                                      'the output of a code cell, copy the ' \
-                                      'code at left into a code cell ' \
-                                      'and run it.</p>' \
-                                      '<p><span style = "color:blue;">' \
-                                      'If you are running in Colab</span>, ' \
+                                      '<p>If you are running in ' \
+                                      '<span style="color:red;">Jupyter ' \
+                                      'Lab</span>, ' \
+                                      'or <span style = "color:blue;">' \
+                                      'in Colab</span>, ' \
                                       'clicking on the "Run Code" button ' \
                                       'will replace this GUI with the ' \
                                       'results of running the code. Copying ' \
@@ -343,7 +337,14 @@ class build_run_snip_widget(ipywidgets.GridBox):
                                       'that was run" summary to a code cell ' \
                                       'will prevent the code ' \
                                       'from being lost if outputs are ' \
-                                      'cleared.</p></div>')
+                                      'cleared.</p><p>POWER USER HINT: ' \
+                                      'You can repeatedly try different ' \
+                                      'settings by copying the completed ' \
+                                      'code from the text box at left into ' \
+                                      'a code cell. Then run it. Then use ' \
+                                      'the GUI tools to update the code at ' \
+                                      'left and then try again.' \
+                                      '</p></div>')
         self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):
             from IPython import get_ipython
