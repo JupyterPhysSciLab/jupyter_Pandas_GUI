@@ -356,7 +356,8 @@ class build_run_snip_widget(ipywidgets.GridBox):
                 '<details><summary style="cursor:pointer;"><span style="font-weight:bold;"><a>' \
                 'Code that was run</a></span>(click to toggle visibility)</summary>' \
                 '<div style="background:#eff0f1;white-space:pre-line;white-space:pre-wrap;">' \
-                '<pre>' + self.sniptext.value + '</pre></div></details>'))
+                '<code><xmp>' + self.sniptext.value
+                +'</xmp></code></div></details>'))
                 display(HTML('<h3>Result<h3>'))
                 exec(str(self.sniptext.value), shell.user_ns)
             pass

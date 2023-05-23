@@ -127,7 +127,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     def polymodelresultstr(resultname):
         template = '' \
-          'fitstr = \'$fit = \'\n' \
+          'fitstr = r\'$fit = \'\n' \
           'termcount = 0\n' \
           'for k in %result.params.keys():\n' \
           '    pwr = int(str(k)[-1:])\n' \
@@ -155,9 +155,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '            if pwr > 1:\n' \
           '                fitstr += \'x^\'+str(pwr)\n' \
           'fitstr+=\'$\'\n' \
-          'captionstr=\'<p>Use the command <code>%result</code> as the ' \
+          'captionstr=r\'<p>Use the command <code>%result</code> as the ' \
           'last line of a code cell for more details.</p>\'\n' \
-          'display(HTML(fitstr+captionstr))'
+          'display(Math(fitstr))\n' \
+          'display(HTML(captionstr))'
         return template.replace('%result', str(resultname))
 
     def linmodelresultstr(resultname):
@@ -179,10 +180,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        '        slopestr = paramstr\n' \
        '    if k == \'intercept\' and %results.params[k].value != 0:\n' \
        '        interceptstr = \' + \' + paramstr\n' \
-       'fitstr = \'$fit = \'+slopestr + \'x\' + interceptstr + \'$\'\n' \
-       'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+       'fitstr = r\'$fit = \'+slopestr + \'x\' + interceptstr + \'$\'\n' \
+       'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
        'last line of a code cell for more details.</p>\'\n' \
-       'display(HTML(fitstr+captionstr))'
+       'display(Math(fitstr))\n' \
+       'display(HTML(captionstr))'
         return template.replace('%results', resultname)
 
     def expmodelresultstr(resultname):
@@ -205,9 +207,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         '        decaystr = paramstr\n' \
         'fitstr = r\'$$fit = \'+ampstr+r\'%EXP %LEFT( %FRAC{-x}' \
                         '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
-        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+        'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\n' \
-        'display(HTML(fitstr+captionstr))'
+        'display(Math(fitstr))\n' \
+        'display(HTML(captionstr))'
         return template.replace('%results',resultname)
 
     def gausmodelresultstr(resultname):
@@ -236,9 +239,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                    '\'+sigmastr+r\'%SQRT{2%PI}}%EXP %LEFT( %FRAC{' \
                    '-%LEFT[x-\'+centstr+r\'%RIGHT]^2}' \
                    '{2\'+sigmastr+r\'^2}%RIGHT)$$\'\n' \
-        'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+        'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\n' \
-        'display(HTML(fitstr+captionstr))'
+        'display(Math(fitstr))\n' \
+        'display(HTML(captionstr))'
         return template.replace('%results',resultname)
 
     def sinmodelresultstr(resultname):
@@ -261,10 +265,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        '        freqstr = paramstr\n' \
        '    if k == \'shift\' and %results.params[k].value != 0:\n' \
        '        shiftstr = \' + \' + paramstr\n' \
-       'fitstr = \'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
-       'captionstr = \'<p>Use the command <code>%results</code> as the ' \
+       'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
+       'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
        'last line of a code cell for more details.</p>\'\n' \
-       'display(HTML(fitstr+captionstr))'
+       'display(Math(fitstr))\n' \
+       'display(HTML(captionstr))'
         return template.replace('%results', resultname)
 
     fitresultstrs = {
@@ -283,7 +288,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 'import round_using_error as rue\n' \
                 'import copy as copy\n' \
                 'from plotly import graph_objects as go\n' \
-                'from IPython.display import HTML\n\n'
+                'from IPython.display import HTML, Math\n\n'
     step1str = ''
     step2str = ''
     step3str = ''
