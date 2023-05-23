@@ -318,35 +318,39 @@ class build_run_snip_widget(ipywidgets.GridBox):
         from ipywidgets import Textarea, Layout, Button, VBox, GridBox
         from ipywidgets import HTML as richLabel
         from IPython.display import display, HTML, clear_output
+        from IPython import get_ipython
+        self.run_env = (get_ipython().user_ns["JPSLUtils"]).notebookenv
         self.sniptext = Textarea(
             layout=Layout(width='98%', height='200px'),
             value=defaulttxt
         )
         self.value = self.sniptext.value
         self.dobutton = Button(description='Run Code')
-        self.instructions = richLabel(value = '<div style="line-height:1;">' \
-                                      '<p>If you are running in ' \
-                                      '<span style="color:red;">Jupyter ' \
-                                      'Lab</span>, ' \
-                                      'or in <span style = "color:blue;">' \
-                                      'Colab</span>, ' \
-                                      'clicking on the "Run Code" button ' \
-                                      'will replace this GUI with the ' \
-                                      'results of running the code. Copying ' \
-                                      'the code in the collapsed "Code ' \
-                                      'that was run" summary to a code cell ' \
-                                      'will prevent the code ' \
-                                      'from being lost if outputs are ' \
-                                      'cleared.</p><br/>' \
-                                      '<p>POWER USER HINT: ' \
-                                      'You can repeatedly try different ' \
-                                      'settings by copying the completed ' \
-                                      'code from the text box at left into ' \
-                                      'a code cell. Then run it. Then use ' \
-                                      'the GUI tools to update the code at ' \
-                                      'left and try again.' \
-                                      '</p></div>')
-        self.dobox = VBox([self.dobutton,self.instructions])
+        instr_str = '<div style="line-height:1;">'
+        if self.run_env == 'colab':
+            instr_str += \
+            '<p>You appear to be running in Google Colabratory. When done ' \
+            'working through all the steps, copy the code at left into a ' \
+            'new code cell to run it. In Jupyter lab and classic Jupyter ' \
+            'notebooks this can be done automatically for you.</p>'
+        else:
+            instr_str += \
+            '<p>You appear to be running in Jupyter lab. When done ' \
+            'working through all the steps, clicking on the "Run Code" ' \
+            'button will replace the GUI with the results of running the ' \
+            'code. Copying the code in the collapsed "Code that was run" ' \
+            'summary into a code cell will prevent the code from being ' \
+            'lost if outputs are cleared.</p>'
+        instr_str += '<br/><p>POWER USER HINT: You can repeatedly try ' \
+                     'different settings by copying the completed code from ' \
+                     'the text box at left into a code cell. Then run it. ' \
+                     'Then use the GUI tools to update the code at left and ' \
+                     'try again.</p></div>'
+        self.instructions = richLabel(value = instr_str)
+        if self.run_env == 'colab':
+            self.dobox = VBox([self.instructions])
+        else:
+            self.dobox = VBox([self.dobutton,self.instructions])
         def onRunCode(change):
             from IPython import get_ipython
             shell = get_ipython()
