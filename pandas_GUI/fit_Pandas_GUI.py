@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 
 def calcresid(result):
@@ -523,28 +525,20 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         currmodel_param = []
         labeltext = ''
         fix = False
-        value = np.nan
-        min = -np.inf
-        max = np.inf
+        value = 0
+        min = -sys.float_info.max
+        max = sys.float_info.max
         expr = None  # Not used, maybe for arbitrary functions.
         for i in range(0,8):
             fix = False
-            if modelname == 'PolynomialModel':
-                # PolynomialModel requires that the initial value be a number
-                value = 0
-            else:
-                value = np.nan
-            min = -np.inf
-            max = np.inf
-            expr = None  # Not used, maybe for arbitrary functions.
             if i < len(currmodel.param_names):
                 labeltext = str(currmodel.param_names[i])
                 hints = currmodel.param_hints.get(labeltext,None)
                 if isinstance(hints,dict):
                     fix = not(hints.get('vary',True))
-                    value = hints.get('value',np.nan)
-                    min = hints.get('min',-np.inf)
-                    max = hints.get('max',np.inf)
+                    value = hints.get('value', 0)
+                    min = hints.get('min', -sys.float_info.max)
+                    max = hints.get('max', sys.float_info.max)
                     expr = hints.get('expr',None)
                 params_set.children[i].layout.display=''
                 if modelname == 'ExponentialModel':
@@ -575,21 +569,22 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         By default the all VBox components have their `layout.display=none`.
         :return: VBox
         '''
+        import sys
         currmodel_param=[]
         for i in range (0,8):
             fixcheck = Checkbox(value=False,
                                 description='Fix (hold)',
                                 disabled=False,
                                 style=longdesc)
-            valuefield = FloatText(value=np.nan,
+            valuefield = FloatText(value=0,
                                    description='Value: ',
                                    disabled=False,
                                    style=longdesc)
-            minfield = FloatText(value=-np.inf,
+            minfield = FloatText(value=-sys.float_info.max,
                                  description='Min: ',
                                  disabled=False,
                                  style=longdesc)
-            maxfield = FloatText(value=np.inf,
+            maxfield = FloatText(value=sys.float_info.max,
                                  description='Max: ',
                                  disabled=False,
                                  style=longdesc)
@@ -809,7 +804,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             pass
         if change['old']== 2:
             # update step 3 string
-            step3str = '# Define the fit model, initial guesses, and contraints\n'
+            step3str = '# Define the fit model, initial guesses, ' \
+                       'and constraints\n'
             step3str += 'fitmod = lmfit.models.'+str(modeldrop.value)+'()\n'
             currmodel = getattr(models, str(modeldrop.value))()
             for k in params_set.children:
@@ -821,8 +817,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     temp_val = k.children[1].children[1].value
                     def tst_temp_val(temp_val):
                         if (temp_val != np.nan) and (temp_val != np.inf) and\
-                                (temp_val != -np.inf) and (str(temp_val) != \
-                                'nan'):
+                                (temp_val != -np.inf) and (temp_val != \
+                                -sys.float_info.max) and (temp_val != \
+                                sys.float_info.max):
                             return True
                         else:
                             return False
@@ -910,9 +907,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'displayed.\n'
                         step5str += 'for i in range(len(resid)):\n'
                         step5str += '    if np.isnan(Xfitdata[i]):\n'
-                        step5str += '        resid[i] = np.nan\n'
+                        step5str += '        resid[i] = None\n'
                         step5str += '        '+str(fitname)+'.best_fit[i] = ' \
-                                                   'np.nan\n\n'
+                                                   'None\n\n'
                 else:
                     xstr = 'Xvals'
                 errbarstr = ''
