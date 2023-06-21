@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 13.1.1"/>
+    <meta name="generator" content="pdoc 14.0.0"/>
     <title>pandas_GUI API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -54,10 +54,16 @@
 
             <h2>API Documentation</h2>
                 <ul class="memberlist">
+            <li>
+                    <a class="variable" href="#name">name</a>
+            </li>
+            <li>
+                    <a class="variable" href="#mydir">mydir</a>
+            </li>
     </ul>
 
 
-            <footer>jupyter_Pandas_GUI v0.8.0.dev</footer>
+            <footer>jupyter_Pandas_GUI v0.8.0</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
             built with <span class="visually-hidden">pdoc</span><img
@@ -105,7 +111,7 @@ Pandas DataFrames in the interactive session. In classic Jupyter the whole GUI
 and the Jupyter cell that created it are deleted when done. This leaves 
 only the code that was generated by the GUI and the results of running the
 generated code. In Colab and Lab the code is generated in an editable text 
-box. In Colab it can be run by clicking a button. In Lab it is best to copy 
+box. In Lab it can be run by clicking a button. In Colab it is best to copy 
 the code into a new cell before running it.</p>
 
 <p>The generated code contains comments meant to help new users 
@@ -228,10 +234,19 @@ instructions.</p>
 <h2 id="change-log">Change Log</h2>
 
 <ul>
-<li>0.8.0dev (2023-5-)
+<li>0.8.0 (2023-6-21)
 <ul>
 <li>In Jupyter Lab results of running code now replace the GUI rather than 
 appearing in the Console.</li>
+<li>Colab behavior has been inconsistent. To avoid problems for the time being 
+the user is required to copy the code from the textbox it is created in 
+and paste it into an empty code cell to run it.</li>
+<li>BUG FIX: collapsed "code that was run" box in Lab now keeps raw html 
+codes, so when copied and pasted output formatting is maintained.</li>
+<li>Changes to avoid warnings caused by JSON having no representation for 
+floating point infinity and not-a-number.</li>
+<li>Requirements updates to reflect changes in the Jupyter ecosystem.</li>
+<li>Documentation updates to reflect changes.</li>
 </ul></li>
 <li>0.7.1 (2022-12-18)
 <ul>
@@ -281,6 +296,17 @@ user global namespace.</li>
 <h2 id="issues-or-comments">Issues or comments</h2>
 
 <p><a href="https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI/issues">JupyterPhysSciLab/jupyter_Pandas_GUI/issues</a></p>
+
+<h3 id="known-issues">Known issues</h3>
+
+<ul>
+<li>In Google Colabratory images in point styles buttons do not show up. This 
+is a related to a known <a href="https://github.com/googlecolab/colabtools/issues/1302">issue with
+Colab</a>. Fix will 
+depend on updates to Colab.</li>
+<li>In Google Colabratory typset rendering of Latex in widgets is hit or miss.
+It works most of the time in regular outputs and for plots. </li>
+</ul>
 
 <h2 id="this-software-is-distributed-under-the-gnu-v3-licensehttpsgnuorglicenses"><a href="https://gnu.org/licenses">This software is distributed under the GNU V3 license</a></h2>
 
@@ -414,6 +440,29 @@ it does not work, pull the release.</li>
 
 
             </section>
+                <section id="name">
+                    <div class="attr variable">
+            <span class="name">name</span>        =
+<span class="default_value">&#39;pandas_GUI&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#name"></a>
+    
+    
+
+                </section>
+                <section id="mydir">
+                    <div class="attr variable">
+            <span class="name">mydir</span>
+
+        
+    </div>
+    <a class="headerlink" href="#mydir"></a>
+    
+    
+
+                </section>
     </main>
 <script>
     function escapeHTML(html) {
