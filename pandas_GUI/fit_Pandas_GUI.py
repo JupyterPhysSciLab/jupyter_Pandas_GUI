@@ -284,6 +284,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
                 'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
+                '# Integers wrapped in `int()` to avoid having them cast \n' \
+                '# as other types by interactive preparsers. \n' \
                 '# Imports (no effect if already imported)\n' \
                 'import numpy as np\n' \
                 'import lmfit as lmfit\n' \
@@ -307,7 +309,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             "Composer</h3> <div style='text-align:center;'>"
             "<span style='color:green;'>Steps with a * are required.</span> The "
             "code that will generate the fit is being "
-            "built in the cell immediately below.</div><div "
+            "built in the textbox or cell immediately below.</div><div "
             "style='text-align:center;'>This composer uses a subset of "
             "<a href ='https://lmfit.github.io/lmfit-py/'> the lmfit package</a>"
             " and <a href ='https://plotly.com/python/line-and-scatter/#'> "
@@ -789,10 +791,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step2str = '# Define error (uncertainty)\n'
             if yerrtype.value == 'none':
                 step2str += 'Yerr = ' + dfname + '[\"'
-                step2str += str(Ycoord.value) + '\"]*0 + 1\n\n'
+                step2str += str(Ycoord.value) + '\"]*0.0 + 1.0\n\n'
             if yerrtype.value=='constant':
                 step2str += 'Yerr = ' + dfname +'[\"'
-                step2str += str(Ycoord.value)+'\"]*0 + ' + str(
+                step2str += str(Ycoord.value)+'\"]*0.0 + ' + str(
                     yerrvalue.value) + '\n\n'
             if yerrtype.value == 'percent':
                 step2str += 'Yerr = np.fabs('+ dfname +'[\"'
@@ -930,7 +932,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     plot_template.value)+'\")\n'
                 step5str += str(figname)+ '.update_layout(title = \"'+ \
                                     str(plot_title.value)+'\")\n'
-                step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
+                step5str += str(figname) + '.set_subplots(rows=int(2), cols=int(1), ' \
                                            'row_heights=[0.2,0.8], ' \
                                            'shared_xaxes=True)\n'
                 step5str += 'scat = go.Scatter(y=resid,x='+xresidstr+', ' \
@@ -938,35 +940,35 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'name = \"residuals\"'+errbarstr+')\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
                                         '\"Residuals\", ' \
-                            'row=1, col=1, zeroline=True, zerolinecolor = ' \
+                            'row=int(1), col=int(1), zeroline=True, zerolinecolor = ' \
                             '\"lightgrey\"'+str(mirrorstr)+')\n'
                 if mirror_axes.value:
                     step5str += str(figname) + '.update_xaxes(' \
-                                           'row=1, col=1'+str(mirrorstr)+')\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=1)\n'
+                                           'row=int(1), col=int(1)'+str(mirrorstr)+')\n'
+                step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(1))\n'
                 step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
                             'mode=\"markers\", name=tracename'+errbarstr+')\n'
-                step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                           'row = 2)\n'
+                step5str += str(figname) + '.add_trace(scat, col=int(1), ' \
+                                           'row=int(2))\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
                                            '\"'+Y_label.value+'\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\n'
+                                           'row=int(2), col=int(1)'+str(mirrorstr)+')\n'
                 step5str += str(figname) + '.update_xaxes(title = ' \
                                            '\"'+X_label.value+'\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\n'
+                                           'row=int(2), col=int(1)'+str(mirrorstr)+')\n'
                 if extend_fit.value:
                     step5str += 'scat = go.Scatter(y='+str(
                         fitname)+'.best_fit, x=Xvals, mode=\"lines\", '\
                                 'line_color = \"black\", ' \
                                 'name=\"extrapolated\",' \
                                  'line_dash=\"dash\")\n'
-                    step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                               'row=2)\n'
+                    step5str += str(figname) + '.add_trace(scat, col=int(1), ' \
+                                               'row=int(2))\n'
                 step5str += 'scat = go.Scatter(y='+str(fitname)+'.best_fit,' \
                                     'x='+xstr+', mode=\"lines\", ' \
                                     'name=\"fit\", line_color = ' \
                                     '\"black\", line_dash=\"solid\")\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=2)\n'
+                step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(2))\n'
                 step5str += str(figname) + '.show()\n\n'
                 pass
         if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
