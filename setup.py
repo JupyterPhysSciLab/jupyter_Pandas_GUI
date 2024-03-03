@@ -20,7 +20,7 @@ setuptools.setup(
     install_requires=[
         # 'python>=3.6',
         'jupyter>=1.0.0',
-        'jupyterlab>=3.6,<4.0',
+        'jupyterlab>=3.6',
         'pandas>=1.5.2',
         'numpy>=1.23.0',
         'plotly>=5.5.0',

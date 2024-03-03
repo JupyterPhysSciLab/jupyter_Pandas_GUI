@@ -136,6 +136,10 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.8.1.dev
+  * Made more robust to running with packages that can use the IPython 
+    preparser to cast Python integers to specialized types (e.g. Sympy & 
+    Algebra_with_Sympy).
 * 0.8.0 (2023-6-21)
   * In Jupyter Lab results of running code now replace the GUI rather than 
     appearing in the Console.

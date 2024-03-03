@@ -138,8 +138,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '            fitstr += \' + \'\n' \
           '        fitstr += \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\n' \
-          '                               %result.params[k].stderr, ' \
-                                         'errdig=1, lowmag=-3)+\'})\'\n' \
+          '                               %result.params[k].stderr, \n' \
+          '                                errdig=int(1), \n' \
+          '                                lowmag=-int(3))+\'})\'\n' \
           '        if pwr == 1:\n' \
           '            fitstr += \'x\'\n' \
           '        if pwr > 1:\n' \
@@ -172,7 +173,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '                                       errdig=int(1),\n' \
+       '                                       lowmag=-int(3))+\'})\'\n' \
        '    else:\n' \
        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
                    'k].value,' \
@@ -198,7 +200,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
         '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '                                 errdig=int(1),\n' \
+        '                                 lowmag=-int(3))+\'})\'\n' \
         '    else:\n' \
         '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
@@ -226,7 +229,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
                                           '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '                                 errdig=int(1),\n' \
+        '                                 lowmag=-int(3))+\'})\'\n' \
         '    else:\n' \
         '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
@@ -257,7 +261,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '                                       errdig=int(1),\n' \
+       '                                       lowmag=-int(3))+\'})\'\n' \
        '    else:\n' \
        '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value' \
                    ')+\'}\'\n' \
