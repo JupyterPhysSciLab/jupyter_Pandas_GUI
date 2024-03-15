@@ -899,7 +899,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step4str += '#  does not calculate for all points under all ' \
                         'conditions\n'
             step4str += 'resid = []\n'
-            step4str += 'for i in range(0,len('+str(fitname)+'.data)):\n'
+            step4str += 'for i in range(int(0),len('+str(fitname)+'.data)):\n'
             step4str += '    resid.append('+str(fitname)+'.data[' \
                                         'i]-'+str(fitname)+'.best_fit[i])\n\n'
             pass
