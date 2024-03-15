@@ -899,6 +899,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step4str += '#  does not calculate for all points under all ' \
                         'conditions\n'
             step4str += 'resid = []\n'
+            step4str += ('# explicit int(0) below avoids collisions with some '
+                         'preparsers.\n')
             step4str += 'for i in range(int(0),len('+str(fitname)+'.data)):\n'
             step4str += '    resid.append('+str(fitname)+'.data[' \
                                         'i]-'+str(fitname)+'.best_fit[i])\n\n'
@@ -932,6 +934,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         mirrorstr = ', mirror = \"ticks\"'
                 # the plot
                 step5str += '# Plot Results\n'
+                step5str += ('# explicit int(..) below avoids collisions with '
+                             'some preparsers.\n')
                 step5str += str(figname) + ' = go.FigureWidget(' \
                                     'layout_template=\"'+str(
                                     plot_template.value)+'\")\n'
