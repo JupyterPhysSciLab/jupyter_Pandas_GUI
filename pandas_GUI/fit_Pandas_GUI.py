@@ -136,11 +136,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '    if %result.params[k].vary:\n' \
           '        if termcount > 0:\n' \
           '            fitstr += \' + \'\n' \
-          '        fitstr += \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+          '        fitstr += r\'({\color{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\n' \
           '                               %result.params[k].stderr, \n' \
           '                                errdig=int(1), \n' \
-          '                                lowmag=-int(3))+\'})\'\n' \
+          '                                lowmag=-int(3))+\'}})\'\n' \
           '        if pwr == 1:\n' \
           '            fitstr += \'x\'\n' \
           '        if pwr > 1:\n' \
@@ -150,8 +150,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '        if %result.params[k].value!=0:\n' \
           '            if termcount > 0:\n' \
           '                fitstr += \'+\'\n' \
-          '            fitstr += \'(\\\color{blue}{\'+str(' \
-                                         '%result.params[k].value)+\'})\'\n' \
+          '            fitstr += r\'({\color{blue}{\'+str(' \
+                                         '%result.params[k].value)+\'}})\'\n' \
           '            termcount +=1\n' \
           '            if pwr == 1:\n' \
           '                fitstr += \'x\'\n' \
@@ -170,16 +170,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'interceptstr = ''\'\'\n' \
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
-       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+       '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
        '                                       errdig=int(1),\n' \
-       '                                       lowmag=-int(3))+\'})\'\n' \
+       '                                       lowmag=-int(3))+\'}})\'\n' \
        '    else:\n' \
-       '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+       '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
                    'k].value,' \
                    '\n' \
-       '                                       )+\'}\'\n' \
+       '                                       )+\'}}\'\n' \
        '    if k == \'slope\':\n' \
        '        slopestr = paramstr\n' \
        '    if k == \'intercept\' and %results.params[k].value != 0:\n' \
@@ -197,15 +197,15 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'decaystr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
         '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
         '                                 errdig=int(1),\n' \
-        '                                 lowmag=-int(3))+\'})\'\n' \
+        '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
-        '                                       )+\'}\'\n' \
+        '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
         '        ampstr = paramstr\n' \
         '    if k == \'decay\':\n' \
@@ -226,15 +226,15 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'sigmastr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
                                           '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
         '                                 errdig=int(1),\n' \
-        '                                 lowmag=-int(3))+\'})\'\n' \
+        '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
-        '                                       )+\'}\'\n' \
+        '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
         '        ampstr = paramstr\n' \
         '    if k == \'center\':\n' \
@@ -258,14 +258,18 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'shiftstr = \'\'\n' \
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
-       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+       '        if %results.params[k].stderr:\n' \
+       '            paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
        '                                       errdig=int(1),\n' \
-       '                                       lowmag=-int(3))+\'})\'\n' \
+       '                                       lowmag=-int(3))+\'}})\'\n' \
+       '        else:\n' \
+       '            paramstr = r\'{\color{red}{\'+' \
+                   'str(%results.params[k].value)+\'}}\'\n' \
        '    else:\n' \
-       '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value' \
-                   ')+\'}\'\n' \
+       '        paramstr = r\'{\color{blue}{\'+str(%results.params[k].value' \
+                   ')+\'}}\'\n' \
        '    if k == \'amplitude\':\n' \
        '        ampstr = paramstr\n' \
        '    if k == \'frequency\':\n' \

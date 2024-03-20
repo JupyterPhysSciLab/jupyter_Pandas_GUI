@@ -137,9 +137,14 @@ instructions.
 
 ## Change Log
 * 0.8.1.dev
+  * BUG Fix: colored text in LaTex not rendering properly. Use of backslash for 
+    escaping unreliable. Switched to using Python raw strings where possible
+    and more careful use of "{}" to indicate range of LaTex expression to color.
   * Made more robust to running with packages that can use the IPython 
     preparser to cast Python integers to specialized types (e.g. Sympy & 
-    Algebra_with_Sympy).
+    Algebra_with_Sympy), by wrapping integers with `int()` in generated code.
+    Added comments to generated code explaining this.
+  * Updated allowable versions of packages.
 * 0.8.0 (2023-6-21)
   * In Jupyter Lab results of running code now replace the GUI rather than 
     appearing in the Console.
