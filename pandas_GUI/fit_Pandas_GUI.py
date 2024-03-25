@@ -155,7 +155,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '            termcount +=int(1)\n' \
           '            if pwr == int(1):\n' \
           '                fitstr += \'x\'\n' \
-          '            if pwr > in(1):\n' \
+          '            if pwr > int(1):\n' \
           '                fitstr += \'x^\'+str(pwr)\n' \
           'fitstr+=\'$\'\n' \
           'captionstr=r\'<p>Use the command <code>%result</code> as the ' \
@@ -871,22 +871,22 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                             'fit not displayed = np.nan\n'
                 for i in range(len(ranges)):
                     if i == 0 and ranges[0][0]>0:
-                        step4str += 'Yfiterr[0:'+str(ranges[0][0])+'] = ' \
-                                                                   'np.inf\n'
-                        step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
-                                    '] = np.nan\n'
+                        step4str += 'Yfiterr[int(0):int('+str(ranges[0][0])+ \
+                                    ')] = np.inf\n'
+                        step4str += 'Xfitdata[int(0):int('+str(ranges[0][0])+\
+                                    ')] = np.nan\n'
                     if (i + 1) < len(ranges):
-                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
-                                    ':'+str(ranges[i+1][0])+'] = np.inf\n'
-                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
-                                    ':'+str(ranges[i+1][0])+'] = np.nan\n'
+                        step4str += 'Yfiterr[int('+str(ranges[i][1]+1)+\
+                                    '):int('+str(ranges[i+1][0])+')] = np.inf\n'
+                        step4str += 'Xfitdata[int('+str(ranges[i][1]+1)+ \
+                                    '):int('+str(ranges[i+1][0])+')] = np.nan\n'
                     if i+1 == len(ranges):
-                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
-                                    ':'+str(len(range_plot.data[0].marker.
-                                                color))+'] = np.inf\n'
-                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
-                                ':'+str(len(range_plot.data[0].marker.
-                                            color))+'] = np.nan\n'
+                        step4str += 'Yfiterr[int('+str(ranges[i][1]+1)+\
+                                    '):int('+str(len(range_plot.data[0].marker.
+                                                color))+')] = np.inf\n'
+                        step4str += 'Xfitdata[int('+str(ranges[i][1]+1)+\
+                                '):int('+str(len(range_plot.data[0].marker.
+                                            color))+')] = np.nan\n'
                 step4str += '\n'
                 step4str += '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
