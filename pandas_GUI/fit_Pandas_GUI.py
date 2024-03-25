@@ -130,32 +130,32 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     def polymodelresultstr(resultname):
         template = '' \
           'fitstr = r\'$fit = \'\n' \
-          'termcount = 0\n' \
+          'termcount = int(0)\n' \
           'for k in %result.params.keys():\n' \
-          '    pwr = int(str(k)[-1:])\n' \
+          '    pwr = int(str(k)[int(-1):])\n' \
           '    if %result.params[k].vary:\n' \
-          '        if termcount > 0:\n' \
+          '        if termcount > int(0):\n' \
           '            fitstr += \' + \'\n' \
           '        fitstr += r\'({\color{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\n' \
           '                               %result.params[k].stderr, \n' \
           '                                errdig=int(1), \n' \
           '                                lowmag=-int(3))+\'}})\'\n' \
-          '        if pwr == 1:\n' \
+          '        if pwr == int(1):\n' \
           '            fitstr += \'x\'\n' \
-          '        if pwr > 1:\n' \
+          '        if pwr > int(1):\n' \
           '            fitstr += \'x^\'+str(pwr)\n' \
-          '        termcount+=1\n' \
+          '        termcount+=int(1)\n' \
           '    else:\n' \
-          '        if %result.params[k].value!=0:\n' \
-          '            if termcount > 0:\n' \
+          '        if %result.params[k].value!=0.0:\n' \
+          '            if termcount > int(0):\n' \
           '                fitstr += \'+\'\n' \
           '            fitstr += r\'({\color{blue}{\'+str(' \
                                          '%result.params[k].value)+\'}})\'\n' \
-          '            termcount +=1\n' \
-          '            if pwr == 1:\n' \
+          '            termcount +=int(1)\n' \
+          '            if pwr == int(1):\n' \
           '                fitstr += \'x\'\n' \
-          '            if pwr > 1:\n' \
+          '            if pwr > in(1):\n' \
           '                fitstr += \'x^\'+str(pwr)\n' \
           'fitstr+=\'$\'\n' \
           'captionstr=r\'<p>Use the command <code>%result</code> as the ' \
@@ -219,7 +219,6 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         return template.replace('%results',resultname)
 
     def gausmodelresultstr(resultname):
-        # TODO
         template = '' \
         'ampstr = ''\'\'\n' \
         'centstr = ''\'\'\n' \
