@@ -274,7 +274,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        '        ampstr = paramstr\n' \
        '    if k == \'frequency\':\n' \
        '        freqstr = paramstr\n' \
-       '    if k == \'shift\' and %results.params[k].value != 0:\n' \
+       '    if k == \'shift\' and %results.params[k].value != 0.0:\n' \
        '        shiftstr = \' + \' + paramstr\n' \
        'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
        'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
