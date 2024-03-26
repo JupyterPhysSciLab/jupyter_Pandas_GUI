@@ -616,11 +616,18 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
 
     # 5.Title, Axes, Format ...
-    step5instr = richLabel(value = 'You must set the axes labels to something '
-                           'appropriate. For example if the X - values '
+    step5instr = richLabel(value = '<ul><li><span '
+                                   'style="font-weight:bold;">You '
+                                   'must set the axes labels to something '
+                           'appropriate.</span> For example if the X - values '
                            'represent time in seconds "Time (s)" is a good '
                            'choice. Likewise, choose an appropriate label '
-                                   'for the Y - axis.')
+                           'for the Y - axis.</li>'
+                           '<li>If the Aspect Ratio is set to `auto` the '
+                           'figure will fill the default output region. '
+                           'Other choices will allow you to pick the Plot '
+                                   'Size. `Large` will use about 2/3 of an HD '
+                                   'screen.</li></ul>')
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
                       layout = Layout(width='80%'))
@@ -650,6 +657,25 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     # TODO: Add aspect ratio and size options (auto, 16:9, 5:3, 7:5, 4:3, 10:8,
     #  1:1) sizes tiny (300), small (450), medium (800), large (width = 1200),
     #  huge (2400)
+    def aspect_change(change):
+        if change['new'] != 'auto':
+            plot_size.disabled=False
+        else:
+            plot_size.disabled=True
+        pass
+
+    plot_aspect = Dropdown(options = ['auto', '16:9', '5:3', '7:5', '4:3',
+                                     '10:8', '1:1'],
+                      value = 'auto',
+                      description = 'Aspect Ratio: ',
+                      style = longdesc)
+    plot_aspect.observe(aspect_change, names = 'value')
+    plot_size = Dropdown(options = ['tiny', 'small', 'medium', 'large',
+                                    'huge'],
+                         value = 'large',
+                         description = 'Plot Size: ',
+                         style = longdesc,
+                         disabled = True)
     plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
                                     'seaborn',
                                  'plotly', 'plotly_white', 'plotly_dark',
@@ -661,7 +687,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         description = 'Plot Styling: ',
                         style = longdesc)
     step5hbox1 =  HBox(children=[X_label, Y_label])
-    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template,
+                                 plot_aspect, plot_size])
     step5 =  VBox(children=[step5instr, plot_title, step5hbox1, step5hbox2])
 
     # 4. Pick Fit Range(s)
