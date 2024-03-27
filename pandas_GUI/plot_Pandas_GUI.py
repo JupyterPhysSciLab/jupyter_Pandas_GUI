@@ -506,7 +506,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                            'figure will fill the default output region. '
                            'Other choices will allow you to pick the Plot '
                            'Size. `Large` will use about 2/3 of an HD '
-                                 'screen.</li>')
+                                 '(1920X1080) screen.</li>')
     step3instracc = Accordion(children=[step3instr])
     step3instracc.set_title(0, 'Instructions')
     step3instracc.selected_index = None
@@ -578,15 +578,16 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step4noticebox = richLabel(value = makeplot_notices.notice_html())
     def makeplt_click(change):
         if JPSLUtils.notebookenv == 'NBClassic':
-            text = '\n# Force save widget states so that graph will still be\n'
-            text += '# available when notebook next opened in trusted state.\n'
-            text += 'import time\ntime.sleep(5)'
-            select_containing_cell('pandasplotGUI')
-            select_cell_immediately_below()
-            insert_newline_at_end_of_current_cell(text)
-            jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
-            text = 'JPSLUtils.OTJS(\''+jscode+'\')'
-            insert_newline_at_end_of_current_cell(text)
+            # These commented out lines do nothing because of timing issues.
+            # text = '\n# Force save widget states so that graph will still be\n'
+            # text += '# available when notebook next opened in trusted state.\n'
+            # text += 'import time\ntime.sleep(5)'
+            # select_containing_cell('pandasplotGUI')
+            # select_cell_immediately_below()
+            # insert_newline_at_end_of_current_cell(text)
+            # jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
+            # text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+            # insert_newline_at_end_of_current_cell(text)
         # run the cell to build the plot
             JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute();')
         # remove the GUI cell
@@ -646,10 +647,40 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step2str += text
             # update step3str
             step3str = step3strdefault
+            plot_width = 1200
+            plot_height = 675
             if plot_title.value != '' or plot_template.value != 'simple_white':
                 text = figname + '.update_layout(title = \'' + plot_title.value + '\', '
-                text += 'template = \'' + plot_template.value + '\')\n'
-                step3str += text
+                text += 'template = \'' + plot_template.value + '\', '
+            if plot_aspect.value == 'auto':
+                text += 'autosize=True)\n'
+            else:
+                if plot_size.value == 'tiny':
+                    plot_width = 300
+                elif plot_size.value == 'small':
+                    plot_width = 450
+                elif plot_size.value == 'medium':
+                    plot_width = 800
+                elif plot_size.value == 'large':
+                    plot_width = 1200
+                elif plot_size.value == 'huge':
+                    plot_width = 2400
+                if plot_aspect.value == '16:9':
+                    plot_height = int(9 * plot_width / 16)
+                elif plot_aspect.value == '5:3':
+                    plot_height = int(3 * plot_width / 5)
+                elif plot_aspect.value == '7:5':
+                    plot_height = int(5 * plot_width / 7)
+                elif plot_aspect.value == '4:3':
+                    plot_height = int(3 * plot_width / 4)
+                elif plot_aspect.value == '10:8':
+                    plot_height = int(8 * plot_width / 10)
+                elif plot_aspect.value == '1:1':
+                    plot_height = plot_width
+                text += 'autosize=False, width = int('
+                text += str(plot_width)+'), height=int('
+                text += str(plot_height)+'))\n'
+            step3str += text
             text = figname + '.show()'
             if JPSLUtils.notebookenv == 'NBClassic':
                 replace_text_of_next_cell(
