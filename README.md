@@ -137,6 +137,8 @@ instructions.
 
 ## Change Log
 * 0.8.1.dev
+  * NEW Feature: plot and fit GUIs allow controlling aspect ratio and size 
+    of figure.
   * BUG Fix: colored text in LaTex not rendering properly. Use of backslash for 
     escaping unreliable. Switched to using Python raw strings where possible
     and more careful use of "{}" to indicate range of LaTex expression to color.

@@ -473,8 +473,9 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step1 = VBox(children=[step1instracc, step1hbox, step1opt])
 
     # 2. Set Axes Labels (will use column names by default).
-    step2instr = richLabel(value = 'You must set the axes labels to something '
-                           'appropriate. For example if the X - values '
+    step2instr = richLabel(value = '<span style = "font-weight:bold;">You must '
+                                   'set the axes labels to something '
+                           'appropriate.</span> For example if the X - values '
                            'represent time in seconds "Time (s)" is a good '
                            'choice. If the Y - values for the traces all '
                            'have the same units using the units as the label '
@@ -497,6 +498,18 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step2hbox = HBox(children=[X_label,Y_label])
     step2 = VBox(children=[step2instracc,step2hbox])
     # 3.Title, Format ...
+    step3instr = richLabel(value='Overall format set here. <ul><li>Experiment '
+                                 'with '
+                                 'the Plot Styling templates to find your '
+                                 'favorite.</li>'
+                                 '<li>If the Aspect Ratio is set to `auto` the '
+                           'figure will fill the default output region. '
+                           'Other choices will allow you to pick the Plot '
+                           'Size. `Large` will use about 2/3 of an HD '
+                                 'screen.</li>')
+    step3instracc = Accordion(children=[step3instr])
+    step3instracc.set_title(0, 'Instructions')
+    step3instracc.selected_index = None
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
                       layout = Layout(width='80%'))
@@ -525,8 +538,28 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value='simple_white',
                         description = 'Plot Styling: ',
                         style = longdesc)
-    step3hbox2 = HBox(children=[mirror_axes,mirror_ticks, plot_template])
-    step3 = VBox(children=[plot_title,step3hbox2])
+    def aspect_change(change):
+        if change['new'] != 'auto':
+            plot_size.disabled=False
+        else:
+            plot_size.disabled=True
+        pass
+
+    plot_aspect = Dropdown(options = ['auto', '16:9', '5:3', '7:5', '4:3',
+                                     '10:8', '1:1'],
+                      value = 'auto',
+                      description = 'Aspect Ratio: ',
+                      style = longdesc)
+    plot_aspect.observe(aspect_change, names = 'value')
+    plot_size = Dropdown(options = ['tiny', 'small', 'medium', 'large',
+                                    'huge'],
+                         value = 'large',
+                         description = 'Plot Size: ',
+                         style = longdesc,
+                         disabled = True)
+    step3hbox2 = HBox(children=[mirror_axes,mirror_ticks, plot_template,
+                                plot_aspect, plot_size])
+    step3 = VBox(children=[step3instracc, plot_title, step3hbox2])
 
     # 4. Final Check*
     step4instr = richLabel(value = 'Things to check before clicking making ' \
