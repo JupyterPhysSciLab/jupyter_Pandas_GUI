@@ -6,8 +6,12 @@
 1. Thoughts on GUI for loading data. Could use ipyfilechooser to select 
    local files. A dropdown for html vs csv to filter and select the reader. 
    A checkbox for the index (label) column or not in file. The html loader 
-   creates an array of dataframes, one for each table.
-2. To make it work across more platforms could try having the computed code.
+   creates an array of dataframes, one for each table. These should be 
+   broken up or the user asked which ones to load.
+2. Consider making array of code strings for each trace in plot GUI, 
+   allowing the user to then delete them from a list and have the plot code 
+   updated.
+3. Consider showing error band, when error bars reach high density.
 
 ## Constructing the Documentation
 
