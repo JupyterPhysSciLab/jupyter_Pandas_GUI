@@ -1042,7 +1042,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'name=\"fit\", line_color = ' \
                                     '\"black\", line_dash=\"solid\")\n'
                 step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(2))\n'
-                step5str += str(figname) + '.show()\n\n'
+                step5str += str(figname) + '.show(config = ' \
+                                            '{\'toImageButtonOptions\': {' \
+                                            '\'format\': \'svg\'}})\n\n'
                 pass
         if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
             df = friendly_to_object[whichframe.value]

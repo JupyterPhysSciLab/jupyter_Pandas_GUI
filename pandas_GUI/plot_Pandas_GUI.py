@@ -681,7 +681,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 text += str(plot_width)+'), height=int('
                 text += str(plot_height)+'))\n'
             step3str += text
-            text = figname + '.show()'
+            text = figname + '.show(config = {' \
+                    '\'toImageButtonOptions\': {\'format\': \'svg\'}})'
             if JPSLUtils.notebookenv == 'NBClassic':
                 replace_text_of_next_cell(
                     importstr+step1str+step2str+step3str+text)

@@ -139,6 +139,8 @@ instructions.
 * 0.8.1.dev
   * NEW Feature: plot and fit GUIs allow controlling aspect ratio and size 
     of figure.
+  * NEW Feature: default format for plotly download (camera in modebar) is 
+    now SVG. If users want a png, they can use a screenshot.
   * BUG Fix: colored text in LaTex not rendering properly. Use of backslash for 
     escaping unreliable. Switched to using Python raw strings where possible
     and more careful use of "{}" to indicate range of LaTex expression to color.
