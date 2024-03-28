@@ -93,7 +93,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
         'from plotly import graph_objects as go\n' + str(figname) + \
         ' = go.FigureWidget(layout_template=\"simple_white\")\n'
-    step1strdefault = '\n# Trace declaration(s) and trace formating\n'
+    step1strdefault = '\n# Trace declaration(s) and trace formatting\n'
     step1str = step1strdefault
     step2strdefault = '\n# Axes labels\n'
     step2str = step2strdefault
@@ -677,7 +677,7 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     plot_height = int(8 * plot_width / 10)
                 elif plot_aspect.value == '1:1':
                     plot_height = plot_width
-                text += 'autosize=False, width = int('
+                text += 'autosize=False,\n                        width = int('
                 text += str(plot_width)+'), height=int('
                 text += str(plot_height)+'))\n'
             step3str += text
