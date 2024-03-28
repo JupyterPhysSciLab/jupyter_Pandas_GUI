@@ -24,6 +24,7 @@ setuptools.setup(
         'pandas>=1.5.2',
         'numpy>=1.23.0',
         'plotly>=5.5.0',
+        'kaleido'
         'ipywidgets>=7.6.2',
         'JPSLUtils>=0.7.0',
         'lmfit>=1.1.0',
