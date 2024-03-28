@@ -582,8 +582,8 @@ def plot_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             # text = '\n# Force save widget states so that graph will still be\n'
             # text += '# available when notebook next opened in trusted state.\n'
             # text += 'import time\ntime.sleep(5)'
-            # select_containing_cell('pandasplotGUI')
-            # select_cell_immediately_below()
+            select_containing_cell('pandasplotGUI')
+            select_cell_immediately_below()
             # insert_newline_at_end_of_current_cell(text)
             # jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
             # text = 'JPSLUtils.OTJS(\''+jscode+'\')'

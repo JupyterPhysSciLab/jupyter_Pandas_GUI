@@ -773,15 +773,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     def dofit_click(change):
         if JPSLUtils.notebookenv == 'NBClassic':
-            text = '\n# Force save widget states so that graph will still be\n'
-            text += '# available when notebook next opened in trusted state.\n'
-            text += 'import time\ntime.sleep(5)'
+            # Commented out do nothing because of timing issues
+            #text = '\n# Force save widget states so that graph will still be\n'
+            #text += '# available when notebook next opened in trusted state.\n'
+            #text += 'import time\ntime.sleep(5)'
             select_containing_cell('pandasfitGUI')
             select_cell_immediately_below()
-            insert_newline_at_end_of_current_cell(text)
-            jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
-            text = 'JPSLUtils.OTJS(\''+jscode+'\')'
-            insert_newline_at_end_of_current_cell(text)
+            #insert_newline_at_end_of_current_cell(text)
+            #jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
+            #text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+            #insert_newline_at_end_of_current_cell(text)
             # run the cell to build the plot
             JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
             # remove the GUI cell
