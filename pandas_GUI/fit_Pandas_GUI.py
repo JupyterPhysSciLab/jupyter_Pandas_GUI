@@ -654,9 +654,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     mirror_ticks = Checkbox(value = False,
                             description = 'Mirror Tick Marks',
                             disabled = True)
-    # TODO: Add aspect ratio and size options (auto, 16:9, 5:3, 7:5, 4:3, 10:8,
-    #  1:1) sizes tiny (300), small (450), medium (800), large (width = 1200),
-    #  huge (2400)
+
     def aspect_change(change):
         if change['new'] != 'auto':
             plot_size.disabled=False
