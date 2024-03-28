@@ -627,7 +627,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                            'figure will fill the default output region. '
                            'Other choices will allow you to pick the Plot '
                                    'Size. `Large` will use about 2/3 of an HD '
-                                   'screen.</li></ul>')
+                                   '(1920X1080) screen.</li></ul>')
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
                       layout = Layout(width='80%'))
@@ -973,7 +973,37 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'layout_template=\"'+str(
                                     plot_template.value)+'\")\n'
                 step5str += str(figname)+ '.update_layout(title = \"'+ \
-                                    str(plot_title.value)+'\")\n'
+                                    str(plot_title.value)+'\",'
+                text = ''
+                if plot_aspect.value == 'auto':
+                    text += 'autosize=True)\n'
+                else:
+                    if plot_size.value == 'tiny':
+                        plot_width = 300
+                    elif plot_size.value == 'small':
+                        plot_width = 450
+                    elif plot_size.value == 'medium':
+                        plot_width = 800
+                    elif plot_size.value == 'large':
+                        plot_width = 1200
+                    elif plot_size.value == 'huge':
+                        plot_width = 2400
+                    if plot_aspect.value == '16:9':
+                        plot_height = int(9 * plot_width / 16)
+                    elif plot_aspect.value == '5:3':
+                        plot_height = int(3 * plot_width / 5)
+                    elif plot_aspect.value == '7:5':
+                        plot_height = int(5 * plot_width / 7)
+                    elif plot_aspect.value == '4:3':
+                        plot_height = int(3 * plot_width / 4)
+                    elif plot_aspect.value == '10:8':
+                        plot_height = int(8 * plot_width / 10)
+                    elif plot_aspect.value == '1:1':
+                        plot_height = plot_width
+                    text += 'autosize=False, width = int('
+                    text += str(plot_width) + '), height=int('
+                    text += str(plot_height) + '))\n'
+                step5str += text
                 step5str += str(figname) + '.set_subplots(rows=int(2), cols=int(1), ' \
                                            'row_heights=[0.2,0.8], ' \
                                            'shared_xaxes=True)\n'
