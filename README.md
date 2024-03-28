@@ -136,7 +136,7 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
-* 0.8.1.dev
+* 0.9.0.dev (2024-3-)
   * NEW Feature: plot and fit GUIs allow controlling aspect ratio and size 
     of figure.
   * NEW Feature: default format for plotly download (camera in modebar) is 
@@ -148,7 +148,10 @@ instructions.
     preparser to cast Python integers to specialized types (e.g. Sympy & 
     Algebra_with_Sympy), by wrapping integers with `int()` in generated code.
     Added comments to generated code explaining this.
+  * Removed statements from generated code for NBClassic that did nothing 
+    because of asynchronicity of javascript and python.
   * Updated allowable versions of packages.
+  * Documentation updates to reflect changes.
 * 0.8.0 (2023-6-21)
   * In Jupyter Lab results of running code now replace the GUI rather than 
     appearing in the Console.
