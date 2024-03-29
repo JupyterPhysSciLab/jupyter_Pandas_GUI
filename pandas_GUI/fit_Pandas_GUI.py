@@ -136,7 +136,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '    if %result.params[k].vary:\n' \
           '        if termcount > int(0):\n' \
           '            fitstr += \' + \'\n' \
-          '        fitstr += r\'({\color{red}{\'+rue.latex_rndwitherr(' \
+          '        fitstr += r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\n' \
           '                               %result.params[k].stderr, \n' \
           '                                errdig=int(1), \n' \
@@ -150,7 +150,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
           '        if %result.params[k].value!=0.0:\n' \
           '            if termcount > int(0):\n' \
           '                fitstr += \'+\'\n' \
-          '            fitstr += r\'({\color{blue}{\'+str(' \
+          '            fitstr += r\'({%COLOR{blue}{\'+str(' \
                                          '%result.params[k].value)+\'}})\'\n' \
           '            termcount +=int(1)\n' \
           '            if pwr == int(1):\n' \
@@ -170,13 +170,13 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'interceptstr = ''\'\'\n' \
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
-       '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
+       '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
        '                                       errdig=int(1),\n' \
        '                                       lowmag=-int(3))+\'}})\'\n' \
        '    else:\n' \
-       '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
+       '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                    'k].value,' \
                    '\n' \
        '                                       )+\'}}\'\n' \
@@ -197,13 +197,13 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'decaystr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
         '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
         '                                 errdig=int(1),\n' \
         '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
         '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
@@ -225,13 +225,13 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'sigmastr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                                           '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
         '                                 errdig=int(1),\n' \
         '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = r\'{\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
         '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
@@ -258,16 +258,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
        '        if %results.params[k].stderr:\n' \
-       '            paramstr = r\'({\color{red}{\'+rue.latex_rndwitherr(' \
+       '            paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
        '                                       errdig=int(1),\n' \
        '                                       lowmag=-int(3))+\'}})\'\n' \
        '        else:\n' \
-       '            paramstr = r\'{\color{red}{\'+' \
+       '            paramstr = r\'{%COLOR{red}{\'+' \
                    'str(%results.params[k].value)+\'}}\'\n' \
        '    else:\n' \
-       '        paramstr = r\'{\color{blue}{\'+str(%results.params[k].value' \
+       '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[k].value' \
                    ')+\'}}\'\n' \
        '    if k == \'amplitude\':\n' \
        '        ampstr = paramstr\n' \
@@ -559,6 +559,14 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value = np.mean(yvals)
                     if labeltext == 'decay':
                         value = (np.max(xvals) - np.min(xvals))/3.0
+                if modelname == 'SineModel':
+                    df = friendly_to_object[whichframe.value]
+                    xvals = df[Xcoord.value]
+                    yvals = df[Ycoord.value]
+                    if labeltext == 'amplitude':
+                        value = np.max(yvals)
+                    if labeltext == 'frequency':
+                        value = (np.max(xvals) - np.min(xvals)) / np.pi
             else:
                 labeltext = str(i)
                 params_set.children[i].layout.display='none'
