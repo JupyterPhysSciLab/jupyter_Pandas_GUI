@@ -566,7 +566,13 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     if labeltext == 'amplitude':
                         value = np.max(yvals)
                     if labeltext == 'frequency':
-                        value = (np.max(xvals) - np.min(xvals)) / np.pi
+                        # Looking for the most prominent frequency component 
+                        # to fit.
+                        temprange = np.max(xvals) - np.min(xvals)
+                        npts = len(xvals)
+                        tempfft = np.fft.fft(yvals)[:int(npts/2)]
+                        maxloc = np.argmax(np.absolute(tempfft))
+                        value = maxloc*temprange/npts
             else:
                 labeltext = str(i)
                 params_set.children[i].layout.display='none'
