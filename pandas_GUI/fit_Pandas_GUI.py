@@ -559,6 +559,17 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value = np.mean(yvals)
                     if labeltext == 'decay':
                         value = (np.max(xvals) - np.min(xvals))/3.0
+                if modelname == 'GaussianModel':
+                    df = friendly_to_object[whichframe.value]
+                    xvals = df[Xcoord.value]
+                    yvals = df[Ycoord.value]
+                    if labeltext == 'amplitude':
+                        value = np.max(yvals)
+                    if labeltext == 'sigma':
+                        value = 1.0
+                    if labeltext == 'center':
+                        maxidx = np.argmax(yvals)
+                        value = xvals[maxidx]
                 if modelname == 'SineModel':
                     df = friendly_to_object[whichframe.value]
                     xvals = df[Xcoord.value]

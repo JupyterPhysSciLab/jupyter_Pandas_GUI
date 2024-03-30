@@ -145,6 +145,7 @@ instructions.
     escaping unreliable. Switched to using Python raw strings where possible
     and more careful use of "{}" to indicate range of LaTex expression to color.
   * Improved initial guess for fitting to sine wave using FFT.
+  * Improved initial guess for fitting a Gaussian.
   * Made more robust to running with packages that can use the IPython 
     preparser to cast Python integers to specialized types (e.g. Sympy & 
     Algebra_with_Sympy), by wrapping integers with `int()` in generated code.
