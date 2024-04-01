@@ -136,7 +136,7 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
-* 0.9.0.dev (2024-3-)
+* 0.9.0 (2024-3-31)
   * NEW Feature: plot and fit GUIs allow controlling aspect ratio and size 
     of figure.
   * NEW Feature: default format for plotly download (camera in modebar) is 
@@ -200,6 +200,7 @@ instructions.
 
 ## Issues or comments
 
+### Please submit issues and comments to the Project on Github
 [JupyterPhysSciLab/jupyter_Pandas_GUI/issues](https://github.com/JupyterPhysSciLab/jupyter_Pandas_GUI/issues)
 
 ### Known issues
@@ -220,4 +221,4 @@ This program is free software: you can redistribute it and/or modify
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-Copyright - Jonathan Gutow, 2021, 2022.
+Copyright - Jonathan Gutow, 2021 - 2024
