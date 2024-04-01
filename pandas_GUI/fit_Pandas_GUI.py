@@ -130,31 +130,32 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     def polymodelresultstr(resultname):
         template = '' \
           'fitstr = r\'$fit = \'\n' \
-          'termcount = 0\n' \
+          'termcount = int(0)\n' \
           'for k in %result.params.keys():\n' \
-          '    pwr = int(str(k)[-1:])\n' \
+          '    pwr = int(str(k)[int(-1):])\n' \
           '    if %result.params[k].vary:\n' \
-          '        if termcount > 0:\n' \
+          '        if termcount > int(0):\n' \
           '            fitstr += \' + \'\n' \
-          '        fitstr += \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+          '        fitstr += r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                                          '%result.params[k].value,\n' \
-          '                               %result.params[k].stderr, ' \
-                                         'errdig=1, lowmag=-3)+\'})\'\n' \
-          '        if pwr == 1:\n' \
+          '                               %result.params[k].stderr, \n' \
+          '                                errdig=int(1), \n' \
+          '                                lowmag=-int(3))+\'}})\'\n' \
+          '        if pwr == int(1):\n' \
           '            fitstr += \'x\'\n' \
-          '        if pwr > 1:\n' \
+          '        if pwr > int(1):\n' \
           '            fitstr += \'x^\'+str(pwr)\n' \
-          '        termcount+=1\n' \
+          '        termcount+=int(1)\n' \
           '    else:\n' \
-          '        if %result.params[k].value!=0:\n' \
-          '            if termcount > 0:\n' \
+          '        if %result.params[k].value!=0.0:\n' \
+          '            if termcount > int(0):\n' \
           '                fitstr += \'+\'\n' \
-          '            fitstr += \'(\\\color{blue}{\'+str(' \
-                                         '%result.params[k].value)+\'})\'\n' \
-          '            termcount +=1\n' \
-          '            if pwr == 1:\n' \
+          '            fitstr += r\'({%COLOR{blue}{\'+str(' \
+                                         '%result.params[k].value)+\'}})\'\n' \
+          '            termcount +=int(1)\n' \
+          '            if pwr == int(1):\n' \
           '                fitstr += \'x\'\n' \
-          '            if pwr > 1:\n' \
+          '            if pwr > int(1):\n' \
           '                fitstr += \'x^\'+str(pwr)\n' \
           'fitstr+=\'$\'\n' \
           'captionstr=r\'<p>Use the command <code>%result</code> as the ' \
@@ -169,15 +170,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'interceptstr = ''\'\'\n' \
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
-       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+       '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '                                       errdig=int(1),\n' \
+       '                                       lowmag=-int(3))+\'}})\'\n' \
        '    else:\n' \
-       '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+       '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                    'k].value,' \
                    '\n' \
-       '                                       )+\'}\'\n' \
+       '                                       )+\'}}\'\n' \
        '    if k == \'slope\':\n' \
        '        slopestr = paramstr\n' \
        '    if k == \'intercept\' and %results.params[k].value != 0:\n' \
@@ -195,14 +197,15 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         'decaystr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
         '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '                                 errdig=int(1),\n' \
+        '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
-        '                                       )+\'}\'\n' \
+        '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
         '        ampstr = paramstr\n' \
         '    if k == \'decay\':\n' \
@@ -216,21 +219,21 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         return template.replace('%results',resultname)
 
     def gausmodelresultstr(resultname):
-        # TODO
         template = '' \
         'ampstr = ''\'\'\n' \
         'centstr = ''\'\'\n' \
         'sigmastr = ''\'\'\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
-        '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+        '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                                           '%results.params[k].value,\n' \
         '                                 %results.params[k].stderr,\n' \
-        '                                 errdig=1, lowmag=-3)+\'})\'\n' \
+        '                                 errdig=int(1),\n' \
+        '                                 lowmag=-int(3))+\'}})\'\n' \
         '    else:\n' \
-        '        paramstr = \'\\\color{blue}{\'+str(%results.params[' \
+        '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
-        '                                       )+\'}\'\n' \
+        '                                       )+\'}}\'\n' \
         '    if k == \'amplitude\':\n' \
         '        ampstr = paramstr\n' \
         '    if k == \'center\':\n' \
@@ -254,18 +257,23 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'shiftstr = \'\'\n' \
        'for k in %results.params.keys():\n' \
        '    if %results.params[k].vary:\n' \
-       '        paramstr = \'(\\\color{red}{\'+rue.latex_rndwitherr(' \
+       '        if %results.params[k].stderr:\n' \
+       '            paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
                    '%results.params[k].value,\n' \
        '                                       %results.params[k].stderr,\n' \
-       '                                       errdig=1,lowmag=-3)+\'})\'\n' \
+       '                                       errdig=int(1),\n' \
+       '                                       lowmag=-int(3))+\'}})\'\n' \
+       '        else:\n' \
+       '            paramstr = r\'{%COLOR{red}{\'+' \
+                   'str(%results.params[k].value)+\'}}\'\n' \
        '    else:\n' \
-       '        paramstr = \'\\\color{blue}{\'+str(%results.params[k].value' \
-                   ')+\'}\'\n' \
+       '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[k].value' \
+                   ')+\'}}\'\n' \
        '    if k == \'amplitude\':\n' \
        '        ampstr = paramstr\n' \
        '    if k == \'frequency\':\n' \
        '        freqstr = paramstr\n' \
-       '    if k == \'shift\' and %results.params[k].value != 0:\n' \
+       '    if k == \'shift\' and %results.params[k].value != 0.0:\n' \
        '        shiftstr = \' + \' + paramstr\n' \
        'fitstr = r\'$fit = \'+ampstr + \'sin[\' + freqstr + \'x\' + shiftstr + \']$\'\n' \
        'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
@@ -284,6 +292,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
                 'https://jupyterphysscilab.github.io/jupyter_Pandas_GUI.\n' \
+                '# Integers wrapped in `int()` to avoid having them cast \n' \
+                '# as other types by interactive preparsers. \n' \
                 '# Imports (no effect if already imported)\n' \
                 'import numpy as np\n' \
                 'import lmfit as lmfit\n' \
@@ -307,7 +317,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             "Composer</h3> <div style='text-align:center;'>"
             "<span style='color:green;'>Steps with a * are required.</span> The "
             "code that will generate the fit is being "
-            "built in the cell immediately below.</div><div "
+            "built in the textbox or cell immediately below.</div><div "
             "style='text-align:center;'>This composer uses a subset of "
             "<a href ='https://lmfit.github.io/lmfit-py/'> the lmfit package</a>"
             " and <a href ='https://plotly.com/python/line-and-scatter/#'> "
@@ -549,6 +559,31 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         value = np.mean(yvals)
                     if labeltext == 'decay':
                         value = (np.max(xvals) - np.min(xvals))/3.0
+                if modelname == 'GaussianModel':
+                    df = friendly_to_object[whichframe.value]
+                    xvals = df[Xcoord.value]
+                    yvals = df[Ycoord.value]
+                    if labeltext == 'amplitude':
+                        value = np.max(yvals)
+                    if labeltext == 'sigma':
+                        value = 1.0
+                    if labeltext == 'center':
+                        maxidx = np.argmax(yvals)
+                        value = xvals[maxidx]
+                if modelname == 'SineModel':
+                    df = friendly_to_object[whichframe.value]
+                    xvals = df[Xcoord.value]
+                    yvals = df[Ycoord.value]
+                    if labeltext == 'amplitude':
+                        value = np.max(yvals)
+                    if labeltext == 'frequency':
+                        # Looking for the most prominent frequency component 
+                        # to fit.
+                        temprange = np.max(xvals) - np.min(xvals)
+                        npts = len(xvals)
+                        tempfft = np.fft.fft(yvals)[:int(npts/2)]
+                        maxloc = np.argmax(np.absolute(tempfft))
+                        value = maxloc*temprange/npts
             else:
                 labeltext = str(i)
                 params_set.children[i].layout.display='none'
@@ -606,11 +641,18 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
 
     # 5.Title, Axes, Format ...
-    step5instr = richLabel(value = 'You must set the axes labels to something '
-                           'appropriate. For example if the X - values '
+    step5instr = richLabel(value = '<ul><li><span '
+                                   'style="font-weight:bold;">You '
+                                   'must set the axes labels to something '
+                           'appropriate.</span> For example if the X - values '
                            'represent time in seconds "Time (s)" is a good '
                            'choice. Likewise, choose an appropriate label '
-                                   'for the Y - axis.')
+                           'for the Y - axis.</li>'
+                           '<li>If the Aspect Ratio is set to `auto` the '
+                           'figure will fill the default output region. '
+                           'Other choices will allow you to pick the Plot '
+                                   'Size. `Large` will use about 2/3 of an HD '
+                                   '(1920X1080) screen.</li></ul>')
     plot_title = Text(value = figname,
                        description = 'Plot title: ',
                       layout = Layout(width='80%'))
@@ -637,6 +679,26 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     mirror_ticks = Checkbox(value = False,
                             description = 'Mirror Tick Marks',
                             disabled = True)
+
+    def aspect_change(change):
+        if change['new'] != 'auto':
+            plot_size.disabled=False
+        else:
+            plot_size.disabled=True
+        pass
+
+    plot_aspect = Dropdown(options = ['auto', '16:9', '5:3', '7:5', '4:3',
+                                     '10:8', '1:1'],
+                      value = 'auto',
+                      description = 'Aspect Ratio: ',
+                      style = longdesc)
+    plot_aspect.observe(aspect_change, names = 'value')
+    plot_size = Dropdown(options = ['tiny', 'small', 'medium', 'large',
+                                    'huge'],
+                         value = 'large',
+                         description = 'Plot Size: ',
+                         style = longdesc,
+                         disabled = True)
     plot_template = Dropdown(options=['none','simple_white', 'ggplot2',
                                     'seaborn',
                                  'plotly', 'plotly_white', 'plotly_dark',
@@ -648,7 +710,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         description = 'Plot Styling: ',
                         style = longdesc)
     step5hbox1 =  HBox(children=[X_label, Y_label])
-    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template])
+    step5hbox2 =  HBox(children=[mirror_axes,mirror_ticks, plot_template,
+                                 plot_aspect, plot_size])
     step5 =  VBox(children=[step5instr, plot_title, step5hbox1, step5hbox2])
 
     # 4. Pick Fit Range(s)
@@ -733,15 +796,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
 
     def dofit_click(change):
         if JPSLUtils.notebookenv == 'NBClassic':
-            text = '\n# Force save widget states so that graph will still be\n'
-            text += '# available when notebook next opened in trusted state.\n'
-            text += 'import time\ntime.sleep(5)'
+            # Commented out do nothing because of timing issues
+            #text = '\n# Force save widget states so that graph will still be\n'
+            #text += '# available when notebook next opened in trusted state.\n'
+            #text += 'import time\ntime.sleep(5)'
             select_containing_cell('pandasfitGUI')
             select_cell_immediately_below()
-            insert_newline_at_end_of_current_cell(text)
-            jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
-            text = 'JPSLUtils.OTJS(\''+jscode+'\')'
-            insert_newline_at_end_of_current_cell(text)
+            #insert_newline_at_end_of_current_cell(text)
+            #jscode = 'Jupyter.actions.call("widgets:save-with-widgets");'
+            #text = 'JPSLUtils.OTJS(\''+jscode+'\')'
+            #insert_newline_at_end_of_current_cell(text)
             # run the cell to build the plot
             JPSLUtils.OTJS('Jupyter.notebook.get_selected_cell().execute()')
             # remove the GUI cell
@@ -789,10 +853,10 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step2str = '# Define error (uncertainty)\n'
             if yerrtype.value == 'none':
                 step2str += 'Yerr = ' + dfname + '[\"'
-                step2str += str(Ycoord.value) + '\"]*0 + 1\n\n'
+                step2str += str(Ycoord.value) + '\"]*0.0 + 1.0\n\n'
             if yerrtype.value=='constant':
                 step2str += 'Yerr = ' + dfname +'[\"'
-                step2str += str(Ycoord.value)+'\"]*0 + ' + str(
+                step2str += str(Ycoord.value)+'\"]*0.0 + ' + str(
                     yerrvalue.value) + '\n\n'
             if yerrtype.value == 'percent':
                 step2str += 'Yerr = np.fabs('+ dfname +'[\"'
@@ -861,22 +925,22 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                             'fit not displayed = np.nan\n'
                 for i in range(len(ranges)):
                     if i == 0 and ranges[0][0]>0:
-                        step4str += 'Yfiterr[0:'+str(ranges[0][0])+'] = ' \
-                                                                   'np.inf\n'
-                        step4str += 'Xfitdata[0:'+str(ranges[0][0])+\
-                                    '] = np.nan\n'
+                        step4str += 'Yfiterr[int(0):int('+str(ranges[0][0])+ \
+                                    ')] = np.inf\n'
+                        step4str += 'Xfitdata[int(0):int('+str(ranges[0][0])+\
+                                    ')] = np.nan\n'
                     if (i + 1) < len(ranges):
-                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
-                                    ':'+str(ranges[i+1][0])+'] = np.inf\n'
-                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+ \
-                                    ':'+str(ranges[i+1][0])+'] = np.nan\n'
+                        step4str += 'Yfiterr[int('+str(ranges[i][1]+1)+\
+                                    '):int('+str(ranges[i+1][0])+')] = np.inf\n'
+                        step4str += 'Xfitdata[int('+str(ranges[i][1]+1)+ \
+                                    '):int('+str(ranges[i+1][0])+')] = np.nan\n'
                     if i+1 == len(ranges):
-                        step4str += 'Yfiterr['+str(ranges[i][1]+1)+\
-                                    ':'+str(len(range_plot.data[0].marker.
-                                                color))+'] = np.inf\n'
-                        step4str += 'Xfitdata['+str(ranges[i][1]+1)+\
-                                ':'+str(len(range_plot.data[0].marker.
-                                            color))+'] = np.nan\n'
+                        step4str += 'Yfiterr[int('+str(ranges[i][1]+1)+\
+                                    '):int('+str(len(range_plot.data[0].marker.
+                                                color))+')] = np.inf\n'
+                        step4str += 'Xfitdata[int('+str(ranges[i][1]+1)+\
+                                '):int('+str(len(range_plot.data[0].marker.
+                                            color))+')] = np.nan\n'
                 step4str += '\n'
                 step4str += '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
@@ -892,7 +956,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             step4str += '#  does not calculate for all points under all ' \
                         'conditions\n'
             step4str += 'resid = []\n'
-            step4str += 'for i in range(0,len('+str(fitname)+'.data)):\n'
+            step4str += ('# explicit int(0) below avoids collisions with some '
+                         'preparsers.\n')
+            step4str += 'for i in range(int(0),len('+str(fitname)+'.data)):\n'
             step4str += '    resid.append('+str(fitname)+'.data[' \
                                         'i]-'+str(fitname)+'.best_fit[i])\n\n'
             pass
@@ -925,12 +991,44 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                         mirrorstr = ', mirror = \"ticks\"'
                 # the plot
                 step5str += '# Plot Results\n'
+                step5str += ('# explicit int(..) below avoids collisions with '
+                             'some preparsers.\n')
                 step5str += str(figname) + ' = go.FigureWidget(' \
                                     'layout_template=\"'+str(
                                     plot_template.value)+'\")\n'
                 step5str += str(figname)+ '.update_layout(title = \"'+ \
-                                    str(plot_title.value)+'\")\n'
-                step5str += str(figname) + '.set_subplots(rows=2, cols=1, ' \
+                                    str(plot_title.value)+'\",'
+                text = ''
+                if plot_aspect.value == 'auto':
+                    text += 'autosize=True)\n'
+                else:
+                    if plot_size.value == 'tiny':
+                        plot_width = 300
+                    elif plot_size.value == 'small':
+                        plot_width = 450
+                    elif plot_size.value == 'medium':
+                        plot_width = 800
+                    elif plot_size.value == 'large':
+                        plot_width = 1200
+                    elif plot_size.value == 'huge':
+                        plot_width = 2400
+                    if plot_aspect.value == '16:9':
+                        plot_height = int(9 * plot_width / 16)
+                    elif plot_aspect.value == '5:3':
+                        plot_height = int(3 * plot_width / 5)
+                    elif plot_aspect.value == '7:5':
+                        plot_height = int(5 * plot_width / 7)
+                    elif plot_aspect.value == '4:3':
+                        plot_height = int(3 * plot_width / 4)
+                    elif plot_aspect.value == '10:8':
+                        plot_height = int(8 * plot_width / 10)
+                    elif plot_aspect.value == '1:1':
+                        plot_height = plot_width
+                    text += 'autosize=False, width = int('
+                    text += str(plot_width) + '), height=int('
+                    text += str(plot_height) + '))\n'
+                step5str += text
+                step5str += str(figname) + '.set_subplots(rows=int(2), cols=int(1), ' \
                                            'row_heights=[0.2,0.8], ' \
                                            'shared_xaxes=True)\n'
                 step5str += 'scat = go.Scatter(y=resid,x='+xresidstr+', ' \
@@ -938,36 +1036,38 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'name = \"residuals\"'+errbarstr+')\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
                                         '\"Residuals\", ' \
-                            'row=1, col=1, zeroline=True, zerolinecolor = ' \
+                            'row=int(1), col=int(1), zeroline=True, zerolinecolor = ' \
                             '\"lightgrey\"'+str(mirrorstr)+')\n'
                 if mirror_axes.value:
                     step5str += str(figname) + '.update_xaxes(' \
-                                           'row=1, col=1'+str(mirrorstr)+')\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=1)\n'
+                                           'row=int(1), col=int(1)'+str(mirrorstr)+')\n'
+                step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(1))\n'
                 step5str += 'scat = go.Scatter(x=Xvals, y=Yvals, ' \
                             'mode=\"markers\", name=tracename'+errbarstr+')\n'
-                step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                           'row = 2)\n'
+                step5str += str(figname) + '.add_trace(scat, col=int(1), ' \
+                                           'row=int(2))\n'
                 step5str += str(figname) + '.update_yaxes(title = ' \
                                            '\"'+Y_label.value+'\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\n'
+                                           'row=int(2), col=int(1)'+str(mirrorstr)+')\n'
                 step5str += str(figname) + '.update_xaxes(title = ' \
                                            '\"'+X_label.value+'\", ' \
-                                           'row=2, col=1'+str(mirrorstr)+')\n'
+                                           'row=int(2), col=int(1)'+str(mirrorstr)+')\n'
                 if extend_fit.value:
                     step5str += 'scat = go.Scatter(y='+str(
                         fitname)+'.best_fit, x=Xvals, mode=\"lines\", '\
                                 'line_color = \"black\", ' \
                                 'name=\"extrapolated\",' \
                                  'line_dash=\"dash\")\n'
-                    step5str += str(figname) + '.add_trace(scat, col=1, ' \
-                                               'row=2)\n'
+                    step5str += str(figname) + '.add_trace(scat, col=int(1), ' \
+                                               'row=int(2))\n'
                 step5str += 'scat = go.Scatter(y='+str(fitname)+'.best_fit,' \
                                     'x='+xstr+', mode=\"lines\", ' \
                                     'name=\"fit\", line_color = ' \
                                     '\"black\", line_dash=\"solid\")\n'
-                step5str += str(figname) + '.add_trace(scat,col=1,row=2)\n'
-                step5str += str(figname) + '.show()\n\n'
+                step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(2))\n'
+                step5str += str(figname) + '.show(config = ' \
+                                            '{\'toImageButtonOptions\': {' \
+                                            '\'format\': \'svg\'}})\n\n'
                 pass
         if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
             df = friendly_to_object[whichframe.value]
