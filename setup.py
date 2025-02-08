@@ -23,6 +23,7 @@ setuptools.setup(
         'jupyterlab>=4.1.5',
         'pandas>=1.5.2',
         'numpy>=1.23.0',
+        'anywidget',
         'plotly>=5.5.0',
         'kaleido',
         'ipywidgets>=7.6.2',

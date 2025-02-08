@@ -136,6 +136,9 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.9.1 (2025-2-8)
+  * Added `anywidget` to requirements. Plotly now requires anywidget for 
+    FigureWidgets to work in Jupyter.
 * 0.9.0 (2024-3-31)
   * NEW Feature: plot and fit GUIs allow controlling aspect ratio and size 
     of figure.
