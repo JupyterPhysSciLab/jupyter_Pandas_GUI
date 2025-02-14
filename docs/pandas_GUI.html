@@ -63,7 +63,7 @@
     </ul>
 
 
-            <footer>jupyter_Pandas_GUI v0.9.1</footer>
+            <footer>jupyter_Pandas_GUI v0.9.2</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
             built with <span class="visually-hidden">pdoc</span><img
@@ -234,6 +234,12 @@ instructions.</p>
 <h2 id="change-log">Change Log</h2>
 
 <ul>
+<li>0.9.2 (2025-2-13)
+<ul>
+<li>BUG Fix: <code>plotly.FigureWidget.show()</code> had stopped working in Jupyter 
+with plotly 6.0.0 unless it is on the last line of a cell. Fit_GUI now 
+wraps it in <code>display(..)</code> to force display when not on last line.</li>
+</ul></li>
 <li>0.9.1 (2025-2-8)
 <ul>
 <li>Added <code>anywidget</code> to requirements. Plotly now requires anywidget for 

@@ -136,6 +136,10 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.9.2 (2025-2-13)
+  * BUG Fix: `plotly.FigureWidget.show()` had stopped working in Jupyter 
+    with plotly 6.0.0 unless it is on the last line of a cell. Fit_GUI now 
+    wraps it in `display(..)` to force display when not on last line.
 * 0.9.1 (2025-2-8)
   * Added `anywidget` to requirements. Plotly now requires anywidget for 
     FigureWidgets to work in Jupyter.
