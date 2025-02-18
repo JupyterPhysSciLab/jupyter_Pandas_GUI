@@ -136,6 +136,10 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.9.3 (2025-2-17)
+  * BUG Fix: Plot_GUI having intermittent failure to display the plot. 
+    Wrapping `plotly.FigureWidget.show()` in `display(..)` as was done in 
+    the Fit_GUI appears to fix.
 * 0.9.2 (2025-2-13)
   * BUG Fix: `plotly.FigureWidget.show()` had stopped working in Jupyter 
     with plotly 6.0.0 unless it is on the last line of a cell. Fit_GUI now 
