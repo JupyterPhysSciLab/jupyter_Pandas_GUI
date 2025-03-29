@@ -1,4 +1,5 @@
 import sys
+from curses.textpad import Textbox
 
 import numpy as np
 
@@ -105,7 +106,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         figname = str(fitname) + '_Figure'
 
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
-                 'GaussianModel','SineModel']
+                 'GaussianModel','SineModel', 'ExpressionModel']
     fitmodeleqns = {
     'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where $\color{'
                   r'red}{a}$ = slope, $\color{red}{b}$ = intercept',
@@ -124,7 +125,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                      r'\color{red}{\phi} \right)$, '
                      r'where $\color{red}{A}$ = ' \
                      r'amplitude, $\color{red}{f}$ = frequency, '\
-                     r'$\color{red}{\phi}$ = shift'
+                     r'$\color{red}{\phi}$ = shift',
+    'ExpressionModel':r''
     }
 
     def polymodelresultstr(resultname):
@@ -282,12 +284,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'display(HTML(captionstr))'
         return template.replace('%results', resultname)
 
+    def expressionmodelresultstr(resultname):
+        return ''
+
     fitresultstrs = {
     'LinearModel': linmodelresultstr,
     'PolynomialModel': polymodelresultstr,
     'ExponentialModel': expmodelresultstr,
     'GaussianModel': gausmodelresultstr,
-    'SineModel': sinmodelresultstr
+    'SineModel': sinmodelresultstr,
+    'ExpressionModel': expressionmodelresultstr
     }
 
     importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
@@ -522,6 +528,21 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     # get selected fit model and update parameters list.
     modeldrop = Dropdown(options=fitmodels)
     modeleqn = texLabel(value = fitmodeleqns[modeldrop.value])
+
+    def expressionmodel_def_box():
+        '''
+        This defines an VBox with an input for the expression and the
+        independent variables
+        '''
+        exprinp = Text(value='',
+                       placeholder='Input expression to fit to',
+                       description='fit = ')
+        indpenvars = Text(value='',
+                          description="Indpendent variables: ",
+                          placeholder='a, b, c',
+                          style=longdesc)
+        return VBox(children=[exprinp, indpenvars])
+
     def getcurrmodel_param(modelname, params_set):
         '''
         Using the model name return ipywidgets for setting the fit 
@@ -531,7 +552,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             guesses and constraints.
         :return VBox: params_set with fields reset and those available visible.
         '''
-        currmodel = getattr(models,modelname)()
+        currmodel = None
+        if modelname == 'ExpressionModel':
+            currmodel = getattr(models,modelname)('x')
+        else:
+            currmodel = getattr(models,modelname)()
         currmodel_param = []
         labeltext = ''
         fix = False
@@ -632,13 +657,21 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         return params_set
 
     def modeldrop_change(change):
-        modeleqn.value=fitmodeleqns[modeldrop.value]
+        if modeldrop.value == 'ExpressionModel':
+            modeleqn = expressionmodel_def_box()
+        else:
+            modeleqn.value=fitmodeleqns[modeldrop.value]
         getcurrmodel_param(modeldrop.value,params_set)
         pass
     modeldrop.observe(modeldrop_change, names = 'value')
     params_set = make_param_set()
     getcurrmodel_param(modeldrop.value, params_set)
-    step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
+    expr_def = expressionmodel_def_box()
+    if modeldrop.value == 'ExpressionModel':
+        step3 = VBox(children=[step3instracc, HBox(children=[modeldrop, expr_def]),
+                               params_set])
+    else:
+        step3 =  VBox(children=[step3instracc, HBox(children=[modeldrop,modeleqn]),params_set])
 
     # 5.Title, Axes, Format ...
     step5instr = richLabel(value = '<ul><li><span '
