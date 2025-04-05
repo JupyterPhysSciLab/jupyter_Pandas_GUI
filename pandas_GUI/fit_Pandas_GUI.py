@@ -107,26 +107,27 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
                  'GaussianModel','SineModel', 'OffsetExpModel']
     fitmodeleqns = {
-    'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where $\color{'
+    'LinearModel':r'$fit ={\color{red}{a}}x+{\color{red}{b}}$, where $\color{'
                   r'red}{a}$ = slope, $\color{red}{b}$ = intercept',
-    'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{\color{red}{c_n}x^n} = '
+    'PolynomialModel': r'$fit = \sum_{n=0}^{\le7}{{\color{red}{c_n}}x^n} = '
                        r'\color{red}{c_0} + \color{red}{c_1}x + \color{red}{'
                        r'c_2}x^2 + ...$',
-    'ExponentialModel': r'$fit = \color{red}{A} \exp \left( \frac{-x} ' \
-                        r'{\color{red}{\tau}}\right)$, where $\color{red}{A}$ '
+    'ExponentialModel': r'$fit ={\color{red}{A}} {\exp \left( \frac{-x} ' \
+                        r'{\color{red}{\tau}}\right)}$, where $\color{red}{A}$ '
                         r'= amplitude, $ \color{red}{\tau}$ = decay',
-    'GaussianModel': r'$fit = \frac{\color{red}{A}}{\color{red}{\sigma} ' \
-                     r'\sqrt{2 \pi}} \exp \left( \frac{-(x-\color{red}' \
+    'GaussianModel': r'$fit = \frac{{\color{red}{A}}}{{\color{red}{\sigma}}' \
+                     r'\sqrt{2 \pi}} \exp \left( \frac{-(x-{\color{red}}' \
                      r'{\mu})^2}{2 \color{red}{\sigma}^2} \right)$, where ' \
                      r'$\color{red}{A}$ = amplitude, $\color{red}{\sigma}$ = sigma, '
                      r'$\color{red}{\mu}$ = center',
-        'SineModel': r'$fit = \color{red}{A} \sin \left ( \color{red}{f}x + '
-                     r'\color{red}{\phi} \right)$, '
+        'SineModel': r'$fit = {\color{red}{A}} \sin \left ({\color{red}{f}}x+' \
+                     r'{\color{red}{\phi}} \right)$, '
                      r'where $\color{red}{A}$ = ' \
                      r'amplitude, $\color{red}{f}$ = frequency, '\
                      r'$\color{red}{\phi}$ = shift',
-    'OffsetExpModel': r'$fit = \color{red}{B} + color{red}{A} \exp \left( '\
-                      r'\frac{-x} {\color{red}{\tau}}\right)$, '\
+    'OffsetExpModel': r'$fit = {\color{red}{B}} + {\color{red}{A}}{\exp ' \
+                      r'\left( '\
+                      r'\frac{-x} {\color{red}{\tau}}\right)}$, '\
                       r'where $\color{red}{B}$ = offset, $\color{red}{A}$ '
                       r'= amplitude, $ \color{red}{\tau}$ = decay',
     }
@@ -308,9 +309,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         '        decaystr = paramstr\n' \
         '    if k == \'offset\':\n' \
         '        offsetstr = paramstr\n' \
-        ('fitstr = r\'$$fit = \'+offsetstr+r\'+\'+ampstr+r\'%EXP ' \
-                      r'%LEFT(%FRAC{-x}') \
-                        '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
+        'fitstr = r\'$$fit = \'+offsetstr+r\'+\'+ampstr+r\'%EXP ' \
+                      r'%LEFT(%FRAC{-x}' \
+                      '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
         'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\n' \
         'display(Math(fitstr))\n' \
