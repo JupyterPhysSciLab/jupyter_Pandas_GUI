@@ -105,7 +105,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         figname = str(fitname) + '_Figure'
 
     fitmodels = ['LinearModel','PolynomialModel','ExponentialModel',
-                 'GaussianModel','SineModel']
+                 'GaussianModel','SineModel', 'OffsetExpModel']
     fitmodeleqns = {
     'LinearModel':r'$fit = \color{red}{a}x+\color{red}{b}$, where $\color{'
                   r'red}{a}$ = slope, $\color{red}{b}$ = intercept',
@@ -124,7 +124,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                      r'\color{red}{\phi} \right)$, '
                      r'where $\color{red}{A}$ = ' \
                      r'amplitude, $\color{red}{f}$ = frequency, '\
-                     r'$\color{red}{\phi}$ = shift'
+                     r'$\color{red}{\phi}$ = shift',
+    'OffsetExpModel': r'$fit = \color{red}{B} + color{red}{A} \exp \left( '\
+                      r'\frac{-x} {\color{red}{\tau}}\right)$, '\
+                      r'where $\color{red}{B}$ = offset, $\color{red}{A}$ '
+                      r'= amplitude, $ \color{red}{\tau}$ = decay',
     }
 
     def polymodelresultstr(resultname):
@@ -282,12 +286,44 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
        'display(HTML(captionstr))'
         return template.replace('%results', resultname)
 
+    def offsetexpmodelresultstr(resultname):
+        template = '' \
+        'offsetstr = ''\'\'\n' \
+        'ampstr = ''\'\'\n' \
+        'decaystr = ''\'\'\n' \
+        'for k in %results.params.keys():\n' \
+        '    if %results.params[k].vary:\n' \
+        '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
+        '%results.params[k].value,\n' \
+        '                                 %results.params[k].stderr,\n' \
+        '                                 errdig=int(1),\n' \
+        '                                 lowmag=-int(3))+\'}})\'\n' \
+        '    else:\n' \
+        '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
+                                               'k].value, \n' \
+        '                                       )+\'}}\'\n' \
+        '    if k == \'amplitude\':\n' \
+        '        ampstr = paramstr\n' \
+        '    if k == \'decay\':\n' \
+        '        decaystr = paramstr\n' \
+        '    if k == \'offset\':\n' \
+        '        offsetstr = paramstr\n' \
+        ('fitstr = r\'$$fit = \'+offsetstr+r\'+\'+ampstr+r\'%EXP ' \
+                      r'%LEFT(%FRAC{-x}') \
+                        '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
+        'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
+        'last line of a code cell for more details.</p>\'\n' \
+        'display(Math(fitstr))\n' \
+        'display(HTML(captionstr))'
+        return template.replace('%results',resultname)
+
     fitresultstrs = {
     'LinearModel': linmodelresultstr,
     'PolynomialModel': polymodelresultstr,
     'ExponentialModel': expmodelresultstr,
     'GaussianModel': gausmodelresultstr,
-    'SineModel': sinmodelresultstr
+    'SineModel': sinmodelresultstr,
+    'OffsetExpModel': offsetexpmodelresultstr
     }
 
     importstr = '# CODE BLOCK generated using fit_pandas_GUI().\n# See '\
