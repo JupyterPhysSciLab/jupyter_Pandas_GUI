@@ -583,8 +583,9 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         min = -sys.float_info.max
         max = sys.float_info.max
         expr = None  # Not used, maybe for arbitrary functions.
-        if hasattr(currmodel,'guess') and (whichframe.value!='Choose data '
-                                                             'set.'):
+        if hasattr(currmodel,'guess') and (modelname !='PolynomialModel') and (
+                modelname != 'SineModel') and (
+                whichframe.value != 'Choose data set.'):
             df = friendly_to_object[whichframe.value]
             xvals = df[Xcoord.value]
             yvals = df[Ycoord.value]
@@ -606,25 +607,6 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     max = hints.get('max', sys.float_info.max)
                     expr = hints.get('expr',None)
                 params_set.children[i].layout.display=''
-                if modelname == 'ExponentialModel':
-                    df = friendly_to_object[whichframe.value]
-                    xvals = df[Xcoord.value]
-                    yvals = df[Ycoord.value]
-                    if labeltext == 'amplitude':
-                        value = np.mean(yvals)
-                    if labeltext == 'decay':
-                        value = (np.max(xvals) - np.min(xvals))/3.0
-                if modelname == 'GaussianModel':
-                    df = friendly_to_object[whichframe.value]
-                    xvals = df[Xcoord.value]
-                    yvals = df[Ycoord.value]
-                    if labeltext == 'amplitude':
-                        value = np.max(yvals)
-                    if labeltext == 'sigma':
-                        value = 1.0
-                    if labeltext == 'center':
-                        maxidx = np.argmax(yvals)
-                        value = xvals[maxidx]
                 if modelname == 'SineModel':
                     df = friendly_to_object[whichframe.value]
                     xvals = df[Xcoord.value]
@@ -632,7 +614,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                     if labeltext == 'amplitude':
                         value = np.max(yvals)
                     if labeltext == 'frequency':
-                        # Looking for the most prominent frequency component 
+                        # Looking for the most prominent frequency component
                         # to fit.
                         temprange = np.max(xvals) - np.min(xvals)
                         npts = len(xvals)
