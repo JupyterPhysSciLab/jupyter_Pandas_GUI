@@ -125,11 +125,11 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                      r'where $\color{red}{A}$ = ' \
                      r'amplitude, $\color{red}{f}$ = frequency, '\
                      r'$\color{red}{\phi}$ = shift',
-    'OffsetExpModel': r'$fit = {\color{red}{B}} + {\color{red}{A}}{\exp ' \
+    'OffsetExpModel': r'$fit = {\color{red}{y_o}} + {\color{red}{A}}{\exp ' \
                       r'\left( '\
-                      r'\frac{-x - {\color{red}{x_o}}} ' \
+                      r'\frac{-(x - {\color{red}{x_o}})} ' \
                       r'{\color{red}{\tau}}\right)}$, '\
-                      r'where $\color{red}{B}$ = y-offset, $\color{red}{A}$ '
+                      r'where $\color{red}{y_o}$ = y-offset, $\color{red}{A}$ '
                       r'= amplitude, $\color{red}{x_o}$ = x-offset, ' \
                       r'$\color{red}{\tau}$ = decay',
     }
@@ -290,10 +290,16 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         return template.replace('%results', resultname)
 
     def offsetexpmodelresultstr(resultname):
-        template = '' \
-        'offsetstr = ''\'\'\n' \
-        'ampstr = ''\'\'\n' \
-        'decaystr = ''\'\'\n' \
+        from .custom_fit_models import OffsetExpModel
+        import sympy as sp
+        # overrides immediately below not necessary for this function
+        #  but for a generic function might be necessary
+        sp.I = sp.Symbol('I') # override of sqrt(-1) sorthand
+        sp.E = sp.Symbol('E') # override of exp(1) shorthand
+        spexpr = sp.sympify(OffsetExpModel().expr)
+        rawlatex = sp.latex(spexpr)
+        template = 'rawlatex = r\''+rawlatex+'\' # via sympy\n' \
+        'from sympy import sympify, latex\n' \
         'for k in %results.params.keys():\n' \
         '    if %results.params[k].vary:\n' \
         '        paramstr = r\'({%COLOR{red}{\'+rue.latex_rndwitherr(' \
@@ -305,15 +311,8 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         '        paramstr = r\'{%COLOR{blue}{\'+str(%results.params[' \
                                                'k].value, \n' \
         '                                       )+\'}}\'\n' \
-        '    if k == \'amplitude\':\n' \
-        '        ampstr = paramstr\n' \
-        '    if k == \'decay\':\n' \
-        '        decaystr = paramstr\n' \
-        '    if k == \'offset\':\n' \
-        '        offsetstr = paramstr\n' \
-        'fitstr = r\'$$fit = \'+offsetstr+r\'+\'+ampstr+r\'%EXP ' \
-                      r'%LEFT(%FRAC{-x}' \
-                      '{\'+decaystr+r\'}%RIGHT)$$\'\n' \
+        '    rawlatex = rawlatex.replace(latex(sympify(k)),paramstr)\n' \
+        'fitstr = r\'$$fit = \'+rawlatex+\'$$\'\n' \
         'captionstr = r\'<p>Use the command <code>%results</code> as the ' \
         'last line of a code cell for more details.</p>\'\n' \
         'display(Math(fitstr))\n' \
@@ -336,6 +335,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 '# Imports (no effect if already imported)\n' \
                 'import numpy as np\n' \
                 'import lmfit as lmfit\n' \
+                'from pandas_GUI import custom_fit_models\n' \
                 'import round_using_error as rue\n' \
                 'import copy as copy\n' \
                 'from plotly import graph_objects as go\n' \
@@ -570,7 +570,12 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             guesses and constraints.
         :return VBox: params_set with fields reset and those available visible.
         '''
-        currmodel = getattr(models,modelname)()
+        currmodel = None
+        try:
+            currmodel = getattr(models,modelname)()
+        except:
+            import pandas_GUI.custom_fit_models as custfitmod
+            currmodel = getattr(custfitmod, modelname)()
         currmodel_param = []
         labeltext = ''
         fix = False
@@ -578,6 +583,17 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
         min = -sys.float_info.max
         max = sys.float_info.max
         expr = None  # Not used, maybe for arbitrary functions.
+        if hasattr(currmodel,'guess') and (whichframe.value!='Choose data '
+                                                             'set.'):
+            df = friendly_to_object[whichframe.value]
+            xvals = df[Xcoord.value]
+            yvals = df[Ycoord.value]
+            try:
+                pars = currmodel.guess(yvals,xvals)
+                for k in pars:
+                    currmodel.set_param_hint(k,value = pars[k].value)
+            except NotImplementedError:
+                pass
         for i in range(0,8):
             fix = False
             if i < len(currmodel.param_names):
@@ -909,8 +925,17 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
             # update step 3 string
             step3str = '# Define the fit model, initial guesses, ' \
                        'and constraints\n'
-            step3str += 'fitmod = lmfit.models.'+str(modeldrop.value)+'()\n'
-            currmodel = getattr(models, str(modeldrop.value))()
+            currmodel = None
+            modelname = modeldrop.value
+            try:
+                currmodel = getattr(models, modelname)()
+                step3str += 'fitmod = lmfit.models.'
+                step3str += str(modeldrop.value) + '()\n'
+            except:
+                import pandas_GUI.custom_fit_models as custfitmod
+                currmodel = getattr(custfitmod, modelname)()
+                step3str += 'fitmod = custom_fit_models.'
+                step3str += str(modeldrop.value)+'()\n'
             for k in params_set.children:
                 param_name = str(k.children[0].value.split(':')[0])
                 if param_name in currmodel.param_names:
@@ -1104,9 +1129,7 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                                     'name=\"fit\", line_color = ' \
                                     '\"black\", line_dash=\"solid\")\n'
                 step5str += str(figname) + '.add_trace(scat,col=int(1),row=int(2))\n'
-                step5str += 'display('+str(figname) + '.show(config = ' \
-                                            '{\'toImageButtonOptions\': {' \
-                                            '\'format\': \'svg\'}}))\n\n'
+                step5str += 'display('+str(figname)+')\n\n'
                 pass
         if change['new'] == 3 and JPSLUtils.notebookenv != 'colab':
             df = friendly_to_object[whichframe.value]
