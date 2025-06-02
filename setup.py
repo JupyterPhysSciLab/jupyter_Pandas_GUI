@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="jupyter_Pandas_GUI",
-    version="0.9.3",
+    version="0.10.0",
     description="Pandas expression composers using Jupyter widgets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -20,16 +20,17 @@ setuptools.setup(
     install_requires=[
         # 'python>=3.6',
         'jupyter>=1.0.0',
-        'jupyterlab>=4.1.5',
+        'jupyterlab>=4.4.3',
         'pandas>=1.5.2',
         'numpy>=1.23.0',
         'anywidget',
-        'plotly>=5.5.0',
+        'plotly>=6.0.0',
         'kaleido',
-        'ipywidgets>=7.6.2',
+        'ipywidgets>=8.1.7',
         'JPSLUtils>=0.7.0',
         'lmfit>=1.1.0',
         'round-using-error>=1.2.0',
+        'sympy>=1.13'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
