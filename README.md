@@ -51,7 +51,9 @@ understand the code.
   <img src = "https://jupyterphysscilab.github.io/jupyter_Pandas_GUI/DataSets/plot_GUI.png" style="width:90%;"/>
   
 * `fit_pandas_GUI()`: A GUI with six steps to lead the user through fitting 
-  Pandas data to a line, polynomial, exponential, Gaussian or sine function.
+  Pandas data to a line, polynomial, simple exponential decay, exponential 
+  decay from an initial value to final value with an x-offset for the 
+  beginning of the decay, Gaussian or sine function.
   **Selecting regions of the data set to fit does NOT currently
   work in Colab**.
 
@@ -136,6 +138,14 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.10.0 (2025-6-1)
+  * BUG Fix: fixes to coloring in fitmodel equations.
+  * NEW Feature: OffsetExp fit (exponential decay from one value to another, 
+    with an x-offset for start of decay).
+  * NEW Feature: Using built in lmfit intial guesses where possible.
+  * Added `Sympy` to requirements to support generating LaTex equations from 
+    Python expressions.
+  * Updated dependency versions.
 * 0.9.3 (2025-2-17)
   * BUG Fix: Plot_GUI having intermittent failure to display the plot. 
     Wrapping `plotly.FigureWidget.show()` in `display(..)` as was done in 
