@@ -30,7 +30,7 @@ setuptools.setup(
         'JPSLUtils>=0.7.0',
         'lmfit>=1.1.0',
         'round-using-error>=1.2.0',
-        'sympy>=1.13'
+        'sympy'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
