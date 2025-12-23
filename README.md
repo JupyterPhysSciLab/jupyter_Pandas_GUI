@@ -144,7 +144,7 @@ instructions.
   * BUG Fix: replaced `1/Yfiterr` and `1/Yerr` with `1.0/...` (issue 25).
   * Set requirements to accept any version of Sympy, as the parsing we 
     intend to use seems good going way back in versions. This way we are 
-    less likely to cause problems for other packages. (issue )
+    less likely to cause problems for other packages. (issue 27)
 * 0.10.0 (2025-6-1)
   * BUG Fix: fixes to coloring in fitmodel equations.
   * NEW Feature: OffsetExp fit (exponential decay from one value to another, 
