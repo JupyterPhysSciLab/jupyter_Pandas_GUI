@@ -138,7 +138,7 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
-* 0.10.1 (2026-12-23)
+* 0.10.1 (2025-12-23)
   * BUG Fix: removed .show in favor of display to avoid clobbering LaTex 
     rendering (issue 24).
   * BUG Fix: replaced `1/Yfiterr` and `1/Yerr` with `1.0/...` (issue 25).
