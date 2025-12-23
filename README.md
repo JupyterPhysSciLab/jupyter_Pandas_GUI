@@ -138,6 +138,9 @@ install -e ../jupyter_Pandas_GUI` in the _Production_
 instructions.
 
 ## Change Log
+* 0.10.1dev (2026-12-XX)
+  * BUG Fix: removed .show in favor of display to avoid clobbering LaTex 
+    rendering (issue 24).
 * 0.10.0 (2025-6-1)
   * BUG Fix: fixes to coloring in fitmodel equations.
   * NEW Feature: OffsetExp fit (exponential decay from one value to another, 
