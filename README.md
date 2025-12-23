@@ -141,6 +141,7 @@ instructions.
 * 0.10.1dev (2026-12-XX)
   * BUG Fix: removed .show in favor of display to avoid clobbering LaTex 
     rendering (issue 24).
+  * BUG Fix: replaced `1/Yfiterr` and `1/Yerr` with `1.0/...` (issue 25).
 * 0.10.0 (2025-6-1)
   * BUG Fix: fixes to coloring in fitmodel equations.
   * NEW Feature: OffsetExp fit (exponential decay from one value to another, 

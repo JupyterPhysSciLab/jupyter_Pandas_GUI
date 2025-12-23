@@ -990,13 +990,13 @@ def fit_pandas_GUI(df_info=None, show_text_col = False, **kwargs):
                 step4str += '\n'
                 step4str += '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
-                    'weights = 1/Yfiterr, scale_covar = '+covscalestr+', ' \
+                    'weights = 1.0/Yfiterr, scale_covar = '+covscalestr+', ' \
                     'nan_policy = \"omit\")\n\n'
             else:
                 range_chosen = False
                 step4str = '# Do fit\n'
                 step4str += str(fitname)+' = fitmod.fit(Yvals, x=Xvals, ' \
-                    'weights = 1/Yerr, scale_covar = '+covscalestr+', ' \
+                    'weights = 1.0/Yerr, scale_covar = '+covscalestr+', ' \
                     'nan_policy = \"omit\")\n\n'
             step4str += '# Calculate residuals (data - fit) because lmfit\n'
             step4str += '#  does not calculate for all points under all ' \
